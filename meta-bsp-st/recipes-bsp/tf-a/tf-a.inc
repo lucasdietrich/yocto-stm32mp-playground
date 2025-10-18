@@ -17,6 +17,9 @@ DEPENDS = "gcc-arm-none-eabi-native dtc-native"
 
 TFA_DEVICETREE ??= "stm32mp157c-dk2"
 
+PACKAGECONFIG ??= "debug"
+PACKAGECONFIG[debug] = "DEBUG=1,"
+
 #
 # Instructions to build the TF-A for STM32MP1
 #
@@ -24,29 +27,35 @@ TFA_DEVICETREE ??= "stm32mp157c-dk2"
 #     unset LDFLAGS && unset CFLAGS && unset CPPFLAGS && \
 #     make CROSS_COMPILE=arm-none-eabi- \
 #     STM32MP_SDMMC=1 \
-#     PLAT=stm32mp1 \ARCH=aarch32 ARM_ARCH_MAJOR=7 \
+#     PLAT=stm32mp1 \
+#     ARCH=aarch32 ARM_ARCH_MAJOR=7 \
 #     DTB_FILE_NAME=stm32mp157c-dk2.dtb \
 #     LOG_LEVEL=40 \
 #     -j16
 EXTRA_OEMAKE = "CROSS_COMPILE=arm-none-eabi-"
-
-# Fixes issue: unrecognized option '-Wl,-O1'
-EXTRA_OEMAKE += "LDFLAGS="
 
 EXTRA_OEMAKE += "STM32MP_SDMMC=1"
 EXTRA_OEMAKE += "PLAT=stm32mp1"
 EXTRA_OEMAKE += "ARCH=aarch32"
 EXTRA_OEMAKE += "ARM_ARCH_MAJOR=7"
 EXTRA_OEMAKE += "DTB_FILE_NAME=${TFA_DEVICETREE}.dtb"
+EXTRA_OEMAKE += "LOG_LEVEL=40"
 
-EXTRA_OEMAKE += "DEBUG=0"
-# EXTRA_OEMAKE += "LOG_LEVEL=40"
+EXTRA_OEMAKE += "${PACKAGECONFIG_CONFARGS}"
+
+do_compile:prepend() {
+    # Fixes issue: unrecognized option '-Wl,-O1'
+    unset LDFLAGS
+    unset CFLAGS
+    unset CPPFLAGS
+}
 
 inherit deploy
 
 do_deploy() {
     mkdir -p ${DEPLOYDIR}/tf-a
-    cp ${S}/build/stm32mp1/release/tf-a-${TFA_DEVICETREE}.stm32 ${DEPLOYDIR}/tf-a/
+    dirname="${@bb.utils.contains('PACKAGECONFIG', 'debug', 'debug', 'release', d)}"
+    cp ${S}/build/stm32mp1/${dirname}/tf-a-${TFA_DEVICETREE}.stm32 ${DEPLOYDIR}/tf-a/
 }
 
 addtask do_deploy after do_install

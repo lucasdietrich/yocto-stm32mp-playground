@@ -43,6 +43,9 @@ do_sdimage() {
     mkdir -p ${WORKDIR}/genimage/tmp ${WORKDIR}/genimage/root ${WORKDIR}/genimage/input
     ln -sf ${DEPLOY_DIR_IMAGE}/tf-a/* ${WORKDIR}/genimage/input/
 
+    # clean up existing .img files
+    rm -f ${IMGDEPLOYDIR}/*.img ${IMGDEPLOYDIR}/*.img.gz
+
     genimage \
         --config ${WORKDIR}/sdcard_genimage.cfg \
         --root ${WORKDIR}/genimage/root \
