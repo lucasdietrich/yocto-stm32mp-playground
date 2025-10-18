@@ -7,14 +7,14 @@ image @IMAGE@-@MACHINE@-sdcard.img {
     # > On STM32MP13x lines and STM32MP15x lines, it locates two FSBLs by 
     # > looking for the two first GPT entries of which the name begins with "fsbl".
 	partition fsbl1 {
-        image = "tf-a-stm32mp157c-dk2.stm32"
+        image = "tf-a-@TFA_DEVICETREE@.stm32"
 
         # SYSRAM size is 256K on STM32MP1
         size = 256K
 	}
 
 	partition fsbl2 {
-        image = "tf-a-stm32mp157c-dk2.stm32"
+        image = "tf-a-@TFA_DEVICETREE@.stm32"
         size = 256K
 	}
 }

@@ -13,6 +13,8 @@ TOOLCHAIN_HOST_TASK += "\
     nativesdk-dtc \
     "
 
+EXTRA_IMAGEDEPENDS += "virtual/tf-a"
+
 #########################
 # Create a sdcard image #
 #########################
@@ -27,7 +29,7 @@ SRC_URI += "file://sdcard_genimage.cfg.in"
 
 DEPENDS += "genimage-native"
 
-do_sdimage[depends] += "tf-a:do_deploy"
+do_sdimage[depends] += "virtual/tf-a:do_deploy"
 addtask do_sdimage after do_image_ext4 before do_image_complete
 
 do_sdimage() {
@@ -35,6 +37,7 @@ do_sdimage() {
 
     sed -e "s|@IMAGE@|${IMAGE_BASENAME}|g" \
         -e "s|@MACHINE@|${MACHINE}|g" \
+        -e "s|@TFA_DEVICETREE@|${TFA_DEVICETREE}|g" \
         ${WORKDIR}/sdcard_genimage.cfg.in > ${WORKDIR}/sdcard_genimage.cfg
 
     mkdir -p ${WORKDIR}/genimage/tmp ${WORKDIR}/genimage/root ${WORKDIR}/genimage/input
