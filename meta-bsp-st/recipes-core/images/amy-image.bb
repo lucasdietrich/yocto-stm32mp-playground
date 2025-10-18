@@ -46,5 +46,8 @@ do_sdimage() {
         --tmppath ${WORKDIR}/genimage/tmp \
         --inputpath ${WORKDIR}/genimage/input \
         --outputpath ${IMGDEPLOYDIR}
+
+    gzip -k -9 ${IMGDEPLOYDIR}/*.img
+
     cp ${WORKDIR}/sdcard_genimage.cfg ${IMGDEPLOYDIR}
 }
