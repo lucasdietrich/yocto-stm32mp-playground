@@ -1,0 +1,10 @@
+{
+    "search.exclude": {
+        "build/**": true,
+        "./build/conf/**": false,
+    },
+    "files.associations": {
+        "*.inc": "bitbake",
+        "*.conf": "bitbake"
+    }
+}
