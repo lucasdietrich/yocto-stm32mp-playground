@@ -1,0 +1,2 @@
+flash:
+    ./scripts/flash.sh

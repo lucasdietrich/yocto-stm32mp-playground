@@ -17,4 +17,28 @@ image @IMAGE@-@MACHINE@-sdcard.img {
         image = "tf-a-@TFA_DEVICETREE@.stm32"
         size = 256K
 	}
+
+    partition tee-header {
+        image = "tee-header_v2.bin"
+        size = 4K
+    }
+
+    partition tee-pager {
+        image = "tee-pager_v2.bin"
+        size = 256K
+    }
+
+    partition tee-pageable {
+        image = "tee-pageable_v2.bin"
+        size = 1M
+    }
+
+    partition u-boot {
+        image = "u-boot.bin"
+        size = 4M
+    }
+
+    partition u-boot-env {
+        size = 128K
+    }
 }

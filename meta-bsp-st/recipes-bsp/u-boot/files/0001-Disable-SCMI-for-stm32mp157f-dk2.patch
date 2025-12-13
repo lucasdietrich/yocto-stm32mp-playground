@@ -1,0 +1,72 @@
+From 9a877811f55e51fbf815d338e9137ebd9a0573e4 Mon Sep 17 00:00:00 2001
+From: Lucas Dietrich <lucas.dietrich.git@proton.me>
+Date: Sat, 13 Dec 2025 18:32:52 +0100
+Subject: [PATCH] Disable SCMI for stm32mp157f-dk2
+
+---
+ dts/upstream/src/arm/st/stm32mp157f-dk2.dts | 20 +++++++++++---------
+ 1 file changed, 11 insertions(+), 9 deletions(-)
+
+diff --git a/dts/upstream/src/arm/st/stm32mp157f-dk2.dts b/dts/upstream/src/arm/st/stm32mp157f-dk2.dts
+index 43375c4d62a..c8470faa0c8 100644
+--- a/dts/upstream/src/arm/st/stm32mp157f-dk2.dts
++++ b/dts/upstream/src/arm/st/stm32mp157f-dk2.dts
+@@ -11,7 +11,7 @@
+ #include "stm32mp15-pinctrl.dtsi"
+ #include "stm32mp15xxac-pinctrl.dtsi"
+ #include "stm32mp15xx-dkx.dtsi"
+-#include "stm32mp157f-dk2-scmi.dtsi"
++#include "stm32mp15-u-boot.dtsi"
+ 
+ / {
+ 	model = "STMicroelectronics STM32MP157F-DK2 Discovery Board";
+@@ -30,11 +30,13 @@
+ 		compatible = "mmc-pwrseq-simple";
+ 		reset-gpios = <&gpioh 4 GPIO_ACTIVE_LOW>;
+ 	};
+-};
+ 
+-&arm_wdt {
+-	timeout-sec = <32>;
+-	status = "okay";
++	reserved-memory {
++		optee@de000000 {
++			reg = <0xde000000 0x2000000>;
++			no-map;
++		};
++	};
+ };
+ 
+ &cryp1 {
+@@ -50,7 +52,7 @@
+ 		compatible = "orisetech,otm8009a";
+ 		reg = <0>;
+ 		reset-gpios = <&gpioe 4 GPIO_ACTIVE_LOW>;
+-		power-supply = <&scmi_v3v3>;
++		power-supply = <&v3v3>;
+ 		status = "okay";
+ 
+ 		port {
+@@ -132,7 +134,7 @@
+ 	cap-sdio-irq;
+ 	st,neg-edge;
+ 	bus-width = <4>;
+-	vmmc-supply = <&scmi_v3v3>;
++	vmmc-supply = <&v3v3>;
+ 	mmc-pwrseq = <&wifi_pwrseq>;
+ 	#address-cells = <1>;
+ 	#size-cells = <0>;
+@@ -159,8 +161,8 @@
+ 		shutdown-gpios = <&gpioz 6 GPIO_ACTIVE_HIGH>;
+ 		compatible = "brcm,bcm43438-bt";
+ 		max-speed = <3000000>;
+-		vbat-supply = <&scmi_v3v3>;
+-		vddio-supply = <&scmi_v3v3>;
++		vbat-supply = <&v3v3>;
++		vddio-supply = <&v3v3>;
+ 	};
+ };
+ 
+-- 
+2.39.5
+

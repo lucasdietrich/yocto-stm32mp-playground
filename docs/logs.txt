@@ -1,0 +1,114 @@
+NOTICE:  CPU: STM32MP157FAC Rev.Z
+NOTICE:  Model: STMicroelectronics STM32MP157F-DK2 Discovery Board
+NOTICE:  Board: MB1272 Var4.0 Rev.C-02
+INFO:    PMIC version = 0x20
+INFO:    Reset reason (0x14):
+INFO:      Pad Reset from NRST
+INFO:    FCONF: Reading FW_CONFIG firmware configuration file from: 0x2ffe2000
+INFO:    FCONF: Reading firmware configuration information for: dyn_cfg
+INFO:    FCONF: Reading firmware configuration information for: stm32mp1_firewall
+INFO:    FCONF: Reading TB_FW firmware configuration file from: 0x2ffe2000
+INFO:    FCONF: Reading firmware configuration information for: stm32mp_fuse
+INFO:    Using SDMMC
+INFO:      Instance 1
+INFO:    Boot used partition fsbl1
+NOTICE:  BL2: v2.10-stm32mp1-r2.0(debug):lts-v2.10.13-dirty(b1f57509)
+NOTICE:  BL2: Built : 17:10:59, Feb 14 2025
+INFO:    BL2: Doing platform setup
+INFO:    RAM: DDR3-DDR3L 16bits 533000kHz
+INFO:    Memory size = 0x20000000 (512 MB)
+INFO:    Partition 'tee-header' found at offset 0x84400 (size 0x1000)
+INFO:    Partition 'tee-pager' found at offset 0x85400 (size 0x40000)
+INFO:    Partition 'tee-pageable' found at offset 0xc5400 (size 0x100000)
+INFO:    Partition 'u-boot' found at offset 0x1c5400 (size 0x400000)
+INFO:    OP-TEE header size updated to 0x2c
+INFO:    OP-TEE header partition found at offset 0x84400 (size 0x1000)
+INFO:    BL2: Loading image id 4
+INFO:    Loading image id=4 at address 0xc0000000
+INFO:    Image id=4 loaded: 0xc0000000 - 0xc000002c
+INFO:    OP-TEE header detected
+INFO:    OPTEE ep=0xc0000000
+INFO:    OPTEE header info:
+INFO:          magic=0x4554504f
+INFO:          version=0x2
+INFO:          arch=0x0
+INFO:          flags=0x0
+INFO:          nb_images=0x2
+INFO:    OP-TEE pc: 0x2ffc0000 arg0: 0xde000000 arg1: 0x0 arg2: 0x0
+INFO:    BL2: Loading image id 8
+INFO:    Loading image id=8 at address 0x2ffc0000
+INFO:    Image id=8 loaded: 0x2ffc0000 - 0x2ffd95f0
+INFO:    BL2: Loading image id 9
+INFO:    Loading image id=9 at address 0xde000000
+INFO:    Image id=9 loaded: 0xde000000 - 0xde06b000
+INFO:    BL2: Loading image id 5
+INFO:    Loading image id=5 at address 0xc0100000
+INFO:    Image id=5 loaded: 0xc0100000 - 0xc0500000
+NOTICE:  BL2: Booting BL32
+INFO:    Entry point address = 0x2ffc0000
+INFO:    SPSR = 0x1d3
+INFO:    lr_svc = 0xc0100000
+INFO:    Argument #0 = 0xde000000
+INFO:    Argument #1 = 0x0
+INFO:    Argument #2 = 0x0
+INFO:    Argument #3 = 0x0
+I/TC: Early console on UART#4
+I/TC:
+I/TC:
+I/TC: Pager is enabled. Hashes: 3520 bytes
+I/TC: Pager pool size: 56kB
+I/TC: No non-secure external DT
+I/TC: Embedded DTB found
+I/TC: OP-TEE version: 4.7.0 (gcc version 13.2.1 20231009 (Arm GNU Toolchain 13.2.rel1 (Build arm-13.7))) #1 Fri Jul 11 09:17:33 UTC 2025 arm
+I/TC: WARNING: This OP-TEE configuration might be insecure!
+I/TC: WARNING: Please check https://optee.readthedocs.io/en/latest/architecture/porting_guidelines.html
+I/TC: Primary CPU initializing
+I/TC: RCC is non-secure
+I/TC: WARNING: All debug accesses are allowed
+I/TC: WARNING: RCC tzen:0, insecure ETZPC hardening 10:ETZPC_DECPROT_NS_R_S_W
+I/TC: WARNING: RCC tzen:0, insecure ETZPC hardening 11:ETZPC_DECPROT_NS_R_S_W
+I/TC: WARNING: RCC tzen:0, insecure ETZPC hardening 0:ETZPC_DECPROT_S_RW
+I/TC: WARNING: RCC tzen:0, insecure ETZPC hardening 1:ETZPC_DECPROT_S_RW
+I/TC: WARNING: RCC tzen:0, insecure ETZPC hardening 2:ETZPC_DECPROT_S_RW
+I/TC: Platform stm32mp1: flavor 157C_DK2 - DT stm32mp157c-dk2.dts
+I/TC: DTB enables console
+I/TC: HUK unlocked
+I/TC: Primary CPU switching to normal world boot
+
+<debug_uart>
+serial_stm32 serial@40010000: pinctrl_select_state_full: uclass_get_device_by_phandle_id: err=-19
+
+
+U-Boot 2026.01-rc4-dirty (Dec 08 2025 - 18:54:47 +0000)
+
+CPU: STM32MP157FAC Rev.Z
+Model: STMicroelectronics STM32MP157F-DK2 Discovery Board
+Board: stm32mp1 in trusted mode (st,stm32mp157f-dk2)
+Board: MB1272 Var4.0 Rev.C-02
+DRAM:  512 MiB
+trace: initialized, enabled
+Clocks:
+- MPU : 650 MHz
+- MCU : 208.878 MHz
+- AXI : 266.500 MHz
+- PER : 24 MHz
+- DDR : 533 MHz
+Core:  127 devices, 39 uclasses, devicetree: separate
+WDT:   Started watchdog@5a002000 with servicing every 1000ms (32s timeout)
+NAND:  0 MiB
+MMC:   STM32 SD/MMC: 0, STM32 SD/MMC: 1
+Loading Environment from MMC... Reading from MMC(0)... *** Warning - bad CRC, using default environment
+
+otm8009a_panel panel@0: Warning: cannot get power supply
+In:    serial
+Out:   serial
+Err:   serial
+Net:   No phy reset gpio provided: -2
+eth0: ethernet@5800a000
+
+Hit any key to stop autoboot: 0
+Boot over mmc0!
+Saving Environment to MMC... Writing to MMC(0)... OK
+switch to partitions #0, OK
+mmc0 is current device
+STM32MP>

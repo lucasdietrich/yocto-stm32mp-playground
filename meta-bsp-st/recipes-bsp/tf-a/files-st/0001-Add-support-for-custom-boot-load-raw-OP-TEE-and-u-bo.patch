@@ -1,0 +1,2060 @@
+From 99e7e609dd3b376db07449f9807b1b76ea6f3952 Mon Sep 17 00:00:00 2001
+From: Lucas Dietrich <lucas.dietrich.git@proton.me>
+Date: Sat, 13 Dec 2025 19:39:55 +0100
+Subject: [PATCH] Add support for custom boot: load raw OP-TEE and u-boot
+ binaries from MMC partitions.
+
+---
+ common/bl_common.c                            |    4 +-
+ drivers/amy/io_amy.c                          |  220 ++++
+ fdts/stm32mp157f-dk2.dts                      |   37 +
+ include/drivers/io/io_amy.h                   |   31 +
+ include/drivers/io/io_storage.h               |    1 +
+ include/export/common/tbbr/tbbr_img_def_exp.h |    4 +-
+ plat/st/common/bl2_io_storage.c               | 1057 +++++------------
+ plat/st/common/common.mk                      |    3 +-
+ plat/st/common/include/stm32mp_fconf_getter.h |    1 -
+ plat/st/common/include/stm32mp_io_storage.h   |    4 -
+ plat/st/common/stm32mp_fconf_io.c             |    6 +-
+ plat/st/stm32mp1/bl2_plat_setup.c             |  215 +---
+ plat/st/stm32mp1/include/platform_def.h       |    2 +-
+ .../stm32mp1/plat_bl2_mem_params_desc_amy.c   |   97 ++
+ plat/st/stm32mp1/platform.mk                  |    2 +-
+ plat/st/stm32mp1/stm32mp1_fip_def.h           |    3 +-
+ 16 files changed, 688 insertions(+), 999 deletions(-)
+ create mode 100644 drivers/amy/io_amy.c
+ create mode 100644 include/drivers/io/io_amy.h
+ create mode 100644 plat/st/stm32mp1/plat_bl2_mem_params_desc_amy.c
+
+diff --git a/common/bl_common.c b/common/bl_common.c
+index e757913d1..4b4737a1d 100644
+--- a/common/bl_common.c
++++ b/common/bl_common.c
+@@ -258,9 +258,11 @@ void print_entry_point_info(const entry_point_info_t *ep_info)
+ 	INFO("SPSR = 0x%x\n", ep_info->spsr);
+ 
+ #define PRINT_IMAGE_ARG(n)					\
+-	VERBOSE("Argument #" #n " = 0x%llx\n",			\
++	INFO("Argument #" #n " = 0x%llx\n",			\
+ 		(unsigned long long) ep_info->args.arg##n)
+ 
++	INFO("lr_svc = 0x%lx\n", ep_info->lr_svc);
++
+ 	PRINT_IMAGE_ARG(0);
+ 	PRINT_IMAGE_ARG(1);
+ 	PRINT_IMAGE_ARG(2);
+diff --git a/drivers/amy/io_amy.c b/drivers/amy/io_amy.c
+new file mode 100644
+index 000000000..d512220bf
+--- /dev/null
++++ b/drivers/amy/io_amy.c
+@@ -0,0 +1,220 @@
++/*
++ * Copyright (c) 2014-2020, ARM Limited and Contributors. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include "drivers/io/io_amy.h"
++#include "plat/common/platform.h"
++#include <assert.h>
++
++#include <platform_def.h>
++
++#include <drivers/io/io_driver.h>
++#include <drivers/io/io_storage.h>
++#include <stdint.h>
++
++/* Identify the device type as amy optee */
++static io_type_t device_type_amy(void)
++{
++	return IO_TYPE_AMY_OPTEE;
++}
++
++static uintptr_t backend_dev_handle;
++static uintptr_t backend_image_spec;
++
++static size_t current_image_size;
++
++
++/* Semi-hosting functions, device info and handle */
++
++static int amy_dev_open(const uintptr_t dev_spec, io_dev_info_t **dev_info);
++static int amy_file_open(io_dev_info_t *dev_info, const uintptr_t spec,
++		io_entity_t *entity);
++static int amy_file_seek(io_entity_t *entity, int mode, signed long long offset);
++static int amy_file_len(io_entity_t *entity, size_t *length);
++static int amy_file_read(io_entity_t *entity, uintptr_t buffer, size_t length,
++		size_t *length_read);
++static int amy_file_close(io_entity_t *entity);
++static int amy_dev_init(io_dev_info_t *dev_info, const uintptr_t init_params);
++static int amy_dev_close(io_dev_info_t *dev_info);
++
++static const io_dev_connector_t amy_dev_connector = {
++	.dev_open = amy_dev_open
++};
++
++
++static const io_dev_funcs_t amy_dev_funcs = {
++	.type = device_type_amy,
++	.open = amy_file_open,
++	.seek = amy_file_seek,
++	.size = amy_file_len,
++	.read = amy_file_read,
++	.write = NULL,
++	.close = amy_file_close,
++	.dev_init = amy_dev_init,	/* NOP */
++	.dev_close = amy_dev_close,	/* NOP */
++};
++
++
++static io_dev_info_t amy_dev_info = {
++	.funcs = &amy_dev_funcs,
++	.info = (uintptr_t)NULL
++};
++
++
++/* Open a connection to the semi-hosting device */
++static int amy_dev_open(const uintptr_t dev_spec,
++		io_dev_info_t **dev_info)
++{
++	assert(dev_info != NULL);
++	*dev_info = &amy_dev_info;
++	return 0;
++}
++
++static int amy_dev_init(io_dev_info_t *dev_info, const uintptr_t init_params)
++{
++	
++	int result;
++	unsigned int image_id = (unsigned int)init_params;
++	uintptr_t backend_handle;
++
++	/* Obtain a reference to the image by querying the platform layer */
++	result = plat_get_image_source(image_id, &backend_dev_handle,
++				       &backend_image_spec);
++	if (result != 0) {
++		WARN("Failed to obtain reference to image id=%u (%i)\n",
++			image_id, result);
++		return -ENOENT;
++	}
++
++	/* Attempt to access the FIP image */
++	result = io_open(backend_dev_handle, backend_image_spec,
++			 &backend_handle);
++	if (result != 0) {
++		WARN("Failed to access image id=%u (%i)\n", image_id, result);
++		return -ENOENT;
++	}
++
++	io_close(backend_handle);
++
++	return 0;
++}
++
++static int amy_dev_close(io_dev_info_t *dev_info)
++{
++
++	backend_dev_handle = (uintptr_t)NULL;
++	backend_image_spec = (uintptr_t)NULL;
++
++	return 0;
++}
++
++/* Open a file on the semi-hosting device */
++static int amy_file_open(io_dev_info_t *dev_info __unused,
++		const uintptr_t spec, io_entity_t *entity)
++{
++	uintptr_t backend_handle;
++	int result = 0;
++	const struct amy_optee_image_spec *image_spec = (const struct amy_optee_image_spec *)spec;
++
++	assert(image_spec != NULL);
++	assert(entity != NULL);
++
++	current_image_size = image_spec->actual_size;
++
++	result = io_open(backend_dev_handle, backend_image_spec, &backend_handle);
++	if (result != 0) {
++		WARN("Failed to open amy optee backend (%i)\n", result);
++		return result;
++	}
++
++	io_close(backend_handle);
++
++	return result;
++}
++
++
++/* Seek to a particular file offset on the semi-hosting device */
++static int amy_file_seek(io_entity_t *entity, int mode, signed long long offset)
++{
++	return 0;
++}
++
++
++/* Return the size of a file on the semi-hosting device */
++static int amy_file_len(io_entity_t *entity, size_t *length)
++{
++	int result = -ENOENT;
++
++	assert(entity != NULL);
++	assert(length != NULL);
++
++	if (current_image_size > 0) {
++		*length = current_image_size;
++		result = 0;
++	}
++
++	return result;
++}
++
++
++/* Read data from a file on the semi-hosting device */
++static int amy_file_read(io_entity_t *entity, uintptr_t buffer, size_t length,
++		size_t *length_read)
++{
++	int result = -ENOENT;
++	size_t bytes_read = length;
++	uintptr_t backend_handle = 0;
++
++	assert(entity != NULL);
++	assert(length_read != NULL);
++
++	result = io_open(backend_dev_handle, backend_image_spec, &backend_handle);
++	if (result != 0) {
++		WARN("Failed to open amy optee backend (%i)\n", result);
++		return result;
++	}
++
++	result = io_read(backend_handle, buffer, length, &bytes_read);
++	if (result != 0) {
++		/* We cannot read our data. Fail. */
++		WARN("Failed to read payload (%i)\n", result);
++		result = -ENOENT;
++		goto exit;
++	} else {
++		/* Set caller length and new file position. */
++		*length_read = bytes_read;
++	}
++
++exit:
++	if (backend_handle != 0) {
++		io_close(backend_handle);
++	}
++
++	return result;
++}
++
++/* Close a file on the amy optee device */
++static int amy_file_close(io_entity_t *entity)
++{
++	assert(entity != NULL);
++
++	return 0;
++}
++
++
++/* Exported functions */
++
++/* Register the amy optee driver with the IO abstraction */
++int register_io_dev_amy(const io_dev_connector_t **dev_con)
++{
++	int result;
++	assert(dev_con != NULL);
++
++	result = io_register_device(&amy_dev_info);
++	if (result == 0)
++		*dev_con = &amy_dev_connector;
++
++	return result;
++}
+diff --git a/fdts/stm32mp157f-dk2.dts b/fdts/stm32mp157f-dk2.dts
+index 4b3aef1b0..7aafd853b 100644
+--- a/fdts/stm32mp157f-dk2.dts
++++ b/fdts/stm32mp157f-dk2.dts
+@@ -4,6 +4,23 @@
+  * Author: Alexandre Torgue <alexandre.torgue@foss.st.com> for STMicroelectronics.
+  */
+ 
++#define DDR_SIZE	0x20000000 /* 512MB */
++
++#include <common/tbbr/tbbr_img_def.h>
++#include <dt-bindings/soc/stm32mp15-tzc400.h>
++#include <platform_def.h>
++
++#define DDR_NS_BASE	STM32MP_DDR_BASE
++
++/* OP-TEE reserved shared memory: located at DDR top or null size */
++#define DDR_SHARE_SIZE	STM32MP_DDR_SHMEM_SIZE
++#define DDR_SHARE_BASE	(STM32MP_DDR_BASE + (DDR_SIZE - DDR_SHARE_SIZE))
++
++/* OP-TEE secure memory: located right below OP-TEE reserved shared memory */
++#define DDR_SEC_SIZE	STM32MP_DDR_S_SIZE
++#define DDR_SEC_BASE	(DDR_SHARE_BASE - DDR_SEC_SIZE)
++#define DDR_NS_SIZE	(DDR_SEC_BASE - DDR_NS_BASE)
++
+ /dts-v1/;
+ 
+ #include "stm32mp157.dtsi"
+@@ -31,3 +48,23 @@
+ &cryp1 {
+ 	status = "okay";
+ };
++
++
++&iwdg1 {
++	status = "disabled";
++};
++
++/ {
++	dtb-registry {
++		compatible = "fconf,dyn_cfg-dtb_registry";
++	};
++
++	st-mem-firewall {
++		compatible = "st,mem-firewall";
++		memory-ranges = <
++			DDR_NS_BASE DDR_NS_SIZE TZC_REGION_S_NONE TZC_REGION_NSEC_ALL_ACCESS_RDWR
++			DDR_SEC_BASE DDR_SEC_SIZE TZC_REGION_S_RDWR 0
++			DDR_SHARE_BASE DDR_SHARE_SIZE TZC_REGION_S_NONE TZC_REGION_ACCESS_RDWR(STM32MP1_TZC_A7_ID)
++		>;
++	};
++};
+diff --git a/include/drivers/io/io_amy.h b/include/drivers/io/io_amy.h
+new file mode 100644
+index 000000000..e0ab41eb6
+--- /dev/null
++++ b/include/drivers/io/io_amy.h
+@@ -0,0 +1,31 @@
++/*
++ * Copyright (c) 2014, ARM Limited and Contributors. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef IO_AMY_OPTEE_H
++#define IO_AMY_OPTEE_H
++
++#include "drivers/io/io_storage.h"
++#include <stddef.h>
++
++enum amy_optee_image_part {
++	AMY_OPTEE_HEADER_IDX,
++	AMY_OPTEE_PAGER_IDX,
++	AMY_OPTEE_PAGEABLE_IDX,
++	AMY_UBOOT_IDX,
++};
++
++struct amy_optee_image_spec {
++	const char *part_name;
++	enum amy_optee_image_part part;
++	io_block_spec_t block_spec;
++	size_t actual_size;
++};
++
++struct io_dev_connector;
++
++int register_io_dev_amy(const struct io_dev_connector **dev_con);
++
++#endif /* IO_AMY_OPTEE_H */
+\ No newline at end of file
+diff --git a/include/drivers/io/io_storage.h b/include/drivers/io/io_storage.h
+index 31793832d..a493b50aa 100644
+--- a/include/drivers/io/io_storage.h
++++ b/include/drivers/io/io_storage.h
+@@ -24,6 +24,7 @@ typedef enum {
+ 	IO_TYPE_MTD,
+ 	IO_TYPE_MMC,
+ 	IO_TYPE_ENCRYPTED,
++	IO_TYPE_AMY_OPTEE,
+ 	IO_TYPE_MAX
+ } io_type_t;
+ 
+diff --git a/include/export/common/tbbr/tbbr_img_def_exp.h b/include/export/common/tbbr/tbbr_img_def_exp.h
+index ce17b4afb..bcf42f460 100644
+--- a/include/export/common/tbbr/tbbr_img_def_exp.h
++++ b/include/export/common/tbbr/tbbr_img_def_exp.h
+@@ -116,7 +116,9 @@
+ /* Platform Key Certificate ID */
+ #define PLAT_KEY_CERT_ID		U(38)
+ 
++#define AMY_IMAGE_ID            U(39)
++
+ /* Max Images */
+-#define MAX_IMAGE_IDS			U(39)
++#define MAX_IMAGE_IDS			U(40)
+ 
+ #endif /* ARM_TRUSTED_FIRMWARE_EXPORT_COMMON_TBBR_TBBR_IMG_DEF_EXP_H */
+diff --git a/plat/st/common/bl2_io_storage.c b/plat/st/common/bl2_io_storage.c
+index 9a02edfe9..0212e67e2 100644
+--- a/plat/st/common/bl2_io_storage.c
++++ b/plat/st/common/bl2_io_storage.c
+@@ -4,7 +4,12 @@
+  * SPDX-License-Identifier: BSD-3-Clause
+  */
+ 
++#include "export/common/tbbr/tbbr_img_def_exp.h"
++#include "lib/optee_utils.h"
++#include "lib/utils_def.h"
++#include "plat_tbbr_img_def.h"
+ #include <assert.h>
++#include <stdint.h>
+ #include <string.h>
+ 
+ #include <arch_helpers.h>
+@@ -13,14 +18,10 @@
+ #include <drivers/auth/auth_mod.h>
+ #include <drivers/fwu/fwu.h>
+ #include <drivers/fwu/fwu_metadata.h>
+-#if STM32MP_HYPERFLASH
+-#include <drivers/hyperflash.h>
+-#endif
+ #include <drivers/io/io_block.h>
+ #include <drivers/io/io_driver.h>
+ #include <drivers/io/io_encrypted.h>
+-#include <drivers/io/io_fip.h>
+-#include <drivers/io/io_memmap.h>
++#include <drivers/io/io_amy.h>
+ #include <drivers/io/io_mtd.h>
+ #include <drivers/io/io_storage.h>
+ #include <drivers/mmc.h>
+@@ -38,7 +39,6 @@
+ #endif
+ #include <drivers/st/stm32_sdmmc2.h>
+ #include <drivers/usb_device.h>
+-#include <lib/fconf/fconf.h>
+ #include <lib/mmio.h>
+ #include <lib/utils.h>
+ #include <plat/common/platform.h>
+@@ -52,16 +52,33 @@
+ #include <usb_dfu.h>
+ 
+ /* IO devices */
+-uintptr_t fip_dev_handle;
+ uintptr_t storage_dev_handle;
++uintptr_t amy_dev_handle;
+ 
+-static const io_dev_connector_t *fip_dev_con;
+-static uint32_t nand_block_sz;
++io_block_spec_t image_block_spec = {
++	.offset = 0,
++	.length = 0,
++};
+ 
+-#ifndef DECRYPTION_SUPPORT_none
+-static const io_dev_connector_t *enc_dev_con;
+-uintptr_t enc_dev_handle;
+-#endif
++struct amy_optee_image_spec amy_part_image_specs[] = {
++	[AMY_OPTEE_HEADER_IDX] = {
++		.part_name = "tee-header",
++		.part = AMY_OPTEE_HEADER_IDX,
++		.actual_size = sizeof(optee_header_t),
++	},
++	[AMY_OPTEE_PAGER_IDX] = {
++		.part_name = "tee-pager",
++		.part = AMY_OPTEE_PAGER_IDX,
++	},
++	[AMY_OPTEE_PAGEABLE_IDX] = {
++		.part_name = "tee-pageable",
++		.part = AMY_OPTEE_PAGEABLE_IDX,
++	},
++	[AMY_UBOOT_IDX] = {
++		.part_name = "u-boot",
++		.part = AMY_UBOOT_IDX,
++	},
++};
+ 
+ #if STM32MP_SDMMC || STM32MP_EMMC
+ static struct mmc_device_info mmc_info;
+@@ -82,128 +99,9 @@ static io_block_dev_spec_t mmc_block_dev_spec = {
+ };
+ 
+ static const io_dev_connector_t *mmc_dev_con;
++static const io_dev_connector_t *amy_dev_con;
+ #endif /* STM32MP_SDMMC || STM32MP_EMMC */
+ 
+-#if STM32MP_SPI_NOR
+-static io_mtd_dev_spec_t spi_nor_dev_spec = {
+-	.ops = {
+-		.init = spi_nor_init,
+-		.read = spi_nor_read,
+-		.reset = spi_nor_reset,
+-	},
+-};
+-#endif
+-
+-#if STM32MP_RAW_NAND
+-static io_mtd_dev_spec_t nand_dev_spec = {
+-	.ops = {
+-		.init = nand_raw_init,
+-		.read = nand_read,
+-		.seek = nand_seek_bb
+-	},
+-};
+-
+-static const io_dev_connector_t *nand_dev_con;
+-#endif
+-
+-#if STM32MP_SPI_NAND
+-static io_mtd_dev_spec_t spi_nand_dev_spec = {
+-	.ops = {
+-		.init = spi_nand_init,
+-		.read = nand_read,
+-		.seek = nand_seek_bb
+-	},
+-};
+-#endif
+-
+-#if STM32MP_HYPERFLASH
+-static io_mtd_dev_spec_t hyperflash_dev_spec = {
+-	.ops = {
+-		.init = hyperflash_init,
+-		.read = hyperflash_read,
+-	},
+-};
+-
+-static const io_dev_connector_t *hyperflash_dev_con;
+-#endif
+-
+-#if STM32MP_SPI_NAND || STM32MP_SPI_NOR
+-static const io_dev_connector_t *spi_dev_con;
+-#endif
+-
+-#if STM32MP_UART_PROGRAMMER || STM32MP_USB_PROGRAMMER
+-static const io_dev_connector_t *memmap_dev_con;
+-#endif
+-
+-io_block_spec_t image_block_spec = {
+-	.offset = 0U,
+-	.length = 0U,
+-};
+-
+-int open_fip(const uintptr_t spec)
+-{
+-	return io_dev_init(fip_dev_handle, (uintptr_t)FIP_IMAGE_ID);
+-}
+-
+-#ifndef DECRYPTION_SUPPORT_none
+-int open_enc_fip(const uintptr_t spec)
+-{
+-	int result;
+-	uintptr_t local_image_handle;
+-
+-	result = io_dev_init(enc_dev_handle, (uintptr_t)ENC_IMAGE_ID);
+-	if (result != 0) {
+-		return result;
+-	}
+-
+-	result = io_open(enc_dev_handle, spec, &local_image_handle);
+-	if (result != 0) {
+-		return result;
+-	}
+-
+-	VERBOSE("Using encrypted FIP\n");
+-	io_close(local_image_handle);
+-
+-	return 0;
+-}
+-#endif
+-
+-int open_storage(const uintptr_t spec)
+-{
+-	return io_dev_init(storage_dev_handle, 0);
+-}
+-
+-#if STM32MP_EMMC_BOOT
+-static uint32_t get_boot_part_fip_header(void)
+-{
+-	io_block_spec_t emmc_boot_fip_block_spec = {
+-		.offset = STM32MP_EMMC_BOOT_FIP_OFFSET,
+-		.length = MMC_BLOCK_SIZE, /* We are interested only in first 4 bytes */
+-	};
+-	uint32_t magic = 0U;
+-	int io_result;
+-	size_t bytes_read;
+-	uintptr_t fip_hdr_handle;
+-
+-	io_result = io_open(storage_dev_handle, (uintptr_t)&emmc_boot_fip_block_spec,
+-			    &fip_hdr_handle);
+-	assert(io_result == 0);
+-
+-	io_result = io_read(fip_hdr_handle, (uintptr_t)&magic, sizeof(magic),
+-			    &bytes_read);
+-	if ((io_result != 0) || (bytes_read != sizeof(magic))) {
+-		panic();
+-	}
+-
+-	io_close(fip_hdr_handle);
+-
+-	VERBOSE("%s: eMMC boot magic at offset 256K: %08x\n",
+-		__func__, magic);
+-
+-	return magic;
+-}
+-#endif
+-
+ static void print_boot_device(boot_api_context_t *boot_context)
+ {
+ 	switch (boot_context->boot_interface_selected) {
+@@ -222,11 +120,6 @@ static void print_boot_device(boot_api_context_t *boot_context)
+ 	case BOOT_API_CTX_BOOT_INTERFACE_SEL_FLASH_NAND_SPI:
+ 		INFO("Using SPI NAND\n");
+ 		break;
+-#if STM32MP_HYPERFLASH
+-	case BOOT_API_CTX_BOOT_INTERFACE_SEL_HYPERFLASH_OSPI:
+-		INFO("Using HYPERFLASH\n");
+-		break;
+-#endif
+ 	case BOOT_API_CTX_BOOT_INTERFACE_SEL_SERIAL_UART:
+ 		INFO("Using UART\n");
+ 		break;
+@@ -241,8 +134,40 @@ static void print_boot_device(boot_api_context_t *boot_context)
+ 	}
+ 
+ 	if (boot_context->boot_interface_instance != 0U) {
+-		INFO("  Instance %d\n", boot_context->boot_interface_instance);
++	 	INFO("  Instance %d\n", boot_context->boot_interface_instance);
++	}
++}
++
++static int get_optee_header(optee_header_t *tee_header, io_block_spec_t *io_block_spec)
++{
++	int io_result;
++	size_t bytes_read;
++	uintptr_t handle;
++
++	io_result = io_open(storage_dev_handle, (uintptr_t)io_block_spec,
++			    &handle);
++	assert(io_result == 0);
++
++	io_result = io_read(handle, (uintptr_t)tee_header, sizeof(*tee_header),
++			    &bytes_read);
++	if ((io_result != 0) || (bytes_read != sizeof(*tee_header))) {
++		panic();
++	}
++
++	io_close(handle);
++
++	if (optee_header_is_valid((uintptr_t)tee_header) == false) {
++		ERROR("OP-TEE header not valid\n");
++		return -EINVAL;
+ 	}
++
++	/* Update the actual size of OP-TEE image */
++	amy_part_image_specs[AMY_OPTEE_HEADER_IDX].actual_size = sizeof(*tee_header) + tee_header->nb_images *
++		sizeof(optee_image_t);
++	INFO("OP-TEE header size updated to 0x%x\n",
++	       amy_part_image_specs[AMY_OPTEE_HEADER_IDX].actual_size);
++
++	return io_result;
+ }
+ 
+ #if STM32MP_SDMMC || STM32MP_EMMC
+@@ -288,170 +213,19 @@ static void boot_mmc(enum mmc_device_type mmc_dev_type,
+ 
+ 	/* Open MMC as a block device to read FIP */
+ 	io_result = register_io_dev_block(&mmc_dev_con);
+-	if (io_result != 0) {
+-		panic();
+-	}
+-
+-	io_result = io_dev_open(mmc_dev_con, (uintptr_t)&mmc_block_dev_spec,
+-				&storage_dev_handle);
+-	assert(io_result == 0);
+-
+-#if STM32MP_EMMC_BOOT
+-	if (mmc_dev_type == MMC_IS_EMMC) {
+-		io_result = mmc_part_switch_current_boot();
+-		assert(io_result == 0);
+-
+-		if (get_boot_part_fip_header() != TOC_HEADER_NAME) {
+-			WARN("%s: Can't find FIP header on eMMC boot partition. Trying GPT\n",
+-			     __func__);
+-			io_result = mmc_part_switch_user();
+-			assert(io_result == 0);
+-			return;
+-		}
+-
+-		VERBOSE("%s: FIP header found on eMMC boot partition\n",
+-			__func__);
+-		image_block_spec.offset = STM32MP_EMMC_BOOT_FIP_OFFSET;
+-		image_block_spec.length = mmc_boot_part_size() - STM32MP_EMMC_BOOT_FIP_OFFSET;
+-	}
+-#endif
+-}
+-#endif /* STM32MP_SDMMC || STM32MP_EMMC */
+-
+-#if STM32MP_SPI_NOR
+-static void boot_spi_nor(boot_api_context_t *boot_context)
+-{
+-	int io_result __maybe_unused = 0;
+-
+-#ifdef STM32MP1X
+-	io_result = stm32_qspi_init();
+-#endif
+-#ifdef STM32MP2X
+-	io_result = stm32_ospi_init();
+-#endif
+-
+-	assert(io_result == 0);
+-
+-	io_result = register_io_dev_mtd(&spi_dev_con);
+-	assert(io_result == 0);
+-
+-	/* Open connections to device */
+-	io_result = io_dev_open(spi_dev_con,
+-				(uintptr_t)&spi_nor_dev_spec,
+-				&storage_dev_handle);
+-	assert(io_result == 0);
+-}
+-#endif /* STM32MP_SPI_NOR */
+-
+-#if STM32MP_RAW_NAND
+-static void boot_fmc2_nand(boot_api_context_t *boot_context)
+-{
+-	int io_result __maybe_unused;
+-
+-	io_result = stm32_fmc2_init();
+-	assert(io_result == 0);
+-
+-	/* Register the IO device on this platform */
+-	io_result = register_io_dev_mtd(&nand_dev_con);
+-	assert(io_result == 0);
+-
+-	/* Open connections to device */
+-	io_result = io_dev_open(nand_dev_con, (uintptr_t)&nand_dev_spec,
+-				&storage_dev_handle);
+ 	assert(io_result == 0);
+ 
+-	nand_block_sz = nand_dev_spec.erase_size;
+-}
+-#endif /* STM32MP_RAW_NAND */
+-
+-#if STM32MP_SPI_NAND
+-static void boot_spi_nand(boot_api_context_t *boot_context)
+-{
+-	int io_result __maybe_unused = 0;
+-
+-#ifdef STM32MP1X
+-	io_result = stm32_qspi_init();
+-#endif
+-#ifdef STM32MP2X
+-	io_result = stm32_ospi_init();
+-#endif
+-	assert(io_result == 0);
+-
+-	io_result = register_io_dev_mtd(&spi_dev_con);
+-	assert(io_result == 0);
+-
+-	/* Open connections to device */
+-	io_result = io_dev_open(spi_dev_con,
+-				(uintptr_t)&spi_nand_dev_spec,
+-				&storage_dev_handle);
+-	assert(io_result == 0);
+-
+-	nand_block_sz = spi_nand_dev_spec.erase_size;
+-}
+-#endif /* STM32MP_SPI_NAND */
+-
+-#if STM32MP_HYPERFLASH
+-static void boot_hyperflash(boot_api_context_t *boot_context)
+-{
+-	int io_result __maybe_unused = 0;
+-
+-	io_result = stm32_ospi_init();
+-	assert(io_result == 0);
+-
+-	io_result = register_io_dev_mtd(&hyperflash_dev_con);
+-	assert(io_result == 0);
+-
+-	/* Open connections to device */
+-	io_result = io_dev_open(hyperflash_dev_con,
+-				(uintptr_t)&hyperflash_dev_spec,
++	io_result = io_dev_open(mmc_dev_con, (uintptr_t)&mmc_block_dev_spec,
+ 				&storage_dev_handle);
+ 	assert(io_result == 0);
+-}
+-#endif /* STM32MP_HYPERFLASH */
+-
+-#if STM32MP_UART_PROGRAMMER || STM32MP_USB_PROGRAMMER
+-static void mmap_io_setup(void)
+-{
+-	int io_result __maybe_unused;
+ 
+-	io_result = register_io_dev_memmap(&memmap_dev_con);
++	io_result = register_io_dev_amy(&amy_dev_con);
+ 	assert(io_result == 0);
+ 
+-	io_result = io_dev_open(memmap_dev_con, (uintptr_t)NULL,
+-				&storage_dev_handle);
++	io_result = io_dev_open(amy_dev_con, 0, &amy_dev_handle);
+ 	assert(io_result == 0);
+ }
+-
+-#if STM32MP_UART_PROGRAMMER
+-static void stm32cubeprogrammer_uart(uint8_t phase, uintptr_t base, size_t len)
+-{
+-	int ret __maybe_unused;
+-	boot_api_context_t *boot_context =
+-		(boot_api_context_t *)stm32mp_get_boot_ctx_address();
+-	uintptr_t uart_base;
+-
+-	uart_base = get_uart_address(boot_context->boot_interface_instance);
+-	ret = stm32cubeprog_uart_load(uart_base, phase, base, len);
+-	assert(ret == 0);
+-}
+-#endif
+-
+-#if STM32MP_USB_PROGRAMMER
+-static void stm32cubeprogrammer_usb(uint8_t phase, uintptr_t base, size_t len)
+-{
+-	int ret __maybe_unused;
+-	static struct usb_handle *pdev;
+-
+-	/* Init USB on platform */
+-	if (pdev == NULL) {
+-		pdev = usb_dfu_plat_init();
+-	}
+-
+-	ret = stm32cubeprog_usb_load(pdev, phase, base, len);
+-	assert(ret == 0);
+-}
+-#endif
+-#endif /* STM32MP_UART_PROGRAMMER || STM32MP_USB_PROGRAMMER */
++#endif /* STM32MP_SDMMC || STM32MP_EMMC */
+ 
+ void stm32mp_io_setup(void)
+ {
+@@ -467,21 +241,6 @@ void stm32mp_io_setup(void)
+ 		     boot_context->boot_partition_used_toboot);
+ 	}
+ 
+-	io_result = register_io_dev_fip(&fip_dev_con);
+-	assert(io_result == 0);
+-
+-	io_result = io_dev_open(fip_dev_con, (uintptr_t)NULL,
+-				&fip_dev_handle);
+-
+-#ifndef DECRYPTION_SUPPORT_none
+-	io_result = register_io_dev_enc(&enc_dev_con);
+-	assert(io_result == 0);
+-
+-	io_result = io_dev_open(enc_dev_con, (uintptr_t)NULL,
+-				&enc_dev_handle);
+-	assert(io_result == 0);
+-#endif
+-
+ 	switch (boot_context->boot_interface_selected) {
+ #if STM32MP_SDMMC
+ 	case BOOT_API_CTX_BOOT_INTERFACE_SEL_FLASH_SD:
+@@ -489,48 +248,6 @@ void stm32mp_io_setup(void)
+ 		boot_mmc(MMC_IS_SD, boot_context->boot_interface_instance);
+ 		break;
+ #endif
+-#if STM32MP_EMMC
+-	case BOOT_API_CTX_BOOT_INTERFACE_SEL_FLASH_EMMC:
+-		dmbsy();
+-		boot_mmc(MMC_IS_EMMC, boot_context->boot_interface_instance);
+-		break;
+-#endif
+-#if STM32MP_SPI_NOR
+-	case BOOT_API_CTX_BOOT_INTERFACE_SEL_FLASH_NOR_SPI:
+-		dmbsy();
+-		boot_spi_nor(boot_context);
+-		break;
+-#endif
+-#if STM32MP_RAW_NAND
+-	case BOOT_API_CTX_BOOT_INTERFACE_SEL_FLASH_NAND_FMC:
+-		dmbsy();
+-		boot_fmc2_nand(boot_context);
+-		break;
+-#endif
+-#if STM32MP_SPI_NAND
+-	case BOOT_API_CTX_BOOT_INTERFACE_SEL_FLASH_NAND_SPI:
+-		dmbsy();
+-		boot_spi_nand(boot_context);
+-		break;
+-#endif
+-#if STM32MP_HYPERFLASH
+-	case BOOT_API_CTX_BOOT_INTERFACE_SEL_HYPERFLASH_OSPI:
+-		dmbsy();
+-		boot_hyperflash(boot_context);
+-		break;
+-#endif
+-#if STM32MP_UART_PROGRAMMER || STM32MP_USB_PROGRAMMER
+-#if STM32MP_UART_PROGRAMMER
+-	case BOOT_API_CTX_BOOT_INTERFACE_SEL_SERIAL_UART:
+-#endif
+-#if STM32MP_USB_PROGRAMMER
+-	case BOOT_API_CTX_BOOT_INTERFACE_SEL_SERIAL_USB:
+-#endif
+-		dmbsy();
+-		mmap_io_setup();
+-		break;
+-#endif
+-
+ 	default:
+ 		ERROR("Boot interface %d not supported\n",
+ 		      boot_context->boot_interface_selected);
+@@ -543,14 +260,16 @@ void stm32mp_io_exit(void)
+ {
+ 	int io_result __maybe_unused;
+ 
+-	/* Close connection to device */
+ 	io_result = io_dev_close(storage_dev_handle);
+ 	assert(io_result == 0);
++
++	io_result = io_dev_close(amy_dev_handle);
++	assert(io_result == 0);
+ }
+ 
+ int bl2_plat_handle_pre_image_load(unsigned int image_id)
+ {
+-	static bool gpt_init_done __maybe_unused;
++	static bool gpt_init_done __maybe_unused = false;
+ 	uint16_t boot_itf = stm32mp_get_boot_itf_selected();
+ 
+ 	if (stm32mp_skip_boot_device_after_standby()) {
+@@ -558,483 +277,277 @@ int bl2_plat_handle_pre_image_load(unsigned int image_id)
+ 	}
+ 
+ 	switch (boot_itf) {
+-#if STM32MP_SDMMC || STM32MP_EMMC
+ 	case BOOT_API_CTX_BOOT_INTERFACE_SEL_FLASH_EMMC:
+-#if STM32MP_EMMC_BOOT
+-		if (image_block_spec.offset == STM32MP_EMMC_BOOT_FIP_OFFSET) {
+-			break;
+-		}
+-#endif
+-		/* fallthrough */
+ 	case BOOT_API_CTX_BOOT_INTERFACE_SEL_FLASH_SD:
+ 		if (!gpt_init_done) {
+-/*
+- * With FWU Multi Bank feature enabled, the selection of
+- * the image to boot will be done by fwu_init calling the
+- * platform hook, plat_fwu_set_images_source.
+- */
+-#if !PSA_FWU_SUPPORT
+-			const partition_entry_t *entry;
+-			const struct efi_guid fip_guid = STM32MP_FIP_GUID;
+-
+ 			partition_init(GPT_IMAGE_ID);
+-			entry = get_partition_entry_by_type(&fip_guid);
+-			if (entry == NULL) {
+-				entry = get_partition_entry(FIP_IMAGE_NAME);
+-				if (entry == NULL) {
+-					ERROR("Could NOT find the %s partition!\n",
+-					      FIP_IMAGE_NAME);
++			
++			for (uint8_t p = 0; p < ARRAY_SIZE(amy_part_image_specs); p++) {
++				const partition_entry_t *entry;
++				io_block_spec_t *block_spec =
++					&amy_part_image_specs[p].block_spec;
+ 
++				entry = get_partition_entry(amy_part_image_specs[p].part_name);
++				if (entry == NULL) {
++					ERROR("Could NOT find the partition '%s'\n",
++					      amy_part_image_specs[p].part_name);
+ 					return -ENOENT;
+ 				}
+-			}
+-
+-			image_block_spec.offset = entry->start;
+-			image_block_spec.length = entry->length;
+-#endif
+-			gpt_init_done = true;
+-		} else {
+-			bl_mem_params_node_t *bl_mem_params = get_bl_mem_params_node(image_id);
+-
+-			assert(bl_mem_params != NULL);
+ 
+-			mmc_block_dev_spec.buffer.offset = bl_mem_params->image_info.image_base;
+-			mmc_block_dev_spec.buffer.length = bl_mem_params->image_info.image_max_size;
+-		}
+-
+-		break;
+-#endif
+-
+-#if STM32MP_RAW_NAND || STM32MP_SPI_NAND
+-#if STM32MP_RAW_NAND
+-	case BOOT_API_CTX_BOOT_INTERFACE_SEL_FLASH_NAND_FMC:
+-#endif
+-#if STM32MP_SPI_NAND
+-	case BOOT_API_CTX_BOOT_INTERFACE_SEL_FLASH_NAND_SPI:
+-#endif
+-/*
+- * With FWU Multi Bank feature enabled, the selection of
+- * the image to boot will be done by fwu_init calling the
+- * platform hook, plat_fwu_set_images_source.
+- */
+-#if !PSA_FWU_SUPPORT
+-		image_block_spec.offset = STM32MP_NAND_FIP_OFFSET;
+-#endif
+-		break;
+-#endif
++				/* Default the actual size to the full partition size */
++				amy_part_image_specs[p].actual_size = entry->length;
+ 
+-#if STM32MP_SPI_NOR
+-	case BOOT_API_CTX_BOOT_INTERFACE_SEL_FLASH_NOR_SPI:
+-/*
+- * With FWU Multi Bank feature enabled, the selection of
+- * the image to boot will be done by fwu_init calling the
+- * platform hook, plat_fwu_set_images_source.
+- */
+-#if !PSA_FWU_SUPPORT
+-		image_block_spec.offset = STM32MP_NOR_FIP_OFFSET;
+-#endif
+-		break;
+-#endif
++				block_spec->offset = entry->start;
++				block_spec->length = entry->length;
+ 
+-#if STM32MP_HYPERFLASH
+-	case BOOT_API_CTX_BOOT_INTERFACE_SEL_HYPERFLASH_OSPI:
+-/*
+- * With FWU Multi Bank feature enabled, the selection of
+- * the image to boot will be done by fwu_init calling the
+- * platform hook, plat_fwu_set_images_source.
+- */
+-#if !PSA_FWU_SUPPORT
+-		image_block_spec.offset = STM32MP_HYPERFLASH_FIP_OFFSET;
+-#endif
+-		break;
+-#endif
++				INFO("Partition '%s' found at offset 0x%x (size 0x%x)\n",
++				     amy_part_image_specs[p].part_name,
++				     block_spec->offset,
++				     block_spec->length);
++			}
+ 
+-#if STM32MP_UART_PROGRAMMER
+-	case BOOT_API_CTX_BOOT_INTERFACE_SEL_SERIAL_UART:
+-#if STM32MP_DDR_FIP_IO_STORAGE
+-		if (image_id == DDR_FW_ID) {
+-			stm32cubeprogrammer_uart(PHASE_DDR_FW,
+-						 DWL_DDR_BUFFER_BASE,
+-						 DWL_DDR_BUFFER_SIZE);
+-			/* FIP loaded at DWL address */
+-			image_block_spec.offset = DWL_DDR_BUFFER_BASE;
+-			image_block_spec.length = DWL_DDR_BUFFER_SIZE;
+-		}
+-#endif
+-		if (image_id == FW_CONFIG_ID) {
+-#if STM32MP_DDR_FIP_IO_STORAGE && TRUSTED_BOARD_BOOT
+-			/*
+-			 * Clear authentication state of STM32MP certificate that will
+-			 * now be loaded from other FIP file
+-			 */
+-			auth_img_flags[STM32MP_CONFIG_CERT_ID] = 0U;
+-#endif
+-			stm32cubeprogrammer_uart(PHASE_SSBL,
+-						 DWL_BUFFER_BASE,
+-						 DWL_BUFFER_SIZE);
+-			/* FIP loaded at DWL address */
+-			image_block_spec.offset = DWL_BUFFER_BASE;
+-			image_block_spec.length = DWL_BUFFER_SIZE;
+-		}
+-		break;
+-#endif
+-#if STM32MP_USB_PROGRAMMER
+-	case BOOT_API_CTX_BOOT_INTERFACE_SEL_SERIAL_USB:
+-#if STM32MP_DDR_FIP_IO_STORAGE
+-		if (image_id == DDR_FW_ID) {
+-			stm32cubeprogrammer_usb(PHASE_DDR_FW,
+-						DWL_DDR_BUFFER_BASE,
+-						DWL_DDR_BUFFER_SIZE);
+-			/* FIP loaded at DWL address */
+-			image_block_spec.offset = DWL_DDR_BUFFER_BASE;
+-			image_block_spec.length = DWL_DDR_BUFFER_SIZE;
+-		}
+-#endif
+-		if (image_id == FW_CONFIG_ID) {
+-#if STM32MP_DDR_FIP_IO_STORAGE && TRUSTED_BOARD_BOOT
+-			/*
+-			 * Clear authentication state of STM32MP certificate that will
+-			 * now be loaded from other FIP file
+-			 */
+-			auth_img_flags[STM32MP_CONFIG_CERT_ID] = 0U;
+-#endif
+-			stm32cubeprogrammer_usb(PHASE_SSBL,
+-						DWL_BUFFER_BASE,
+-						DWL_BUFFER_SIZE);
+-			/* FIP loaded at DWL address */
+-			image_block_spec.offset = DWL_BUFFER_BASE;
+-			image_block_spec.length = DWL_BUFFER_SIZE;
++			optee_header_t tee_header;
++			int ret = get_optee_header(&tee_header, &amy_part_image_specs[AMY_OPTEE_HEADER_IDX].block_spec);
++			if (ret == 0) {
++				INFO("OP-TEE header partition found at offset 0x%x (size 0x%x)\n",
++					amy_part_image_specs[AMY_OPTEE_HEADER_IDX].block_spec.offset,
++					amy_part_image_specs[AMY_OPTEE_HEADER_IDX].block_spec.length);
++			} else {
++				ERROR("Failed to read OP-TEE header from partition: %d\n", ret);
++				return -EINVAL;
++			}
++			gpt_init_done = true;
+ 		}
+ 		break;
+-#endif
+ 
+ 	default:
+-		ERROR("FIP Not found\n");
++		ERROR("Boot interface %d not supported in pre-image load\n",
++		      boot_itf);
+ 		panic();
+ 	}
+ 
+ 	return 0;
+ }
+ 
+-/*
+- * Return an IO device handle and specification which can be used to access
+- * an image. Use this to enforce platform load policy.
+- */
+-int plat_get_image_source(unsigned int image_id, uintptr_t *dev_handle,
+-			  uintptr_t *image_spec)
+-{
+-	int rc;
+-	const struct plat_io_policy *policy;
+-
+-	policy = FCONF_GET_PROPERTY(stm32mp, io_policies, image_id);
+-	rc = policy->check(policy->image_spec);
+-	if (rc == 0) {
+-		*image_spec = policy->image_spec;
+-		*dev_handle = *(policy->dev_handle);
+-	}
+ 
+-	return rc;
+-}
+-
+-/*
+- * This function shall return 0 if it cannot find an alternate
+- * image to be loaded or it returns 1 otherwise.
+- */
+-int plat_try_backup_partitions(unsigned int image_id)
++/*******************************************************************************
++ * This function can be used by the platforms to update/use image
++ * information for given `image_id`.
++ ******************************************************************************/
++int bl2_plat_handle_post_image_load(unsigned int image_id)
+ {
+-	static unsigned int backup_id;
+-	static unsigned int backup_block_nb;
++	
++	int err = 0;
++	bl_mem_params_node_t *bl_mem_params = get_bl_mem_params_node(image_id);
++	bl_mem_params_node_t *bl32_mem_params;
++	bl_mem_params_node_t *pager_mem_params __unused;
++	bl_mem_params_node_t *paged_mem_params __unused;
++	unsigned long long ddr_top __unused;
++
++	assert(bl_mem_params != NULL);
++
++	switch (image_id) {
++	case BL32_IMAGE_ID:
++		if (bl_mem_params->image_info.image_base == 0) {
++			ERROR("bl_mem_params->image_info.image_base is not set\n");
++			panic();
++		}
+ 
+-	/* Check if NAND storage used */
+-	if (nand_block_sz == 0U) {
+-		return 0;
+-	}
++		if (optee_header_is_valid(bl_mem_params->image_info.image_base)) {
++			INFO("OP-TEE header detected\n");
+ 
+-	if (backup_id != image_id) {
+-		backup_block_nb = PLATFORM_MTD_MAX_PART_SIZE / nand_block_sz;
+-		backup_id = image_id;
+-	}
++			/* BL32 is OP-TEE header */
++			bl_mem_params->ep_info.pc = bl_mem_params->image_info.image_base;
+ 
+-	if (backup_block_nb-- == 0U) {
+-		return 0;
+-	}
++			pager_mem_params = get_bl_mem_params_node(BL32_EXTRA1_IMAGE_ID);
++			assert(pager_mem_params != NULL);
+ 
+-#if PSA_FWU_SUPPORT
+-	if (((image_block_spec.offset < STM32MP_NAND_FIP_B_OFFSET) &&
+-	     ((image_block_spec.offset + nand_block_sz) >= STM32MP_NAND_FIP_B_OFFSET)) ||
+-	    (image_block_spec.offset + nand_block_sz >= STM32MP_NAND_FIP_B_MAX_OFFSET)) {
+-		return 0;
+-	}
+-#endif
++			paged_mem_params = get_bl_mem_params_node(BL32_EXTRA2_IMAGE_ID);
++			assert(paged_mem_params != NULL);
+ 
+-	image_block_spec.offset += nand_block_sz;
++			/* Update actual size and location for OP-TEE pager and pageable parts */
++			err = parse_optee_header(&bl_mem_params->ep_info,
++						 &pager_mem_params->image_info,
++						 &paged_mem_params->image_info);
++			if (err != 0) {
++				ERROR("OPTEE header parse error.\n");
++				panic();
++			}
+ 
+-	return 1;
+-}
++			amy_part_image_specs[AMY_OPTEE_PAGER_IDX].actual_size =
++				pager_mem_params->image_info.image_size;
++			amy_part_image_specs[AMY_OPTEE_PAGEABLE_IDX].actual_size =
++				paged_mem_params->image_info.image_size;
+ 
+-#if PSA_FWU_SUPPORT
+-/*
+- * In each boot in non-trial mode, we set the BKP register to
+- * FWU_MAX_TRIAL_REBOOT, and return the active_index from metadata.
+- *
+- * As long as the update agent didn't update the "accepted" field in metadata
+- * (i.e. we are in trial mode), we select the new active_index.
+- * To avoid infinite boot loop at trial boot we decrement a BKP register.
+- * If this counter is 0:
+- *     - an unexpected TAMPER event raised (that resets the BKP registers to 0)
+- *     - a power-off occurs before the update agent was able to update the
+- *       "accepted' field
+- *     - we already boot FWU_MAX_TRIAL_REBOOT times in trial mode.
+- * we select the previous_active_index.
+- */
+-uint32_t plat_fwu_get_boot_idx(void)
+-{
+-	/*
+-	 * Select boot index and update boot counter only once per boot
+-	 * even if this function is called several times.
+-	 */
+-	static uint32_t boot_idx = INVALID_BOOT_IDX;
+-	int err = 0;
++			/* Set OP-TEE pageable at the top of DDR just before the shared memory */
++			paged_mem_params->image_info.image_base = STM32MP_DDR_BASE +
++				dt_get_ddr_size() - STM32MP_DDR_SHMEM_SIZE - STM32MP_DDR_S_SIZE;
+ 
+-	if (boot_idx == INVALID_BOOT_IDX) {
+-		const struct fwu_metadata *data = fwu_get_metadata();
+-		uint32_t bootcount = 0;
+-
+-		boot_idx = data->active_index;
+-
+-		switch (data->bank_state[boot_idx]) {
+-		case FWU_BANK_STATE_ACCEPTED:
+-			err = stm32_set_max_fwu_trial_boot_cnt();
+-			break;
+-		case FWU_BANK_STATE_VALID:
+-			err = stm32_get_and_dec_fwu_trial_boot_cnt(&bootcount);
+-			if (err == 0) {
+-				if (bootcount == 1U) {
+-					WARN("Trial FWU fails %u times\n",
+-					     (FWU_MAX_TRIAL_REBOOT - 1U));
+-					boot_idx = fwu_get_alternate_boot_bank();
+-				} else if (bootcount == 0U) {
+-					WARN("Trial backup register empty : set max boot count\n");
+-					err = stm32_set_max_fwu_trial_boot_cnt();
+-				} else {
+-					VERBOSE("Trial FWU: %u\n",
+-						FWU_MAX_TRIAL_REBOOT - bootcount);
+-				}
+-			}
+-			break;
+-		case FWU_BANK_STATE_INVALID:
+-		default:
+-			ERROR("The active bank(%u) of the platform is in Invalid State.\n",
+-			      boot_idx);
+-			boot_idx = fwu_get_alternate_boot_bank();
+-			err = stm32_clear_fwu_trial_boot_cnt();
+-			break;
+-		}
++			/* Set optee boot info from parsed header data */
++			bl_mem_params->ep_info.args.arg0 =
++					paged_mem_params->image_info.image_base;
++
++			bl_mem_params->ep_info.args.arg1 = 0U; /* Unused */
++			bl_mem_params->ep_info.args.arg2 = 0U; /* No DT supported */
+ 
+-		if (err != 0) {
+-			ERROR("%s: Bkp register access failed. Bank state: %d\n",
+-				__func__, data->bank_state[boot_idx]);
++			INFO("OP-TEE pc: 0x%lx arg0: 0x%x arg1: 0x%x arg2: 0x%x\n",
++			     bl_mem_params->ep_info.pc,
++			     bl_mem_params->ep_info.args.arg0,
++			     bl_mem_params->ep_info.args.arg1,
++			     bl_mem_params->ep_info.args.arg2);
++		} else {
++			ERROR("BL32 is not a valid OP-TEE header\n");
+ 			panic();
+ 		}
+-	}
++		break;
+ 
+-	return boot_idx;
+-}
++	case BL33_IMAGE_ID:
++		bl32_mem_params = get_bl_mem_params_node(BL32_IMAGE_ID);
++		assert(bl32_mem_params != NULL);
++		bl32_mem_params->ep_info.lr_svc = bl_mem_params->ep_info.pc;
++		break;
+ 
+-static void *stm32_get_image_spec(const struct efi_guid *img_type_guid)
+-{
+-	unsigned int i;
++	default:
++		/* Do nothing in default case */
++		break;
++	}
+ 
+-	for (i = 0U; i < MAX_NUMBER_IDS; i++) {
+-		if ((guidcmp(&policies[i].img_type_guid, img_type_guid)) == 0) {
+-			return (void *)policies[i].image_spec;
+-		}
++#if STM32MP_SDMMC || STM32MP_EMMC
++	/*
++	 * Invalidate remaining data read from MMC but not flushed by load_image_flush().
++	 * We take the worst case which is 2 MMC blocks.
++	 */
++	if ((image_id != FW_CONFIG_ID) &&
++	    ((bl_mem_params->image_info.h.attr & IMAGE_ATTRIB_SKIP_LOADING) == 0U)) {
++		inv_dcache_range(bl_mem_params->image_info.image_base +
++				 bl_mem_params->image_info.image_size,
++				 2U * MMC_BLOCK_SIZE);
+ 	}
++#endif /* STM32MP_SDMMC || STM32MP_EMMC */
+ 
+-	return NULL;
++	return err;
+ }
+ 
+-void plat_fwu_set_images_source(const struct fwu_metadata *metadata)
+-{
+-	unsigned int i;
+-	uint32_t boot_idx;
+-	const partition_entry_t *entry __maybe_unused;
+-	const struct fwu_image_entry *img_entry;
+-	const void *img_type_guid;
+-	const void *img_guid;
+-	io_block_spec_t *image_spec;
+-	const uint16_t boot_itf = stm32mp_get_boot_itf_selected();
+-
+-	boot_idx = plat_fwu_get_boot_idx();
+-	assert(boot_idx < NR_OF_FW_BANKS);
+-	VERBOSE("Selecting to boot from bank %u\n", boot_idx);
+-
+-	img_entry = (void *)&metadata->fw_desc.img_entry;
+-	for (i = 0U; i < NR_OF_IMAGES_IN_FW_BANK; i++) {
+-		img_type_guid = &img_entry[i].img_type_guid;
+-
+-		img_guid = &img_entry[i].img_bank_info[boot_idx].img_guid;
+-
+-		image_spec = stm32_get_image_spec(img_type_guid);
+-		if (image_spec == NULL) {
+-			ERROR("Unable to get image spec for the image in the metadata\n");
+-			panic();
+-		}
++struct plat_io_policy2 {
++	const char *name;
++	uintptr_t *dev_handle;
++	uintptr_t image_spec;
++	int (*open)(const uintptr_t spec);
++};
+ 
+-		switch (boot_itf) {
+-#if (STM32MP_SDMMC || STM32MP_EMMC)
+-		case BOOT_API_CTX_BOOT_INTERFACE_SEL_FLASH_SD:
+-		case BOOT_API_CTX_BOOT_INTERFACE_SEL_FLASH_EMMC:
+-			entry = get_partition_entry_by_guid(img_guid);
+-			if (entry == NULL) {
+-				ERROR("No partition with the uuid mentioned in metadata\n");
+-				panic();
+-			}
+ 
+-			image_spec->offset = entry->start;
+-			image_spec->length = entry->length;
+-			break;
+-#endif
+-#if STM32MP_SPI_NOR
+-		case BOOT_API_CTX_BOOT_INTERFACE_SEL_FLASH_NOR_SPI:
+-			if (guidcmp(img_guid, &STM32MP_NOR_FIP_A_GUID) == 0) {
+-				image_spec->offset = STM32MP_NOR_FIP_A_OFFSET;
+-			} else if (guidcmp(img_guid, &STM32MP_NOR_FIP_B_GUID) == 0) {
+-				image_spec->offset = STM32MP_NOR_FIP_B_OFFSET;
+-			} else {
+-				ERROR("Invalid uuid mentioned in metadata\n");
+-				panic();
+-			}
+-			break;
+-#endif
+-#if (STM32MP_RAW_NAND || STM32MP_SPI_NAND)
+-		case BOOT_API_CTX_BOOT_INTERFACE_SEL_FLASH_NAND_FMC:
+-		case BOOT_API_CTX_BOOT_INTERFACE_SEL_FLASH_NAND_SPI:
+-			if (guidcmp(img_guid, &STM32MP_NAND_FIP_A_GUID) == 0) {
+-				image_spec->offset = STM32MP_NAND_FIP_A_OFFSET;
+-			} else if (guidcmp(img_guid, &STM32MP_NAND_FIP_B_GUID) == 0) {
+-				image_spec->offset = STM32MP_NAND_FIP_B_OFFSET;
+-			} else {
+-				ERROR("Invalid uuid mentioned in metadata\n");
+-				panic();
+-			}
+-			break;
+-#endif
+-#if STM32MP_HYPERFLASH
+-		case BOOT_API_CTX_BOOT_INTERFACE_SEL_HYPERFLASH_OSPI:
+-			if (guidcmp(img_guid, &STM32MP_HYPERFLASH_FIP_A_GUID) == 0) {
+-				image_spec->offset = STM32MP_HYPERFLASH_FIP_A_OFFSET;
+-			} else if (guidcmp(img_guid, &STM32MP_HYPERFLASH_FIP_B_GUID) == 0) {
+-				image_spec->offset = STM32MP_HYPERFLASH_FIP_B_OFFSET;
+-			} else {
+-				ERROR("Invalid uuid mentioned in metadata\n");
+-				panic();
+-			}
+-			break;
++#if !defined(AARCH32_SP_OPTEE)
++#warning  "Why is AARCH32_SP_OPTEE not defined?"
+ #endif
+-		default:
+-			panic();
+-			break;
+-		}
+-	}
+-}
+ 
+-static int plat_set_image_source(unsigned int image_id,
+-				 uintptr_t *handle,
+-				 uintptr_t *image_spec)
+-{
+-	struct plat_io_policy *policy;
+-	io_block_spec_t *spec __maybe_unused;
+-	const partition_entry_t *entry __maybe_unused;
+-	const uint16_t boot_itf = stm32mp_get_boot_itf_selected();
+-	const struct efi_guid metadata_type_guid __maybe_unused = FWU_METADATA_GUID;
+-
+-	policy = &policies[image_id];
+-	spec = (io_block_spec_t *)policy->image_spec;
+-
+-	switch (boot_itf) {
+-#if (STM32MP_SDMMC || STM32MP_EMMC)
+-	case BOOT_API_CTX_BOOT_INTERFACE_SEL_FLASH_SD:
+-	case BOOT_API_CTX_BOOT_INTERFACE_SEL_FLASH_EMMC:
+-		partition_init(GPT_IMAGE_ID);
++static io_block_spec_t gpt_block_spec = {
++	.offset = 0U,
++	.length = 34U * MMC_BLOCK_SIZE, /* Size of GPT table */
++};
+ 
+-		entry = get_partition_entry_by_type(&metadata_type_guid);
+-		if (entry == NULL) {
+-			entry = (image_id == FWU_METADATA_IMAGE_ID) ?
+-				get_partition_entry(METADATA_PART_1) :
+-				get_partition_entry(METADATA_PART_2);
++int open_storage(const uintptr_t spec)
++{
++	return io_dev_init(storage_dev_handle, 0);
++}
+ 
++int open_backend(const uintptr_t spec)
++{
++	int result;
++	uintptr_t local_image_handle;
+ 
+-			if (entry == NULL) {
+-				ERROR("Unable to find a metadata partition\n");
+-				return -ENOENT;
+-			}
++	result = io_dev_init(storage_dev_handle, (uintptr_t)NULL);
++	if (result == 0) {
++		result = io_open(storage_dev_handle, spec, &local_image_handle);
++		if (result == 0) {
++			io_close(local_image_handle);
+ 		}
++	}
++	return result;
++}
+ 
+-		spec->offset = entry->start;
+-		spec->length = entry->length;
+-		break;
+-#endif
++int open_part(const uintptr_t spec)
++{
++	uintptr_t handle;
++	int32_t io_result;
+ 
+-#if STM32MP_SPI_NOR
+-	case BOOT_API_CTX_BOOT_INTERFACE_SEL_FLASH_NOR_SPI:
+-		if (image_id == FWU_METADATA_IMAGE_ID) {
+-			spec->offset = STM32MP_NOR_METADATA1_OFFSET;
+-		} else {
+-			spec->offset = STM32MP_NOR_METADATA2_OFFSET;
+-		}
++	struct amy_optee_image_spec *amy_spec = (struct amy_optee_image_spec *)spec;
++		
++	// Copy block_spec to image_block_spec
++	image_block_spec.offset = amy_spec->block_spec.offset;
++	image_block_spec.length = amy_spec->block_spec.length;
+ 
+-		spec->length = sizeof(struct fwu_metadata);
+-		break;
+-#endif
++	// Will call : amy_dev_init -> plat_get_image_source(AMY_IMAGE_ID) -> open_storage(image_block_spec)
++	io_result = io_dev_init(amy_dev_handle, AMY_IMAGE_ID);
++	assert(io_result == 0);
+ 
+-#if (STM32MP_RAW_NAND || STM32MP_SPI_NAND)
+-	case BOOT_API_CTX_BOOT_INTERFACE_SEL_FLASH_NAND_FMC:
+-	case BOOT_API_CTX_BOOT_INTERFACE_SEL_FLASH_NAND_SPI:
+-		if (image_id == FWU_METADATA_IMAGE_ID) {
+-			spec->offset = STM32MP_NAND_METADATA1_OFFSET;
+-		} else {
+-			spec->offset = STM32MP_NAND_METADATA2_OFFSET;
+-		}
++	io_result = io_open(amy_dev_handle, spec, &handle);
++	assert(io_result == 0);
+ 
+-		spec->length = sizeof(struct fwu_metadata);
+-		break;
+-#endif
++	return io_result;
++}
+ 
+-#if STM32MP_HYPERFLASH
+-		case BOOT_API_CTX_BOOT_INTERFACE_SEL_HYPERFLASH_OSPI:
+-		if (image_id == FWU_METADATA_IMAGE_ID) {
+-			spec->offset = STM32MP_HYPERFLASH_METADATA1_OFFSET;
+-		} else {
+-			spec->offset = STM32MP_HYPERFLASH_METADATA2_OFFSET;
+-		}
++static const struct plat_io_policy2 policies[] = {
++	[GPT_IMAGE_ID] = {
++		.name = "GPT_IMAGE_ID",
++		.dev_handle = &storage_dev_handle,
++		.image_spec = (uintptr_t)&gpt_block_spec,
++		.open = open_storage
++	},
++	[AMY_IMAGE_ID] = {
++		.name = "AMY_IMAGE_ID",
++		.dev_handle = &storage_dev_handle,
++		.image_spec = (uintptr_t)&image_block_spec,
++		.open = open_backend
++	},
++	[BL32_IMAGE_ID] = { // OP-TEE header
++		.name = "BL32_IMAGE_ID",
++		.dev_handle = &amy_dev_handle,
++		.image_spec = (uintptr_t)&amy_part_image_specs[AMY_OPTEE_HEADER_IDX],
++		.open = open_part
++	},
++	[BL33_IMAGE_ID] = {
++		.name = "BL33_IMAGE_ID",
++		.dev_handle = &amy_dev_handle,
++		.image_spec = (uintptr_t)&amy_part_image_specs[AMY_UBOOT_IDX],
++		.open = open_part
++	},
++	[BL32_EXTRA1_IMAGE_ID] = { // OP-TEE pager
++		.name = "BL32_EXTRA1_IMAGE_ID",
++		.dev_handle = &amy_dev_handle,
++		.image_spec = (uintptr_t)&amy_part_image_specs[AMY_OPTEE_PAGER_IDX],
++		.open = open_part
++	},
++	[BL32_EXTRA2_IMAGE_ID] = { // OP-TEE pageable
++		.name = "BL32_EXTRA2_IMAGE_ID",
++		.dev_handle = &amy_dev_handle,
++		.image_spec = (uintptr_t)&amy_part_image_specs[AMY_OPTEE_PAGEABLE_IDX],
++		.open = open_part
++	},
++};
+ 
+-		spec->length = sizeof(struct fwu_metadata);
+-		break;
+-#endif
++/*
++ * Return an IO device handle and specification which can be used to access
++ * an image. Use this to enforce platform load policy.
++ */
++int plat_get_image_source(unsigned int image_id, uintptr_t *dev_handle,
++			  uintptr_t *image_spec)
++{
++	int rc;
++	const struct plat_io_policy2 *policy;
+ 
+-	default:
+-		panic();
+-		break;
++	policy = &policies[image_id];
++	if (policy->open == NULL) {
++		return -ENOENT;
+ 	}
+-	*image_spec = policy->image_spec;
+-	*handle = *policy->dev_handle;
+-
+-	return 0;
+-}
+ 
+-int plat_fwu_set_metadata_image_source(unsigned int image_id,
+-				       uintptr_t *handle,
+-				       uintptr_t *image_spec)
+-{
+-	assert((image_id == FWU_METADATA_IMAGE_ID) ||
+-	       (image_id == BKUP_FWU_METADATA_IMAGE_ID));
+-
+-	return plat_set_image_source(image_id, handle, image_spec);
+-}
++	rc = policy->open(policy->image_spec);
++	if (rc == 0) {
++		*image_spec = policy->image_spec;
++		*dev_handle = *(policy->dev_handle);
++	} else {
++		ERROR("Failed to open IO device for image id=%u (%i)\n",
++		      image_id, rc);
++	}
+ 
+-bool plat_fwu_is_enabled(void)
+-{
+-	return !stm32mp_skip_boot_device_after_standby();
++	return rc;
+ }
+-#endif /* PSA_FWU_SUPPORT */
+diff --git a/plat/st/common/common.mk b/plat/st/common/common.mk
+index 066d1faad..6ef6b4ab7 100644
+--- a/plat/st/common/common.mk
++++ b/plat/st/common/common.mk
+@@ -196,7 +196,8 @@ BL2_SOURCES			+=	drivers/io/io_fip.c				\
+ 
+ BL2_SOURCES			+=	drivers/io/io_block.c				\
+ 					drivers/io/io_mtd.c				\
+-					drivers/io/io_storage.c
++					drivers/io/io_storage.c \
++					drivers/amy/io_amy.c
+ 
+ ifneq (${DECRYPTION_SUPPORT},none)
+ BL2_SOURCES			+=	drivers/io/io_encrypted.c
+diff --git a/plat/st/common/include/stm32mp_fconf_getter.h b/plat/st/common/include/stm32mp_fconf_getter.h
+index 18884ae06..41d0e34ac 100644
+--- a/plat/st/common/include/stm32mp_fconf_getter.h
++++ b/plat/st/common/include/stm32mp_fconf_getter.h
+@@ -25,7 +25,6 @@ struct plat_io_policy {
+ 	int (*check)(const uintptr_t spec);
+ };
+ 
+-extern struct plat_io_policy policies[];
+ int fconf_populate_stm32mp_io_policies(uintptr_t config);
+ 
+ #endif /* STM32MP_FCONF_GETTER */
+diff --git a/plat/st/common/include/stm32mp_io_storage.h b/plat/st/common/include/stm32mp_io_storage.h
+index 7e0194c24..fa6f162f2 100644
+--- a/plat/st/common/include/stm32mp_io_storage.h
++++ b/plat/st/common/include/stm32mp_io_storage.h
+@@ -92,13 +92,9 @@
+ 
+ /* IO devices handle */
+ extern uintptr_t storage_dev_handle;
+-extern uintptr_t fip_dev_handle;
+-extern uintptr_t enc_dev_handle;
+-
+ extern io_block_spec_t image_block_spec;
+ 
+ /* Function declarations */
+-int open_fip(const uintptr_t spec);
+ #ifndef DECRYPTION_SUPPORT_none
+ int open_enc_fip(const uintptr_t spec);
+ #endif
+diff --git a/plat/st/common/stm32mp_fconf_io.c b/plat/st/common/stm32mp_fconf_io.c
+index e12eded81..17fa17fc1 100644
+--- a/plat/st/common/stm32mp_fconf_io.c
++++ b/plat/st/common/stm32mp_fconf_io.c
+@@ -205,8 +205,8 @@ int fconf_populate_stm32mp_io_policies(uintptr_t config)
+ 			break;
+ #endif
+ 		default:
+-			policies[load_info[i].image_id].dev_handle = &fip_dev_handle;
+-			policies[load_info[i].image_id].check = open_fip;
++			ERROR("Unhandled image_id %u in fconf_populate_stm32mp_io_policies\n",
++			      load_info[i].image_id);
+ 			break;
+ 		}
+ 	}
+@@ -214,4 +214,4 @@ int fconf_populate_stm32mp_io_policies(uintptr_t config)
+ 	return 0;
+ }
+ 
+-FCONF_REGISTER_POPULATOR(TB_FW, stm32mp_io, fconf_populate_stm32mp_io_policies);
++// FCONF_REGISTER_POPULATOR(TB_FW, stm32mp_io, fconf_populate_stm32mp_io_policies);
+diff --git a/plat/st/stm32mp1/bl2_plat_setup.c b/plat/st/stm32mp1/bl2_plat_setup.c
+index 83013c902..0b28ee7d2 100644
+--- a/plat/st/stm32mp1/bl2_plat_setup.c
++++ b/plat/st/stm32mp1/bl2_plat_setup.c
+@@ -507,6 +507,8 @@ skip_console_init:
+ 
+ 	stm32mp_syscfg_enable_io_compensation_finish();
+ 
++	// TODO Where is the best place to put this call?
++	fconf_populate("FW_CONFIG", STM32MP_DTB_BASE);
+ 	fconf_populate("TB_FW", STM32MP_DTB_BASE);
+ 
+ 	if (stm32mp_skip_boot_device_after_standby()) {
+@@ -553,219 +555,6 @@ static void prepare_encryption(void)
+ }
+ #endif
+ 
+-/*******************************************************************************
+- * This function can be used by the platforms to update/use image
+- * information for given `image_id`.
+- ******************************************************************************/
+-int bl2_plat_handle_post_image_load(unsigned int image_id)
+-{
+-	int err = 0;
+-	bl_mem_params_node_t *bl_mem_params = get_bl_mem_params_node(image_id);
+-	bl_mem_params_node_t *bl32_mem_params;
+-	bl_mem_params_node_t *pager_mem_params __unused;
+-	bl_mem_params_node_t *paged_mem_params __unused;
+-	const struct dyn_cfg_dtb_info_t *config_info;
+-	bl_mem_params_node_t *tos_fw_mem_params;
+-	unsigned int i;
+-	unsigned int idx;
+-	unsigned long long ddr_top __unused;
+-#if STM32MP_UART_PROGRAMMER || STM32MP_USB_PROGRAMMER
+-	bool wakeup_ddr_sr = false;
+-#else /* STM32MP_UART_PROGRAMMER || STM32MP_USB_PROGRAMMER */
+-	bool wakeup_ddr_sr = stm32mp1_ddr_is_restored();
+-#endif /* STM32MP_UART_PROGRAMMER || STM32MP_USB_PROGRAMMER */
+-	const unsigned int image_ids[] = {
+-		BL32_IMAGE_ID,
+-		BL33_IMAGE_ID,
+-		HW_CONFIG_ID,
+-		TOS_FW_CONFIG_ID,
+-	};
+-
+-	assert(bl_mem_params != NULL);
+-
+-	switch (image_id) {
+-	case FW_CONFIG_ID:
+-#if STM32MP13
+-		if ((stm32mp_check_closed_device() == STM32MP_CHIP_SEC_CLOSED) ||
+-		    stm32mp_is_auth_supported()) {
+-			prepare_encryption();
+-		}
+-#endif
+-
+-		/* Restore DDR training area on resume after encryption was enabled */
+-		if (wakeup_ddr_sr) {
+-			stm32_restore_ddr_training_area();
+-		}
+-
+-		if (stm32mp_skip_boot_device_after_standby()) {
+-			return 0;
+-		}
+-
+-		/* Set global DTB info for fixed fw_config information */
+-		set_config_info(STM32MP_FW_CONFIG_BASE, ~0UL, STM32MP_FW_CONFIG_MAX_SIZE,
+-				FW_CONFIG_ID);
+-		fconf_populate("FW_CONFIG", STM32MP_FW_CONFIG_BASE);
+-
+-		idx = dyn_cfg_dtb_info_get_index(TOS_FW_CONFIG_ID);
+-
+-		/* Iterate through all the fw config IDs */
+-		for (i = 0U; i < ARRAY_SIZE(image_ids); i++) {
+-			if ((image_ids[i] == TOS_FW_CONFIG_ID) && (idx == FCONF_INVALID_IDX)) {
+-				continue;
+-			}
+-
+-			bl_mem_params = get_bl_mem_params_node(image_ids[i]);
+-			assert(bl_mem_params != NULL);
+-
+-			config_info = FCONF_GET_PROPERTY(dyn_cfg, dtb, image_ids[i]);
+-			if (config_info == NULL) {
+-				continue;
+-			}
+-
+-			bl_mem_params->image_info.image_base = config_info->config_addr;
+-			bl_mem_params->image_info.image_max_size = config_info->config_max_size;
+-
+-			/*
+-			 * If going back from CSTANDBY / STANDBY and DDR was in Self-Refresh,
+-			 * DDR partitions must not be reloaded.
+-			 */
+-			if (!(wakeup_ddr_sr && (config_info->config_addr >= STM32MP_DDR_BASE))) {
+-				bl_mem_params->image_info.h.attr &= ~IMAGE_ATTRIB_SKIP_LOADING;
+-			}
+-
+-			switch (image_ids[i]) {
+-			case BL32_IMAGE_ID:
+-				bl_mem_params->ep_info.pc = config_info->config_addr;
+-
+-				/* In case of OPTEE, initialize address space with tos_fw addr */
+-				pager_mem_params = get_bl_mem_params_node(BL32_EXTRA1_IMAGE_ID);
+-				assert(pager_mem_params != NULL);
+-				pager_mem_params->image_info.image_base = config_info->config_addr;
+-				pager_mem_params->image_info.image_max_size =
+-					config_info->config_max_size;
+-
+-				/* Init base and size for pager if exist */
+-				paged_mem_params = get_bl_mem_params_node(BL32_EXTRA2_IMAGE_ID);
+-				if (paged_mem_params != NULL) {
+-					paged_mem_params->image_info.image_base = STM32MP_DDR_BASE +
+-						(dt_get_ddr_size() - STM32MP_DDR_S_SIZE);
+-					paged_mem_params->image_info.image_max_size =
+-						STM32MP_DDR_S_SIZE;
+-				}
+-				break;
+-
+-			case BL33_IMAGE_ID:
+-				if (wakeup_ddr_sr) {
+-					/*
+-					 * Set ep_info PC to 0, to inform BL32 it is a reset
+-					 * after STANDBY
+-					 */
+-					bl_mem_params->ep_info.pc = 0U;
+-				} else {
+-					bl_mem_params->ep_info.pc = config_info->config_addr;
+-				}
+-				break;
+-
+-			case HW_CONFIG_ID:
+-			case TOS_FW_CONFIG_ID:
+-				break;
+-
+-			default:
+-				return -EINVAL;
+-			}
+-		}
+-		break;
+-
+-	case BL32_IMAGE_ID:
+-#if !STM32MP_UART_PROGRAMMER && !STM32MP_USB_PROGRAMMER
+-		if (wakeup_ddr_sr && stm32mp_skip_boot_device_after_standby()) {
+-			bl_mem_params->ep_info.pc = stm32_pm_get_optee_ep();
+-			if (stm32mp1_addr_inside_backupsram(bl_mem_params->ep_info.pc)) {
+-				clk_enable(BKPSRAM);
+-			}
+-			break;
+-		}
+-#endif /* !STM32MP_UART_PROGRAMMER && !STM32MP_USB_PROGRAMMER */
+-
+-		if (optee_header_is_valid(bl_mem_params->image_info.image_base)) {
+-			image_info_t *paged_image_info = NULL;
+-
+-			/* BL32 is OP-TEE header */
+-			bl_mem_params->ep_info.pc = bl_mem_params->image_info.image_base;
+-
+-			pager_mem_params = get_bl_mem_params_node(BL32_EXTRA1_IMAGE_ID);
+-			assert(pager_mem_params != NULL);
+-
+-			paged_mem_params = get_bl_mem_params_node(BL32_EXTRA2_IMAGE_ID);
+-			if (paged_mem_params != NULL) {
+-				paged_image_info = &paged_mem_params->image_info;
+-			}
+-
+-			err = parse_optee_header(&bl_mem_params->ep_info,
+-						 &pager_mem_params->image_info,
+-						 paged_image_info);
+-			if (err != 0) {
+-				ERROR("OPTEE header parse error.\n");
+-				panic();
+-			}
+-
+-			/* Set optee boot info from parsed header data */
+-			if (paged_mem_params != NULL) {
+-				bl_mem_params->ep_info.args.arg0 =
+-					paged_mem_params->image_info.image_base;
+-			} else {
+-				bl_mem_params->ep_info.args.arg0 = 0U;
+-			}
+-
+-			bl_mem_params->ep_info.args.arg1 = 0U; /* Unused */
+-			bl_mem_params->ep_info.args.arg2 = 0U; /* No DT supported */
+-		} else {
+-			bl_mem_params->ep_info.pc = bl_mem_params->image_info.image_base;
+-			tos_fw_mem_params = get_bl_mem_params_node(TOS_FW_CONFIG_ID);
+-			assert(tos_fw_mem_params != NULL);
+-			bl_mem_params->image_info.image_max_size +=
+-				tos_fw_mem_params->image_info.image_max_size;
+-			bl_mem_params->ep_info.args.arg0 = 0;
+-		}
+-
+-		stm32_context_save_bl2_param();
+-		break;
+-
+-	case BL33_IMAGE_ID:
+-		bl32_mem_params = get_bl_mem_params_node(BL32_IMAGE_ID);
+-		assert(bl32_mem_params != NULL);
+-		bl32_mem_params->ep_info.lr_svc = bl_mem_params->ep_info.pc;
+-#if PSA_FWU_SUPPORT
+-		if (plat_fwu_is_enabled()) {
+-			err = stm32_fwu_set_boot_idx();
+-			if (err != 0) {
+-				panic();
+-			}
+-		}
+-#endif /* PSA_FWU_SUPPORT */
+-		break;
+-
+-	default:
+-		/* Do nothing in default case */
+-		break;
+-	}
+-
+-#if STM32MP_SDMMC || STM32MP_EMMC
+-	/*
+-	 * Invalidate remaining data read from MMC but not flushed by load_image_flush().
+-	 * We take the worst case which is 2 MMC blocks.
+-	 */
+-	if ((image_id != FW_CONFIG_ID) &&
+-	    ((bl_mem_params->image_info.h.attr & IMAGE_ATTRIB_SKIP_LOADING) == 0U)) {
+-		inv_dcache_range(bl_mem_params->image_info.image_base +
+-				 bl_mem_params->image_info.image_size,
+-				 2U * MMC_BLOCK_SIZE);
+-	}
+-#endif /* STM32MP_SDMMC || STM32MP_EMMC */
+-
+-	return err;
+-}
+-
+ void bl2_el3_plat_prepare_exit(void)
+ {
+ #if STM32MP_UART_PROGRAMMER || STM32MP_USB_PROGRAMMER
+diff --git a/plat/st/stm32mp1/include/platform_def.h b/plat/st/stm32mp1/include/platform_def.h
+index 75c8219a2..ea25c1592 100644
+--- a/plat/st/stm32mp1/include/platform_def.h
++++ b/plat/st/stm32mp1/include/platform_def.h
+@@ -36,7 +36,7 @@
+ #define PLATFORM_MAX_CPUS_PER_CLUSTER	2
+ 
+ #define MAX_IO_DEVICES			U(4)
+-#define MAX_IO_HANDLES			U(4)
++#define MAX_IO_HANDLES			U(6)
+ #define MAX_IO_BLOCK_DEVICES		U(1)
+ #define MAX_IO_MTD_DEVICES		U(1)
+ 
+diff --git a/plat/st/stm32mp1/plat_bl2_mem_params_desc_amy.c b/plat/st/stm32mp1/plat_bl2_mem_params_desc_amy.c
+new file mode 100644
+index 000000000..9b9e1a889
+--- /dev/null
++++ b/plat/st/stm32mp1/plat_bl2_mem_params_desc_amy.c
+@@ -0,0 +1,97 @@
++/*
++ * Copyright (c) 2016-2022, ARM Limited and Contributors. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include "stm32mp1_def.h"
++#include "stm32mp1_fip_def.h"
++#include <common/bl_common.h>
++#include <common/desc_image_load.h>
++#include <plat/common/platform.h>
++
++#include <platform_def.h>
++
++/*******************************************************************************
++ * Following descriptor provides BL image/ep information that gets used
++ * by BL2 to load the images and also subset of this information is
++ * passed to next BL image. The image loading sequence is managed by
++ * populating the images in required loading order. The image execution
++ * sequence is managed by populating the `next_handoff_image_id` with
++ * the next executable image id.
++ ******************************************************************************/
++static bl_mem_params_node_t bl2_mem_params_descs[] = {
++	/* Fill BL32 (OP-TEE header) related information */
++	{
++		.image_id = BL32_IMAGE_ID,
++
++		SET_STATIC_PARAM_HEAD(ep_info, PARAM_EP,
++				      VERSION_2, entry_point_info_t,
++				      SECURE | EXECUTABLE | EP_FIRST_EXE),
++		.image_info.image_base = STM32MP_DDR_BASE,
++		.image_info.image_max_size = 0x1000, /* 4 KB for OP-TEE header */
++		.ep_info.spsr = SPSR_MODE32(MODE32_svc, SPSR_T_ARM,
++					    SPSR_E_LITTLE,
++					    DISABLE_ALL_EXCEPTIONS),
++
++		SET_STATIC_PARAM_HEAD(image_info, PARAM_EP,
++				      VERSION_2, image_info_t,
++				      IMAGE_ATTRIB_PLAT_SETUP), // SDRAM must be initialized before loading OP-TEE header
++
++		.next_handoff_image_id = BL33_IMAGE_ID,
++	},
++
++	/* Fill BL32 external 1 image (OP-TEE pager) related information */
++	{
++		.image_id = BL32_EXTRA1_IMAGE_ID,
++		.image_info.image_base = STM32MP_SYSRAM_BASE,
++		.image_info.image_max_size = STM32MP_SYSRAM_SIZE, // (TODO divided by 2 ??)
++		SET_STATIC_PARAM_HEAD(ep_info, PARAM_EP,
++				      VERSION_2, entry_point_info_t,
++				      SECURE | NON_EXECUTABLE),
++
++		SET_STATIC_PARAM_HEAD(image_info, PARAM_EP,
++				      VERSION_2, image_info_t,
++				      0u),
++
++		.next_handoff_image_id = INVALID_IMAGE_ID,
++	},
++	/* Fill BL32 external 2 image (OP-TEE pageable) related information */
++	{
++		.image_id = BL32_EXTRA2_IMAGE_ID,
++		.image_info.image_base = STM32MP_DDR_BASE,
++		.image_info.image_max_size = STM32MP_DDR_MAX_SIZE,
++		SET_STATIC_PARAM_HEAD(ep_info, PARAM_EP,
++				      VERSION_2, entry_point_info_t,
++				      SECURE | NON_EXECUTABLE),
++
++		SET_STATIC_PARAM_HEAD(image_info, PARAM_EP,
++				      VERSION_2, image_info_t,
++				      0u),
++
++		.next_handoff_image_id = INVALID_IMAGE_ID,
++	},
++	/* Fill BL33 (u-boot) related information */
++	{
++		.image_id = BL33_IMAGE_ID,
++
++		SET_STATIC_PARAM_HEAD(ep_info, PARAM_EP,
++				      VERSION_2, entry_point_info_t,
++				      NON_SECURE | EXECUTABLE),
++		.image_info.image_base = STM32MP_BL33_BASE,
++		.image_info.image_max_size = STM32MP_BL33_MAX_SIZE,
++
++		.ep_info.pc = STM32MP_BL33_BASE,
++		.ep_info.spsr = SPSR_MODE32(MODE32_svc, SPSR_T_ARM,
++					    SPSR_E_LITTLE,
++					    DISABLE_ALL_EXCEPTIONS),
++
++		SET_STATIC_PARAM_HEAD(image_info, PARAM_EP,
++				      VERSION_2, image_info_t,
++				      0u), // IMAGE_ATTRIB_SKIP_LOADING ?
++
++		.next_handoff_image_id = INVALID_IMAGE_ID,
++	}
++};
++
++REGISTER_BL_IMAGE_DESCS(bl2_mem_params_descs)
+diff --git a/plat/st/stm32mp1/platform.mk b/plat/st/stm32mp1/platform.mk
+index 0e4540b34..adb7cbffe 100644
+--- a/plat/st/stm32mp1/platform.mk
++++ b/plat/st/stm32mp1/platform.mk
+@@ -260,7 +260,7 @@ else
+ PLAT_BL_COMMON_SOURCES	+=	drivers/st/clk/stm32mp1_clk.c
+ endif
+ 
+-BL2_SOURCES		+=	plat/st/stm32mp1/plat_bl2_mem_params_desc.c		\
++BL2_SOURCES		+=	plat/st/stm32mp1/plat_bl2_mem_params_desc_amy.c		\
+ 				plat/st/stm32mp1/stm32mp1_fconf_firewall.c
+ 
+ BL2_SOURCES		+=	drivers/st/crypto/stm32_hash.c				\
+diff --git a/plat/st/stm32mp1/stm32mp1_fip_def.h b/plat/st/stm32mp1/stm32mp1_fip_def.h
+index 8ad1ed9c7..9f8ff85e6 100644
+--- a/plat/st/stm32mp1/stm32mp1_fip_def.h
++++ b/plat/st/stm32mp1/stm32mp1_fip_def.h
+@@ -7,7 +7,8 @@
+ #ifndef STM32MP1_FIP_DEF_H
+ #define STM32MP1_FIP_DEF_H
+ 
+-#define STM32MP_DDR_S_SIZE		U(0x02000000)	/* 32 MB */
++#define STM32MP_DDR_S_SIZE		U(0x01E00000)	/* 30 MB */
++#define STM32MP_DDR_SHMEM_SIZE		U(0x00200000)	/* 2 MB */
+ 
+ #if STM32MP_SSP
+ #if STM32MP13
+-- 
+2.39.5
+

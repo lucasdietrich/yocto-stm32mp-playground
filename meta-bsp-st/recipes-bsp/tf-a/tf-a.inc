@@ -4,10 +4,6 @@ HOMEPAGE = "https://www.trustedfirmware.org/projects/tf-a/"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://docs/license.rst;md5=b2c740efedc159745b9b31f88ff03dde"
 
-SRC_URI = "git://github.com/TrustedFirmware-A/trusted-firmware-a.git;protocol=https;branch=lts-v2.10"
-SRCREV = "bf6bc80a5f2d4a24ac5950314b3e79d61a7e6cee"
-PV = "2.10.25"
-
 S = "${WORKDIR}/git"
 
 PROVIDES += "virtual/tf-a"
@@ -17,8 +13,8 @@ DEPENDS = "gcc-arm-none-eabi-native dtc-native"
 
 TFA_DEVICETREE ??= "stm32mp157c-dk2"
 
-PACKAGECONFIG ??= "debug"
-PACKAGECONFIG[debug] = "DEBUG=1,"
+PACKAGECONFIG ??= "${@bb.utils.contains('AMY_DEBUG', '1', 'debug', '', d)}"
+PACKAGECONFIG[debug] = "DEBUG=1 LOG_LEVEL=40,"
 
 #
 # Instructions to build the TF-A for STM32MP1
@@ -34,12 +30,12 @@ PACKAGECONFIG[debug] = "DEBUG=1,"
 #     -j16
 EXTRA_OEMAKE = "CROSS_COMPILE=arm-none-eabi-"
 
-EXTRA_OEMAKE += "STM32MP_SDMMC=1"
 EXTRA_OEMAKE += "PLAT=stm32mp1"
 EXTRA_OEMAKE += "ARCH=aarch32"
 EXTRA_OEMAKE += "ARM_ARCH_MAJOR=7"
+EXTRA_OEMAKE += "STM32MP_SDMMC=1"
 EXTRA_OEMAKE += "DTB_FILE_NAME=${TFA_DEVICETREE}.dtb"
-EXTRA_OEMAKE += "LOG_LEVEL=40"
+EXTRA_OEMAKE += "STM32MP1_OPTEE_IN_SYSRAM=1"
 
 EXTRA_OEMAKE += "${PACKAGECONFIG_CONFARGS}"
 

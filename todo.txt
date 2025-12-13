@@ -1,0 +1,29 @@
+[ ] integrate TF-A into yocto
+    [x] st version
+    [ ] mainline version ?
+    [ ] understand why loading of image 5 (u-boot) takes multiples seconds from TF-A
+
+[ ] integrate OP-TEE into yocto
+    [ ] use stm32mp157f instead of stm32mp157c
+    [ ] TEE-FS
+    [ ] OP-TEE Client
+    [ ] OP-TEE PKCS
+
+[ ] integrate u-boot into yocto
+    [ ] env
+    [ ] initial env
+    
+[ ] integrate kernel into yocto
+    [ ] devicetree
+    [ ] 1.18
+    [ ] FIT
+
+[ ] distribution
+    [ ] port userfs
+    [ ] dmcrypt/dmintegrity
+    [ ] container system
+
+Goring further:
+[ ] SCMI (u-boot/OP-TEE)
+[ ] boot kernel from network with u-boot
+[ ] custom rust toolchain

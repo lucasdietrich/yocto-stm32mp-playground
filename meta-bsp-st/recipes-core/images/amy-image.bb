@@ -13,7 +13,7 @@ TOOLCHAIN_HOST_TASK += "\
     nativesdk-dtc \
     "
 
-EXTRA_IMAGEDEPENDS += "virtual/tf-a"
+EXTRA_IMAGEDEPENDS += "virtual/tf-a virtual/u-boot optee-os"
 
 #########################
 # Create a sdcard image #
@@ -30,6 +30,8 @@ SRC_URI += "file://sdcard_genimage.cfg.in"
 DEPENDS += "genimage-native"
 
 do_sdimage[depends] += "virtual/tf-a:do_deploy"
+do_sdimage[depends] += "optee-os:do_deploy"
+do_sdimage[depends] += "virtual/u-boot:do_deploy"
 addtask do_sdimage after do_image_ext4 before do_image_complete
 
 do_sdimage() {
@@ -38,10 +40,12 @@ do_sdimage() {
     sed -e "s|@IMAGE@|${IMAGE_BASENAME}|g" \
         -e "s|@MACHINE@|${MACHINE}|g" \
         -e "s|@TFA_DEVICETREE@|${TFA_DEVICETREE}|g" \
-        ${WORKDIR}/sdcard_genimage.cfg.in > ${WORKDIR}/sdcard_genimage.cfg
+        ${FILE_DIRNAME}/files/sdcard_genimage.cfg.in > ${WORKDIR}/sdcard_genimage.cfg
 
     mkdir -p ${WORKDIR}/genimage/tmp ${WORKDIR}/genimage/root ${WORKDIR}/genimage/input
     ln -sf ${DEPLOY_DIR_IMAGE}/tf-a/* ${WORKDIR}/genimage/input/
+    ln -sf ${DEPLOY_DIR_IMAGE}/optee-os/* ${WORKDIR}/genimage/input/
+    ln -sf ${DEPLOY_DIR_IMAGE}/u-boot/* ${WORKDIR}/genimage/input/
 
     # clean up existing .img files
     rm -f ${IMGDEPLOYDIR}/*.img ${IMGDEPLOYDIR}/*.img.gz
