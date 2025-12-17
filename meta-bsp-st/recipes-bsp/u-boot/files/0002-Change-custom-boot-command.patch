@@ -1,0 +1,31 @@
+From 723a20f9d193efa3fb1117d373c2bd3f42366978 Mon Sep 17 00:00:00 2001
+From: Lucas Dietrich <lucas.dietrich.git@proton.me>
+Date: Tue, 16 Dec 2025 19:40:40 +0100
+Subject: [PATCH 2/2] Change custom boot command
+
+---
+ include/configs/stm32mp15_st_common.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/include/configs/stm32mp15_st_common.h b/include/configs/stm32mp15_st_common.h
+index 60838cb0e3f..8207beef4b8 100644
+--- a/include/configs/stm32mp15_st_common.h
++++ b/include/configs/stm32mp15_st_common.h
+@@ -9,10 +9,10 @@
+ #define __CONFIG_STM32MP15_ST_COMMON_H__
+ 
+ #define STM32MP_BOARD_EXTRA_ENV \
+-	"usb_pgood_delay=2000\0" \
+-	"console=ttySTM0\0" \
+-	"splashimage=" __stringify(CONFIG_SYS_LOAD_ADDR) "\0" \
+-	"splashpos=m,m\0"
++	"bootcmd_amy=fatload mmc 0:8 ${kernel_addr_r} zImage;" \
++		"fatload mmc 0:8 ${fdt_addr_r} stm32mp157f-dk2-amy.dtb;" \
++		"setenv bootargs 'console=ttySTM0,115200 earlycon root=PARTLABEL=rootfs rootfstype=ext4 rw rootwait';" \
++		"bootz ${kernel_addr_r} - ${fdt_addr_r}\0"
+ 
+ #include <configs/stm32mp15_common.h>
+ 
+-- 
+2.39.5
+

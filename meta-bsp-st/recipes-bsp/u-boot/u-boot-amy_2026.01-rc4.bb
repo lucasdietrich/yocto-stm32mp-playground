@@ -13,6 +13,7 @@ SRC_URI = "git://github.com/u-boot/u-boot.git;protocol=https;branch=master"
 SRCREV = "0e0a198a68be71148f5ec27ef86796174f91436f"
 
 SRC_URI += "file://0001-Disable-SCMI-for-stm32mp157f-dk2.patch \
+            file://0002-Change-custom-boot-command.patch \
             file://amy_defconfig \
             "
 

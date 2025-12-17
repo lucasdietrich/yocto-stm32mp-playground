@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 dev=/dev/sdd
-machine=${1-"dk2"}
+machine=${1-"stm32mp157f-dk2"}
 image=${2:-"amy"}
 
 if [ ! -b $dev ]; then

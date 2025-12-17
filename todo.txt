@@ -1,3 +1,7 @@
+[ ] fix clock frequency to 800MHz for 157f device
+[ ] fix dts to use 157f device for all relevant components
+[ ] fix coloring of the terminal: `export TERM=xterm-256color`
+
 [ ] integrate TF-A into yocto
     [x] st version
     [ ] mainline version ?
