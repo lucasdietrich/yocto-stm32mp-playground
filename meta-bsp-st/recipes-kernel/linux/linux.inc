@@ -19,3 +19,5 @@ S="${WORKDIR}/linux-${LINUX_VERSION}"
 
 COMPATIBLE_MACHINE = "stm32mp157f-dk2"
 KCONFIG_MODE = "alldefconfig"
+
+DEPENDS += " lz4-native "

@@ -12,22 +12,28 @@
     [ ] TEE-FS
     [ ] OP-TEE Client
     [ ] OP-TEE PKCS
+    [ ] disable OP-TEE on startup
 
 [ ] integrate u-boot into yocto
-    [ ] env
+    [x] env
     [ ] initial env
+
+[ ] yocto
+    [ ] rename machine from stm32mp157f-dk2 to "amy" or "dk2"
     
 [ ] integrate kernel into yocto
-    [ ] devicetree
-    [ ] 1.18
+    [x] devicetree
+    [x] 1.18
     [ ] FIT
+    [ ] remove unused config option (try to find the minimum config)
+        [ ] create features with .scc files
 
 [ ] distribution
     [ ] port userfs
     [ ] dmcrypt/dmintegrity
     [ ] container system
 
-Goring further:
+Going further:
 [ ] SCMI (u-boot/OP-TEE)
 [ ] boot kernel from network with u-boot
 [ ] custom rust toolchain
