@@ -35,7 +35,7 @@ image @IMAGE@-@MACHINE@-sdcard.img {
 
     partition u-boot {
         image = "u-boot/u-boot.bin"
-        size = 4M
+        size = 1M
     }
 
     partition u-boot-env {

@@ -1,7 +1,7 @@
-From 9a877811f55e51fbf815d338e9137ebd9a0573e4 Mon Sep 17 00:00:00 2001
+From 82766f66c2e23f356bf8ac60d261836277be574f Mon Sep 17 00:00:00 2001
 From: Lucas Dietrich <lucas.dietrich.git@proton.me>
 Date: Sat, 13 Dec 2025 18:32:52 +0100
-Subject: [PATCH] Disable SCMI for stm32mp157f-dk2
+Subject: [PATCH 1/2] Disable SCMI for stm32mp157f-dk2
 
 ---
  dts/upstream/src/arm/st/stm32mp157f-dk2.dts | 20 +++++++++++---------

@@ -10,7 +10,7 @@ PROVIDES += "virtual/u-boot"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 SRC_URI = "git://github.com/u-boot/u-boot.git;protocol=https;branch=master"
-SRCREV = "0e0a198a68be71148f5ec27ef86796174f91436f"
+SRCREV = "0f6ff53d55ba254de8a995c2a2f5a313acd40ac7"
 
 SRC_URI += "file://0001-Disable-SCMI-for-stm32mp157f-dk2.patch \
             file://0002-Change-custom-boot-command.patch \
@@ -32,6 +32,7 @@ do_configure:prepend() {
     # Use merge_config.sh to automatically merge config fragments if debug.cfg exists
     if [ -f ${WORKDIR}/debug.cfg ]; then
         ${S}/scripts/kconfig/merge_config.sh -m -O ${B} ${S}/configs/amy_defconfig ${WORKDIR}/debug.cfg
+        oe_runmake olddefconfig
     else
         oe_runmake amy_defconfig
     fi

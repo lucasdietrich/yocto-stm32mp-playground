@@ -1,6 +1,6 @@
-From 723a20f9d193efa3fb1117d373c2bd3f42366978 Mon Sep 17 00:00:00 2001
+From d1260bc6dc92ad5b7580ed35d6637f632e66b024 Mon Sep 17 00:00:00 2001
 From: Lucas Dietrich <lucas.dietrich.git@proton.me>
-Date: Tue, 16 Dec 2025 19:40:40 +0100
+Date: Thu, 25 Dec 2025 11:26:21 +0100
 Subject: [PATCH 2/2] Change custom boot command
 
 ---
@@ -8,7 +8,7 @@ Subject: [PATCH 2/2] Change custom boot command
  1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/include/configs/stm32mp15_st_common.h b/include/configs/stm32mp15_st_common.h
-index 60838cb0e3f..8207beef4b8 100644
+index 60838cb0e3f..2b0479d9168 100644
 --- a/include/configs/stm32mp15_st_common.h
 +++ b/include/configs/stm32mp15_st_common.h
 @@ -9,10 +9,10 @@
