@@ -20,6 +20,7 @@ SSTATE_DIR ?= "/home/lucas/yocto/sstate-cache"
 MACHINE = "dk2"
 INHERIT += "rm_work"
 RM_WORK_EXCLUDE += ""
+AMY_DEBUG = "0"
 ```
 
 Configure the `bblayers.conf`:
@@ -29,11 +30,12 @@ BBLAYERS ?= " \
   /home/lucas/yocto/yocto-ld-mp1/poky/meta \
   /home/lucas/yocto/yocto-ld-mp1/poky/meta-poky \
   /home/lucas/yocto/yocto-ld-mp1/poky/meta-yocto-bsp \
-  /home/lucas/yocto/yocto-ld-mp1/meta-bsp-st \
   /home/lucas/yocto/yocto-ld-mp1/meta-openembedded/meta-oe \
   /home/lucas/yocto/yocto-ld-mp1/meta-openembedded/meta-python \
   /home/lucas/yocto/yocto-ld-mp1/meta-openembedded/meta-networking \
   /home/lucas/yocto/yocto-ld-mp1/meta-arm/meta-arm-toolchain \
+  /home/lucas/yocto/yocto-ld-mp1/meta-bsp-st \
+  /home/lucas/yocto/yocto-ld-mp1/meta-playground \
   "
 ```
 
