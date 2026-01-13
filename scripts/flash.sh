@@ -9,6 +9,6 @@ if [ ! -b $dev ]; then
     exit 1
 fi
 
-img=images/$machine/$image-image-$machine-sdcard.img
+img=build/tmp/deploy/images/$machine/$image-image-$machine-sdcard.img
 
 sudo dd if=$img of=$dev bs=4M status=progress

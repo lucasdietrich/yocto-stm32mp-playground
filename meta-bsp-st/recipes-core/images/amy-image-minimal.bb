@@ -64,3 +64,8 @@ do_sdimage() {
 
     cp ${WORKDIR}/sdcard_genimage.cfg ${IMGDEPLOYDIR}
 }
+
+
+IMAGE_OVERHEAD_FACTOR = "1.0"
+IMAGE_ROOTFS_EXTRA_SPACE = "32768"
+IMAGE_ROOTFS_MAXSIZE = "262400"
