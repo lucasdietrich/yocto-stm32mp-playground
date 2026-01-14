@@ -7,3 +7,6 @@
 [submodule "meta-arm"]
 	path = meta-arm
 	url = git://git.yoctoproject.org/meta-arm
+[submodule "meta-lts-mixins"]
+	path = meta-lts-mixins
+	url = git://git.yoctoproject.org/meta-lts-mixins

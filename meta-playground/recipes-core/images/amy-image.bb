@@ -6,6 +6,10 @@ IMAGE_INSTALL:append = "\
     htop \
 "
 
+IMAGE_INSTALL:append = " \
+    packagegroup-amy-examples \
+"
+
 IMAGE_INSTALL:append = "${@bb.utils.contains('AMY_DEBUG_UTILS', '1',' \
     util-linux \
     e2fsprogs-resize2fs \
