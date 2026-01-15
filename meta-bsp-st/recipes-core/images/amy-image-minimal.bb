@@ -32,11 +32,12 @@ SRC_URI += "file://sdcard_genimage.cfg.in"
 DEPENDS += "genimage-native"
 
 # vfat tools
-DEPENDS += "dosfstools-native mtools-native"
+DEPENDS += "dosfstools-native mtools-native virtual/tf-a optee-os virtual/u-boot virtual/kernel"
 
 do_sdimage[depends] += "virtual/tf-a:do_deploy"
 do_sdimage[depends] += "optee-os:do_deploy"
 do_sdimage[depends] += "virtual/u-boot:do_deploy"
+do_sdimage[depends] += "virtual/kernel:do_deploy"
 addtask do_sdimage after do_image_ext4 before do_image_complete
 
 do_sdimage() {
