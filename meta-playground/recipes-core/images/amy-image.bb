@@ -7,6 +7,7 @@ IMAGE_INSTALL:append = "\
 "
 
 IMAGE_INSTALL:append = " \
+    packagegroup-amy-core \
     packagegroup-amy-examples \
 "
 

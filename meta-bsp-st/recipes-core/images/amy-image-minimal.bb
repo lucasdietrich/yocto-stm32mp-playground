@@ -1,7 +1,11 @@
 SUMMARY = "stm32mp1 Amy Image"
 LICENSE = "MIT"
 
-IMAGE_INSTALL = "packagegroup-core-boot ${CORE_IMAGE_EXTRA_INSTALL}"
+IMAGE_INSTALL = "\
+    packagegroup-core-boot \
+    packagegroup-amy-bsp \
+    ${CORE_IMAGE_EXTRA_INSTALL}\
+"
 
 inherit core-image
 
@@ -70,3 +74,9 @@ do_sdimage() {
 IMAGE_OVERHEAD_FACTOR = "1.0"
 IMAGE_ROOTFS_EXTRA_SPACE = "32768"
 IMAGE_ROOTFS_MAXSIZE = "262400"
+
+# userfs directory
+rootfs_prepare_userfs() {
+    install -d ${IMAGE_ROOTFS}/mnt/userfs
+}
+ROOTFS_POSTPROCESS_COMMAND += "rootfs_prepare_userfs;"

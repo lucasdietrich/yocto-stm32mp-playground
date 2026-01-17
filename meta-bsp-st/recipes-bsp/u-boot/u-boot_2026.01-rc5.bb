@@ -15,12 +15,13 @@ SRCREV = "0f6ff53d55ba254de8a995c2a2f5a313acd40ac7"
 SRC_URI += "file://0001-Disable-SCMI-for-stm32mp157f-dk2.patch \
             file://0002-Change-custom-boot-command.patch \
             file://amy_defconfig \
+            file://fw_env.config \
             ${@bb.utils.contains('AMY_DEBUG', '1', 'file://debug.cfg', '', d)} \
             "
 
 DEPENDS = "gcc-arm-none-eabi-native bison-native swig-native"
 
-EXTRA_OEMAKE = 'CROSS_COMPILE=arm-none-eabi- CC="${TARGET_PREFIX}gcc ${TOOLCHAIN_OPTIONS} ${DEBUG_PREFIX_MAP}"'
+EXTRA_OEMAKE = 'CROSS_COMPILE=${TARGET_PREFIX} CC="${TARGET_PREFIX}gcc ${TOOLCHAIN_OPTIONS} ${DEBUG_PREFIX_MAP}"'
 EXTRA_OEMAKE += 'HOSTCC="${BUILD_CC} ${BUILD_CFLAGS} ${BUILD_LDFLAGS}"'
 EXTRA_OEMAKE += 'STAGING_INCDIR=${STAGING_INCDIR_NATIVE} STAGING_LIBDIR=${STAGING_LIBDIR_NATIVE}'
 
@@ -43,6 +44,27 @@ do_compile:prepend() {
     unset CFLAGS
     unset CPPFLAGS
 }
+
+do_compile:append() {
+    # Generate the uboot-initial-env
+    oe_runmake -C ${S} O=${B}/${config} u-boot-initial-env
+}
+
+do_install() {
+    install -d ${D}${sysconfdir}
+    install -m 0644 ${WORKDIR}/fw_env.config ${D}${sysconfdir}/fw_env.config
+    install -m 0644 ${B}/${config}/u-boot-initial-env ${D}${sysconfdir}/u-boot-initial-env
+}
+
+# u-boot env
+PACKAGE_BEFORE_PN += "${PN}-env"
+RPROVIDES:${PN}-env += "u-boot-default-env"
+FILES:${PN}-env = " \
+    ${sysconfdir}/u-boot-initial-env \
+    ${sysconfdir}/fw_env.config \
+"
+
+RDEPENDS:${PN} += "${PN}-env"
 
 inherit deploy
 
