@@ -10,7 +10,7 @@ PROVIDES += "virtual/u-boot"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 SRC_URI = "git://github.com/u-boot/u-boot.git;protocol=https;branch=master"
-SRCREV = "0f6ff53d55ba254de8a995c2a2f5a313acd40ac7"
+SRCREV = "127a42c7257a6ffbbd1575ed1cbaa8f5408a44b3"
 
 SRC_URI += "file://0001-Disable-SCMI-for-stm32mp157f-dk2.patch \
             file://0002-Change-custom-boot-command.patch \
