@@ -3,8 +3,13 @@ SUMMARY = "Kernel for STM32MP157"
 inherit kernel
 require recipes-kernel/linux/linux-yocto.inc
 
+PREMIRRORS:prepend = "\
+  https://cdn.kernel.org/pub/linux/kernel/v6.x/ \
+  https://git.kernel.org/torvalds/t/ \n \
+"
+
 SRC_URI = "\
-        https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-${PV}.tar.xz \
+        https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-${PV}.tar.gz \
         file://defconfig \
         "
 
