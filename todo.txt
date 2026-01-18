@@ -26,10 +26,22 @@
 
 [ ] yocto
     [ ] rename machine from stm32mp157f-dk2 to "amy" or "dk2"
+
+[ ] optee
+    [x] 4.7.0
+    [ ] 4.8.0
+        [ ] fix call of newly introduced function `stm32_rtc_init` in core/drivers/stm32_rtc.c since 4.8.0 which makes init panic
+    [ ] 4.9.0
+        [ ] same as 4.8.0
+    [ ] optee-client
+    [ ] optee-samples
+    [ ] optee-pkcs11
+    [ ] optee custom TA
     
 [ ] integrate kernel into yocto
     [x] devicetree
     [x] 1.18
+    [x] 6.19-rc5
     [ ] FIT
     [ ] remove unused config option (try to find the minimum config)
         [ ] create features with .scc files
