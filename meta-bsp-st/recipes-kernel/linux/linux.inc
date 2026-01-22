@@ -11,7 +11,10 @@ PREMIRRORS:prepend = "\
 SRC_URI = "\
         https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-${PV}.tar.gz \
         file://defconfig \
+        file://features/veth.scc \
         "
+
+KERNEL_FEATURES += "veth.scc"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 

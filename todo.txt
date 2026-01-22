@@ -54,6 +54,9 @@
         [ ] dnat / masquerade / forwarding
         [ ] MTU
 
+[ ] networking
+    [ ] udev auto DHCP when ethernet cable is plugged
+
 [ ] distribution
     [x] port userfs
         [ ] implement ext4 in addition to btrfs
