@@ -46,8 +46,11 @@
     [ ] remove unused config option (try to find the minimum config)
         [ ] create features with .scc files
 
+[ ] create meta-lw-container layer
+    [ ] orchestration application: lway
+
 [ ] container system
-    [ ] runc
+    [ ] crun
     [ ] networking
         [ ] virtual ethernet devices
         [ ] bridge
