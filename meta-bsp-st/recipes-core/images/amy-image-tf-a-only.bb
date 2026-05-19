@@ -1,11 +1,7 @@
-SUMMARY = "stm32mp1 Amy Image"
+SUMMARY = "stm32mp1 Amy Image TF-A only"
 LICENSE = "MIT"
 
-IMAGE_INSTALL = "\
-    packagegroup-core-boot \
-    packagegroup-amy-bsp \
-    ${CORE_IMAGE_EXTRA_INSTALL}\
-"
+IMAGE_INSTALL = "packagegroup-core-boot ${CORE_IMAGE_EXTRA_INSTALL}"
 
 inherit core-image
 
@@ -17,9 +13,7 @@ TOOLCHAIN_HOST_TASK += "\
     nativesdk-dtc \
     "
 
-EXTRA_IMAGEDEPENDS += "virtual/tf-a virtual/u-boot optee-os"
-
-IMAGE_FSTYPES = "ext4"
+EXTRA_IMAGEDEPENDS += "virtual/tf-a"
 
 #########################
 # Create a sdcard image #
@@ -35,13 +29,7 @@ SRC_URI += "file://${SDIMAGE_CONF}"
 
 DEPENDS += "genimage-native"
 
-# vfat tools
-DEPENDS += "dosfstools-native mtools-native virtual/tf-a optee-os virtual/u-boot virtual/kernel"
-
 do_sdimage[depends] += "virtual/tf-a:do_deploy"
-do_sdimage[depends] += "optee-os:do_deploy"
-do_sdimage[depends] += "virtual/u-boot:do_deploy"
-do_sdimage[depends] += "virtual/kernel:do_deploy"
 addtask do_sdimage after do_image_ext4 before do_image_complete
 
 do_sdimage() {
@@ -69,14 +57,3 @@ do_sdimage() {
 
     cp ${WORKDIR}/sdcard_genimage.cfg ${IMGDEPLOYDIR}
 }
-
-
-IMAGE_OVERHEAD_FACTOR = "1.0"
-IMAGE_ROOTFS_EXTRA_SPACE = "32768"
-IMAGE_ROOTFS_MAXSIZE = "262400"
-
-# userfs directory
-rootfs_prepare_userfs() {
-    install -d ${IMAGE_ROOTFS}/mnt/userfs
-}
-ROOTFS_POSTPROCESS_COMMAND += "rootfs_prepare_userfs;"

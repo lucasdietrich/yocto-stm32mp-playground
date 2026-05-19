@@ -25,7 +25,7 @@ KERNEL_DEPLOYSUBDIR = "kernel"
 
 S="${WORKDIR}/linux-${LINUX_VERSION}"
 
-COMPATIBLE_MACHINE = "dk2"
+COMPATIBLE_MACHINE = "^(mp1|dk2|mp2)$"
 KCONFIG_MODE = "alldefconfig"
 
 DEPENDS += " lz4-native "

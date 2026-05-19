@@ -1,4 +1,4 @@
-SUMMARIZE = "U-Boot for STM32MP1"
+SUMMARY = "U-Boot for STM32MP1"
 HOMEPAGE = "https://github.com/u-boot/u-boot.git"
 
 LICENSE = "GPL-2.0-or-later"

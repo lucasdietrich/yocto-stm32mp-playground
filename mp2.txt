@@ -1,0 +1,15 @@
+NOTICE:  CPU: STM32MP257FAK Rev.Y
+NOTICE:  Model: STMicroelectronics STM32MP257F-DK Discovery Board
+NOTICE:  Board: MB1605 Var1.0 Rev.C-01
+INFO:    Reset reason: Power-on reset (por_rstn) (0x2035)
+INFO:    PMIC2 version = 0x11
+INFO:    PMIC2 product ID = 0x20
+INFO:    FCONF: Reading TB_FW firmware configuration file from: 0xe011000
+INFO:    FCONF: Reading firmware configuration information for: stm32mp_io
+INFO:    Using SDMMC
+INFO:      Instance 1
+INFO:    Boot used partition fsbl1
+NOTICE:  BL2: v2.14.2(debug):lts-v2.14.2
+NOTICE:  BL2: Built : 14:54:30, May  2 2026
+ERROR:   Could NOT find the fip partition!
+ERROR:   BL2: Failure in pre image load handling (-2)

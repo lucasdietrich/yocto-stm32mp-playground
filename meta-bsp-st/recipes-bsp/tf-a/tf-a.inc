@@ -1,41 +1,41 @@
-SUMMARIZE = "Trusted Firmware A"
-HOMEPAGE = "https://www.trustedfirmware.org/projects/tf-a/"
+SUMMARY = "Trusted Firmware A"
+require tf-a-common.inc
 
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://docs/license.rst;md5=b2c740efedc159745b9b31f88ff03dde"
 
-S = "${WORKDIR}/git"
-
 PROVIDES += "virtual/tf-a"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-DEPENDS = "gcc-arm-none-eabi-native dtc-native"
+DEPENDS = "dtc-native"
+DEPENDS:append:armv7a = " gcc-arm-none-eabi-native"
+DEPENDS:append:aarch64 = " gcc-aarch64-none-elf-native"
+
+TFA_PLATFORM:mp1  = "stm32mp1"
+TFA_ARM_MAJOR:mp1 = "7"
+TFA_ARM_ARCH:mp1  = "aarch32"
+
+TFA_PLATFORM:mp2  = "stm32mp2"
+TFA_ARM_MAJOR:mp2 = "8"
+TFA_ARM_ARCH:mp2  = "aarch64"
 
 TFA_DEVICETREE ??= "stm32mp157c-dk2"
 
 PACKAGECONFIG ??= "${@bb.utils.contains('AMY_DEBUG', '1', 'debug', '', d)}"
 PACKAGECONFIG[debug] = "DEBUG=1 LOG_LEVEL=40,"
 
-#
-# Instructions to build the TF-A for STM32MP1
-#
-# . /opt/amy/1.0/environment-setup-cortexa7t2hf-neon-vfpv4-poky-linux-gnueabi && \
-#     unset LDFLAGS && unset CFLAGS && unset CPPFLAGS && \
-#     make CROSS_COMPILE=arm-none-eabi- \
-#     STM32MP_SDMMC=1 \
-#     PLAT=stm32mp1 \
-#     ARCH=aarch32 ARM_ARCH_MAJOR=7 \
-#     DTB_FILE_NAME=stm32mp157c-dk2.dtb \
-#     LOG_LEVEL=40 \
-#     -j16
-EXTRA_OEMAKE = "CROSS_COMPILE=arm-none-eabi-"
+EXTRA_OEMAKE = ""
 
-EXTRA_OEMAKE += "PLAT=stm32mp1"
-EXTRA_OEMAKE += "ARCH=aarch32"
-EXTRA_OEMAKE += "ARM_ARCH_MAJOR=7"
+EXTRA_OEMAKE:append:armv7a = " CROSS_COMPILE=arm-none-eabi- "
+EXTRA_OEMAKE:append:aarch64 = " CROSS_COMPILE=aarch64-none-elf- "
+
+EXTRA_OEMAKE += "PLAT=${TFA_PLATFORM}"
+EXTRA_OEMAKE += "ARCH=${TFA_ARM_ARCH}"
+EXTRA_OEMAKE += "ARM_ARCH_MAJOR=${TFA_ARM_MAJOR}"
 EXTRA_OEMAKE += "STM32MP_SDMMC=1"
 EXTRA_OEMAKE += "DTB_FILE_NAME=${TFA_DEVICETREE}.dtb"
-EXTRA_OEMAKE += "STM32MP1_OPTEE_IN_SYSRAM=1"
+EXTRA_OEMAKE:append:mp1 = " STM32MP1_OPTEE_IN_SYSRAM=1"
+EXTRA_OEMAKE:append:mp2 = " STM32MP_LPDDR4_TYPE=1"
 
 EXTRA_OEMAKE += "${PACKAGECONFIG_CONFARGS}"
 
@@ -44,14 +44,38 @@ do_compile:prepend() {
     unset LDFLAGS
     unset CFLAGS
     unset CPPFLAGS
+
+    # Fixes issue: aarch64-poky-linux-as: unrecognized option '-x'
+    # Allow TF-A to derive AS from CROSS_COMPILE instead of using the Linux-sysroot assembler
+    unset AS
 }
+
+export_binaries() {
+    local dest="${1}"
+    dirname="${@bb.utils.contains('PACKAGECONFIG', 'debug', 'debug', 'release', d)}"
+
+    install -d ${dest}
+    install -m 0644 ${S}/build/${TFA_PLATFORM}/${dirname}/tf-a-${TFA_DEVICETREE}.stm32 ${dest}/
+    
+    install -d ${dest}/bl31
+    if [ -f ${S}/build/${TFA_PLATFORM}/${dirname}/bl31.bin ]; then
+        install -m 0644 ${S}/build/${TFA_PLATFORM}/${dirname}/bl31.bin ${dest}/bl31/
+    fi
+
+    install -d ${dest}/fdts
+    install -m 0644 ${S}/build/${TFA_PLATFORM}/${dirname}/fdts/${TFA_DEVICETREE}-bl2.dtb ${dest}/fdts/
+    install -m 0644 ${S}/build/${TFA_PLATFORM}/${dirname}/fdts/${TFA_DEVICETREE}-bl31.dtb ${dest}/fdts/
+    install -m 0644 ${S}/build/${TFA_PLATFORM}/${dirname}/fdts/${TFA_DEVICETREE}-fw-config.dtb ${dest}/fdts/
+}
+
+tf_a_sysroot_populate() {
+  export_binaries ${SYSROOT_DESTDIR}${FIP_DIR_TFA_BASE}
+}
+SYSROOT_PREPROCESS_FUNCS =+ "tf_a_sysroot_populate"
+SYSROOT_DIRS:append = " ${FIP_DIR_TFA_BASE}"
 
 inherit deploy
-
 do_deploy() {
-    mkdir -p ${DEPLOYDIR}/tf-a
-    dirname="${@bb.utils.contains('PACKAGECONFIG', 'debug', 'debug', 'release', d)}"
-    cp ${S}/build/stm32mp1/${dirname}/tf-a-${TFA_DEVICETREE}.stm32 ${DEPLOYDIR}/tf-a/
+    export_binaries ${DEPLOYDIR}/tf-a
 }
-
 addtask do_deploy after do_install

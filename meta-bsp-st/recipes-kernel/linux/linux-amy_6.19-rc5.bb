@@ -1,4 +1,4 @@
-require linux.inc
+require linux-amy.inc
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files/6.19:"
 

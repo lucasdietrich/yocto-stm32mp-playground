@@ -1,0 +1,20 @@
+image @IMAGE@-@MACHINE@-sdcard.img {
+    hdimage {
+        partition-table-type = "gpt"
+    }
+
+    # According to STM32MP2 Boot ROM documentation: https://wiki.st.com/stm32mpu/wiki/STM32_MPU_ROM_code_overview
+    # > On STM32MP2 series, it locates two FSBLs by looking for the two first GPT entries of which the name begins with either "fsbla" or "fsblm".
+	
+    partition fsbla1 {
+        image = "tf-a/tf-a-@TFA_DEVICETREE@.stm32"
+
+        # SYSRAM size is 256K on STM32MP1
+        size = 256K
+	}
+
+	partition fsbla2 {
+        image = "tf-a/tf-a-@TFA_DEVICETREE@.stm32"
+        size = 256K
+	}
+}

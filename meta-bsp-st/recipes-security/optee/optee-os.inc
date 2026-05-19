@@ -1,4 +1,4 @@
-SUMMARIZE = "Op-TEE"
+SUMMARY = "Op-TEE"
 HOMEPAGE = "https://optee.readthedocs.io/en/latest/index.html"
 
 LICENSE = "BSD-2-Clause"
@@ -10,20 +10,35 @@ S = "${WORKDIR}/git"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-DEPENDS = "gcc-arm-none-eabi-native dtc-native python3-cryptography-native python3-pyelftools-native"
+DEPENDS = "dtc-native python3-cryptography-native python3-pyelftools-native"
+DEPENDS:append:armv7a  = " gcc-arm-none-eabi-native"
+DEPENDS:append:aarch64 = " gcc-aarch64-none-elf-native"
 
-EXTRA_OEMAKE = "CROSS_COMPILE=arm-none-eabi-"
 
-EXTRA_OEMAKE += "PLATFORM=stm32mp1-157C_DK2"
-EXTRA_OEMAKE += "CFG_EMBED_DTB_SOURCE_FILE=stm32mp157c-dk2.dts"
+# OPTEE_PLATFORM is built as ${PLATFORM}-${PLATFORM_FLAVOR}
+OPTEE_PLATFORM:mp1   = "stm32mp1-157C_DK2"
+OPTEE_DEVICETREE:mp1 = "stm32mp157c-dk2"
 
-EXTRA_OEMAKE += "CFG_WITH_PAGER=y"
-EXTRA_OEMAKE += "CFG_CORE_RESERVED_SHM=y"
-# u-boot scmi driver requires CFG_CORE_DYN_SHM=y
-EXTRA_OEMAKE += "CFG_CORE_DYN_SHM=y"
+OPTEE_PLATFORM:mp2   = "stm32mp2-257F_DK"
+OPTEE_DEVICETREE:mp2 = "stm32mp257f-dk"
 
-EXTRA_OEMAKE += "CFG_STM32MP_REMOTEPROC=y"
+EXTRA_OEMAKE = ""
+
+EXTRA_OEMAKE:append:armv7a  = " CROSS_COMPILE=arm-none-eabi-"
+EXTRA_OEMAKE:append:aarch64 = " CROSS_COMPILE64=aarch64-none-elf-"
+
+EXTRA_OEMAKE += "PLATFORM=${OPTEE_PLATFORM}"
+EXTRA_OEMAKE += "CFG_EMBED_DTB_SOURCE_FILE=${OPTEE_DEVICETREE}.dts"
+
 EXTRA_OEMAKE += "CFG_TEE_CORE_NB_CORE=2"
+
+EXTRA_OEMAKE:append:mp1 = " CFG_WITH_PAGER=y "
+EXTRA_OEMAKE:append:mp1 = " CFG_CORE_RESERVED_SHM=y "
+# u-boot scmi driver requires CFG_CORE_DYN_SHM=y
+EXTRA_OEMAKE:append:mp1 = " CFG_CORE_DYN_SHM=y "
+EXTRA_OEMAKE:append:mp1 = " CFG_STM32MP_REMOTEPROC=y "
+
+EXTRA_OEMAKE:append:mp2 = " CFG_SCMI_SCPFW=n "
 
 # CFG_TEE_CORE_LOG_LEVEL might be increase to 3/4 for more verbose output
 EXTRA_OEMAKE += "${@bb.utils.contains('AMY_DEBUG', '1', '\
@@ -41,13 +56,28 @@ do_compile:prepend() {
     unset CPPFLAGS
 }
 
-inherit deploy
+export_binaries() {
+    local dest="${1}"
+    plat="${@d.getVar('OPTEE_PLATFORM').split('-')[0]}"
 
-do_deploy() {
-    mkdir -p ${DEPLOYDIR}/optee-os
-    cp ${S}/out/arm-plat-stm32mp1/core/tee-header_v2.bin ${DEPLOYDIR}/optee-os
-    cp ${S}/out/arm-plat-stm32mp1/core/tee-pager_v2.bin ${DEPLOYDIR}/optee-os
-    cp ${S}/out/arm-plat-stm32mp1/core/tee-pageable_v2.bin ${DEPLOYDIR}/optee-os
+    install -d ${dest}
+    install -m 0644 ${S}/out/arm-plat-${plat}/core/tee-header_v2.bin ${dest}/
+    install -m 0644 ${S}/out/arm-plat-${plat}/core/tee-pager_v2.bin ${dest}/
+    install -m 0644 ${S}/out/arm-plat-${plat}/core/tee-pageable_v2.bin ${dest}/
+    install -m 0644 ${S}/out/arm-plat-${plat}/conf.mk ${dest}/
+
+    # TODO copy all TAs
+    mkdir -p ${dest}/ta
 }
 
+optee_sysroot_populate() {
+  export_binaries ${SYSROOT_DESTDIR}${FIP_DIR_OPTEE_BASE}
+}
+SYSROOT_PREPROCESS_FUNCS =+ "optee_sysroot_populate"
+SYSROOT_DIRS:append = " ${FIP_DIR_OPTEE_BASE}"
+
+inherit deploy
+do_deploy() {
+    export_binaries ${DEPLOYDIR}/optee-os
+}
 addtask do_deploy after do_install
