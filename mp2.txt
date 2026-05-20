@@ -1,15 +1,50 @@
 NOTICE:  CPU: STM32MP257FAK Rev.Y
 NOTICE:  Model: STMicroelectronics STM32MP257F-DK Discovery Board
 NOTICE:  Board: MB1605 Var1.0 Rev.C-01
-INFO:    Reset reason: Power-on reset (por_rstn) (0x2035)
+NOTICE:  Reset reason: Power-on reset (por_rstn) (0x2035)
 INFO:    PMIC2 version = 0x11
 INFO:    PMIC2 product ID = 0x20
 INFO:    FCONF: Reading TB_FW firmware configuration file from: 0xe011000
 INFO:    FCONF: Reading firmware configuration information for: stm32mp_io
+INFO:    FCONF: Reading firmware configuration information for: stm32mp_fuse
 INFO:    Using SDMMC
 INFO:      Instance 1
 INFO:    Boot used partition fsbl1
-NOTICE:  BL2: v2.14.2(debug):lts-v2.14.2
-NOTICE:  BL2: Built : 14:54:30, May  2 2026
-ERROR:   Could NOT find the fip partition!
-ERROR:   BL2: Failure in pre image load handling (-2)
+NOTICE:  BL2: v2.10-stm32mp2-r2.0(debug):lts-v2.10.24-dirty(a07367a1)
+NOTICE:  BL2: Built : 16:16:36, Oct  3 2025
+INFO:    BL2: Loading image id 26
+INFO:    Loading image id=26 at address 0xe041000
+INFO:    Image id=26 loaded: 0xe041000 - 0xe049650
+INFO:    BL2: Doing platform setup
+INFO:    RAM: LPDDR4 1x32Gbits 1x32bits 1200MHz
+INFO:    Memory size = 0x100000000 (4096 MB)
+INFO:    BL2: Loading image id 1
+INFO:    Loading image id=1 at address 0xe000000
+INFO:    Image id=1 loaded: 0xe000000 - 0xe000326
+INFO:    FCONF: Reading FW_CONFIG firmware configuration file from: 0xe000000
+INFO:    FCONF: Reading firmware configuration information for: dyn_cfg
+INFO:    FCONF: Reading firmware configuration information for: risaf_config
+INFO:    RISAF2: No configuration in DT, use default
+INFO:    BL31 max size = 0x17000 (94208B)
+INFO:    BL2: Loading image id 3
+INFO:    Loading image id=3 at address 0xe000000
+INFO:    Image id=3 loaded: 0xe000000 - 0xe0159f0
+INFO:    BL2: Loading image id 19
+INFO:    Loading image id=19 at address 0x81fc0000
+INFO:    Image id=19 loaded: 0x81fc0000 - 0x81fc3958
+INFO:    BL2: Loading image id 4
+INFO:    Loading image id=4 at address 0x82000000
+INFO:    Image id=4 loaded: 0x82000000 - 0x8200001c
+INFO:    OPTEE ep=0x82000000
+INFO:    OPTEE header info:
+INFO:          magic=0x4554504f
+INFO:          version=0x2
+INFO:          arch=0x1
+INFO:          flags=0x0
+INFO:          nb_images=0x1
+INFO:    BL2: Loading image id 8
+INFO:    Loading image id=8 at address 0x82000000
+INFO:    Image id=8 loaded: 0x82000000 - 0x820a6700
+INFO:    BL2: Loading image id 2
+WARNING: Failed to access image id=2 (-2)
+ERROR:   BL2: Failed to load image id 2 (-2)

@@ -1,0 +1,1 @@
+Adapted copy from meta-st-stm32mp/recipes-bsp/ddr-firmware of ST layer

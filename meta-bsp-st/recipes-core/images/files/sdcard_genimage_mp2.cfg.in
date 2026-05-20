@@ -17,4 +17,42 @@ image @IMAGE@-@MACHINE@-sdcard.img {
         image = "tf-a/tf-a-@TFA_DEVICETREE@.stm32"
         size = 256K
 	}
+
+    partition fip-a {
+        image = "fip/fip-@MACHINE@.bin"
+        partition-type-uuid = "19d5df83-11b0-457b-be2c-7559c13142a5"
+        partition-uuid = "4fd84c93-54ef-463f-a7ef-ae25ff887087"
+        size = 4M
+    }
+
+    partition fip-b {
+        image = "fip/fip-@MACHINE@.bin"
+        partition-type-uuid = "19d5df83-11b0-457b-be2c-7559c13142a5"
+        partition-uuid = "09c54952-d5bf-45af-acee-335303766fb3"
+        size = 4M
+    }
+
+    partition u-boot-env {
+        size = 128K
+    }
+
+    partition bootfs {
+        image = "bootfs.vfat"
+    }
+
+    partition rootfs {
+        image = "@IMAGE_ROOTFS@"
+        size = 256M
+    }
+}
+
+image bootfs.vfat {
+    vfat {
+        label = "bootfs"
+        files = {
+            "kernel/Image",
+            "kernel/stm32mp257f-dk-mp2.dtb"
+        }
+    }
+    size = 32M
 }
