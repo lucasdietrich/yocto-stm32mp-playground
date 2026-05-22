@@ -47,7 +47,7 @@ INFO:    Loading image id=8 at address 0x82000000
 INFO:    Image id=8 loaded: 0x82000000 - 0x820f76e8
 INFO:    BL2: Loading image id 2
 INFO:    Loading image id=2 at address 0x84400000
-INFO:    Image id=2 loaded: 0x84400000 - 0x844115a8
+INFO:    Image id=2 loaded: 0x84400000 - 0x8440fc00
 INFO:    BL2: Loading image id 5
 INFO:    Loading image id=5 at address 0x84000000
 INFO:    Image id=5 loaded: 0x84000000 - 0x84114588
@@ -88,8 +88,8 @@ I/TC: Asynchronous notifications are enabled
 U-Boot 2026.04 (Apr 06 2026 - 17:59:18 +0000)
 
 CPU: STM32MP257FAK Rev.Y
-Model: STMicroelectronics STM32MP257F-EV1 Evaluation Board
-Board: stm32mp2 (st,stm32mp257f-ev1)
+Model: STMicroelectronics STM32MP257F-DK Discovery Board
+Board: stm32mp2 (st,stm32mp257f-dk)
 Board: MB1605 Var1.0 Rev.C-01
 DRAM:  4 GiB
 optee optee: OP-TEE: revision 4.0 (2a5b1d12)
@@ -97,20 +97,18 @@ I/TC: Reserved shared memory is disabled
 I/TC: Dynamic shared memory is enabled
 I/TC: Normal World virtualization support is disabled
 I/TC: Asynchronous notifications are enabled
-Core:  372 devices, 29 uclasses, devicetree: board
+Core:  359 devices, 26 uclasses, devicetree: board
 WDT:   Started watchdog with servicing every 1000ms (32s timeout)
 MMC:   STM32 SD/MMC: 0
-Loading Environment from MMC... MMC: no card present
-*** Warning - No block device, using default environment
+Loading Environment from MMC... *** Warning - bad CRC, using default environment
 
-In:    serial
+Reading from MMC(0)... In:    serial
 Out:   serial
 Err:   serial
 
 Hit any key to stop autoboot: 0
 Boot over mmc0!
-Saving Environment to MMC... MMC: no card present
-No block device
-Failed (1)
-MMC: no card present
+Saving Environment to MMC... Writing to MMC(0)... OK
+switch to partitions #0, OK
+mmc0 is current device
 STM32MP>

@@ -35,7 +35,7 @@ DEPENDS:append:armv7a = " gcc-arm-none-eabi-native"
 DEPENDS:append:aarch64 = " gcc-aarch64-none-elf-native"
 
 UBOOT_CONFIG ?= "amy_defconfig"
-UBOOT_DEVICETREE ?= "stm32mp157f-dk2"
+UBOOT_DEVICETREE ?= "st/stm32mp157f-dk2"
 
 do_configure:prepend:mp1() {
     cp ${WORKDIR}/amy_defconfig ${S}/configs/amy_defconfig
@@ -52,13 +52,16 @@ do_configure:prepend() {
     oe_runmake DEVICE_TREE=${UBOOT_DEVICETREE} ${UBOOT_CONFIG}
 }
 
-do_compile:prepend() {
+do_compile() {
     unset LDFLAGS
     unset CFLAGS
     unset CPPFLAGS
 
-    # Build u-boot binaries + uboot-initial-env
-    oe_runmake -C ${S} O=${B} all
+    # Build u-boot binaries
+    oe_runmake -C ${S} O=${B} DEVICE_TREE=${UBOOT_DEVICETREE} all
+
+    # Build u-boot-initial-env
+    oe_runmake -C ${S} O=${B} DEVICE_TREE=${UBOOT_DEVICETREE} u-boot-initial-env
 }
 
 do_install() {
