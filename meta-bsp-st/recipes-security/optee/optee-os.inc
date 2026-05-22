@@ -13,6 +13,7 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 DEPENDS = "dtc-native python3-cryptography-native python3-pyelftools-native"
 DEPENDS:append:armv7a  = " gcc-arm-none-eabi-native"
 DEPENDS:append:aarch64 = " gcc-aarch64-none-elf-native"
+DEPENDS:append:mp2 = " scp-firmware-src cmake-native ninja-native"
 
 
 # OPTEE_PLATFORM is built as ${PLATFORM}-${PLATFORM_FLAVOR}
@@ -38,10 +39,15 @@ EXTRA_OEMAKE:append:mp1 = " CFG_CORE_RESERVED_SHM=y "
 EXTRA_OEMAKE:append:mp1 = " CFG_CORE_DYN_SHM=y "
 EXTRA_OEMAKE:append:mp1 = " CFG_STM32MP_REMOTEPROC=y "
 
-EXTRA_OEMAKE:append:mp2 = " CFG_SCMI_SCPFW=n "
+EXTRA_OEMAKE:append:mp2 = " \
+    CFG_SCMI_SCPFW=y \
+    CFG_SCP_FIRMWARE=${RECIPE_SYSROOT}${SCP_FIRMWARE_SYSROOT_DIR} \
+"
+
+OPTEE_DEBUG ??= "${AMY_DEBUG}"
 
 # CFG_TEE_CORE_LOG_LEVEL might be increase to 3/4 for more verbose output
-EXTRA_OEMAKE += "${@bb.utils.contains('AMY_DEBUG', '1', '\
+EXTRA_OEMAKE += "${@bb.utils.contains('OPTEE_DEBUG', '1', '\
     DEBUG=y \
     CFG_TEE_CORE_DEBUG=y \
     CFG_TEE_CORE_LOG_LEVEL=3\

@@ -3,12 +3,13 @@
 [ ] use sysroot instead of deploydir for inter-recipe build-time inputs
     [x] tf-a
     [x] op-tee
-    [ ] bl31
-    [ ] u-boot
+    [x] bl31
+    [x] u-boot
     [ ] kernel
 
 [ ] fip
     [ ] /home/lucas/yocto/yocto-dk2/build/tmp/deploy/images/stm32mp2/fip/fip-stm32mp257f-dk-optee-sdcard.txt
+    [ ] /home/lucas/yocto/yocto-dk2/build/tmp/deploy/images/stm32mp2/fip/fip-stm32mp257f-dk-optee-sdcard.bin
 
 # MP1
 

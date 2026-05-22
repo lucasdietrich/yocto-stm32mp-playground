@@ -1,0 +1,43 @@
+prerequirements: venv
+    sudo apt-get update && \
+    sudo apt install libgnutls28-dev gnutls-bin
+
+venv:
+    python3 -m venv .venv
+    . .venv/bin/activate && \
+        pip install --upgrade pip && \
+        pip install setuptools
+
+# CONFIG_TRACE_EARLY=y make u-boot crash
+
+# bear -- 
+build:
+    make CROSS_COMPILE="/opt/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-" \
+        HOSTCC=gcc-12 HOSTCXX=g++-12 amy_dk2_defconfig && \
+        make CROSS_COMPILE="/opt/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-" \
+        all \
+        -j$(nproc)
+
+u-boot-initial-env:
+    make CROSS_COMPILE="/opt/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-"         HOSTCC=gcc-12 HOSTCXX=g++-12 u-boot-initial-env
+
+# flash depends on file "u-boot.bin" being present in the current directory
+flash: build clear-env
+    if [ -b "/dev/disk/by-partlabel/u-boot" ]; then \
+        sudo dd if=u-boot.bin of=/dev/disk/by-partlabel/u-boot bs=1M conv=fsync ; \
+    else \
+        echo "Error: /dev/disk/by-partlabel/u-boot not found. Is the SD card mounted?" ; \
+    fi
+
+clear-env:
+    sudo dd if=/dev/random of=/dev/disk/by-partlabel/u-boot-env bs=128K count=1
+
+decompile:
+    dtc -I dtb -O dts -o u-boot-decompiled.dts u-boot.dtb
+
+menuconfig:
+    make CROSS_COMPILE="/opt/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-" \
+        HOSTCC=gcc-12 HOSTCXX=g++-12 menuconfig
+
+clean:
+    make mrproper

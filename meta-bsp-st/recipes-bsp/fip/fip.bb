@@ -8,7 +8,7 @@ DEPENDS += "tf-a-tools-native"
 DEPENDS += "optee-os"
 DEPENDS += "virtual/tf-a"
 DEPENDS += "stm32mp-ddr-phy"
-# DEPENDS += "virtual/u-boot"
+DEPENDS += "virtual/u-boot"
 
 do_compile() {
     fiptool create \
@@ -19,6 +19,8 @@ do_compile() {
         --tos-fw ${RECIPE_SYSROOT}${FIP_DIR_OPTEE_BASE}/tee-header_v2.bin \
         --tos-fw-extra1 ${RECIPE_SYSROOT}${FIP_DIR_OPTEE_BASE}/tee-pager_v2.bin \
         --tos-fw-extra2 ${RECIPE_SYSROOT}${FIP_DIR_OPTEE_BASE}/tee-pageable_v2.bin \
+        --nt-fw ${RECIPE_SYSROOT}${FIP_DIR_UBOOT_BASE}/u-boot-nodtb.bin \ 
+        --hw-config ${RECIPE_SYSROOT}${FIP_DIR_UBOOT_BASE}/u-boot.dtb   \ 
         fip-${MACHINE}.bin
 
     fiptool info fip-${MACHINE}.bin > fip-${MACHINE}.info.txt
