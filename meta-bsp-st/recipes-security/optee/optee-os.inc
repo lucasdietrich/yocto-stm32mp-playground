@@ -4,17 +4,23 @@ HOMEPAGE = "https://optee.readthedocs.io/en/latest/index.html"
 LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=c1f21c4f72f372ef38a5a4aee55ec173"
 
-SRC_URI = "git://github.com/OP-TEE/optee_os.git;protocol=https;branch=master"
+SRC_BRANCH ??= "master"
+SRC_URI = "git://github.com/OP-TEE/optee_os.git;protocol=https;branch=${SRC_BRANCH}"
 
 S = "${WORKDIR}/git"
 
+PROVIDES += "virtual/optee-os"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 DEPENDS = "dtc-native python3-cryptography-native python3-pyelftools-native"
 DEPENDS:append:armv7a  = " gcc-arm-none-eabi-native"
 DEPENDS:append:aarch64 = " gcc-aarch64-none-elf-native"
-DEPENDS:append:mp2 = " scp-firmware-src cmake-native ninja-native"
 
+PACKAGECONFIG ??= "scpfw"
+PACKAGECONFIG[scpfw] = "\
+    CFG_SCMI_SCPFW=y CFG_SCP_FIRMWARE=${RECIPE_SYSROOT}${SCP_FIRMWARE_SYSROOT_DIR},,\
+    scp-firmware-src cmake-native ninja-native\
+    "
 
 # OPTEE_PLATFORM is built as ${PLATFORM}-${PLATFORM_FLAVOR}
 OPTEE_PLATFORM:mp1   = "stm32mp1-157C_DK2"
@@ -33,16 +39,22 @@ EXTRA_OEMAKE += "CFG_EMBED_DTB_SOURCE_FILE=${OPTEE_DEVICETREE}.dts"
 
 EXTRA_OEMAKE += "CFG_TEE_CORE_NB_CORE=2"
 
+EXTRA_OEMAKE += "CFG_STM32_DEBUG_ACCESS_PTA=y"
+
 EXTRA_OEMAKE:append:mp1 = " CFG_WITH_PAGER=y "
 EXTRA_OEMAKE:append:mp1 = " CFG_CORE_RESERVED_SHM=y "
 # u-boot scmi driver requires CFG_CORE_DYN_SHM=y
 EXTRA_OEMAKE:append:mp1 = " CFG_CORE_DYN_SHM=y "
 EXTRA_OEMAKE:append:mp1 = " CFG_STM32MP_REMOTEPROC=y "
 
-EXTRA_OEMAKE:append:mp2 = " \
-    CFG_SCMI_SCPFW=y \
-    CFG_SCP_FIRMWARE=${RECIPE_SYSROOT}${SCP_FIRMWARE_SYSROOT_DIR} \
-"
+
+# u-boot requires BSEC PTA to be present
+# EXTRA_OEMAKE += "CFG_STM32_BSEC_PTA=y"
+# EXTRA_OEMAKE:append:mp1 = " CFG_STM32_BSEC=y "
+# EXTRA_OEMAKE:append:mp2 = " CFG_STM32_BSEC3=y "
+
+# TODO fix for mp2 (missing RPROC_SIGN_KEY=keys/default.pem)
+# EXTRA_OEMAKE += "CFG_REMOTEPROC_PTA=y"
 
 OPTEE_DEBUG ??= "${AMY_DEBUG}"
 

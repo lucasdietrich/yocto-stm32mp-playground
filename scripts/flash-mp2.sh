@@ -2,7 +2,7 @@
 
 dev=/dev/sdd
 machine=${1-"mp2"}
-image=${2:-"amy-image-tf-a-only"}
+image=${2:-"amy-image-minimal"}
 
 if [ ! -b $dev ]; then
     echo "No such device: $dev"

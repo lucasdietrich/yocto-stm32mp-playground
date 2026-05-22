@@ -1,7 +1,7 @@
 NOTICE:  CPU: STM32MP257FAK Rev.Y
 NOTICE:  Model: STMicroelectronics STM32MP257F-DK Discovery Board
 NOTICE:  Board: MB1605 Var1.0 Rev.C-01
-NOTICE:  Reset reason: Power-on reset (por_rstn) (0x2035)
+NOTICE:  Reset reason: Pin reset from NRST (0x2034)
 INFO:    PMIC2 version = 0x11
 INFO:    PMIC2 product ID = 0x20
 INFO:    FCONF: Reading TB_FW firmware configuration file from: 0xe011000
@@ -44,7 +44,7 @@ INFO:          flags=0x0
 INFO:          nb_images=0x1
 INFO:    BL2: Loading image id 8
 INFO:    Loading image id=8 at address 0x82000000
-INFO:    Image id=8 loaded: 0x82000000 - 0x820ac980
+INFO:    Image id=8 loaded: 0x82000000 - 0x820f76e8
 INFO:    BL2: Loading image id 2
 INFO:    Loading image id=2 at address 0x84400000
 INFO:    Image id=2 loaded: 0x84400000 - 0x844115a8
@@ -62,13 +62,17 @@ INFO:    BL31: Initializing BL32
 I/TC: Early console on UART#2
 I/TC:
 I/TC: Embedded DTB found
-I/TC: OP-TEE version: 4.10.0 (gcc version 13.2.1 20231009 (Arm GNU Toolchain 13.2.rel1 (Build arm-13.7))) #1 Fri Apr 17 09:49:20 UTC 2026 aarch64
+I/TC: OP-TEE version: 4.0.0-dev (gcc version 13.2.1 20231009 (Arm GNU Toolchain 13.2.rel1 (Build arm-13.7))) #1 Fri Oct 20 18:29:31 UTC 2023 aarch64
 I/TC: WARNING: This OP-TEE configuration might be insecure!
 I/TC: WARNING: Please check https://optee.readthedocs.io/en/latest/architecture/porting_guidelines.html
 I/TC: Primary CPU initializing
+I/TC: WARNING: All debug access are allowed
+I/TC: Override the OTP 124: 0 to 0x18db6
+I/TC: WARNING: Embeds insecure stm32mp_provisioning driver
+I/TC: PMIC STPMIC REFID:2.@ V1.1
 I/TC: Platform stm32mp2: flavor 257F_DK - DT stm32mp257f-dk.dts
-I/TC: DTB enables console
-[    0.000000] SCP-firmware v2.16.0-254-gf76402df
+I/TC: OP-TEE ST profile: secure_and_system_services
+[    0.000000] SCP-firmware 2.13.0-intree-optee-os-4.0.0-dev
 [    0.000000]
 [    0.000000] [FWK] Module initialization complete!
 I/TC: Primary CPU switching to normal world boot
@@ -83,54 +87,30 @@ I/TC: Asynchronous notifications are enabled
 
 U-Boot 2026.04 (Apr 06 2026 - 17:59:18 +0000)
 
-I/TC: WARNING (insecure configuration): Failed to get monotonic counter for REE FS, using 0
-E/LD:  init_elf:494 sys_open_ta_bin(94cf71ad-80e6-40b5-a7c6-3dc501eb2803)
-E/TC:? 0 ldelf_init_with_ldelf:152 ldelf failed with res: 0xffff0009
-E/TC:? 0 tee_ta_close_session:518 session id 0 to be removed is not found
-E/LD:  init_elf:494 sys_open_ta_bin(94cf71ad-80e6-40b5-a7c6-3dc501eb2803)
-E/TC:? 0 ldelf_init_with_ldelf:152 ldelf failed with res: 0xffff0009
-optee optee: PTA_BSEC invoke failed TEE err: ffff0006, err:0
-E/TC:? 0 tee_ta_close_session:518 session id 0 to be removed is not found
-E/LD:  init_elf:494 sys_open_ta_bin(94cf71ad-80e6-40b5-a7c6-3dc501eb2803)
-E/TC:? 0 ldelf_init_with_ldelf:152 ldelf failed with res: 0xffff0009
-optee optee: PTA_BSEC invoke failed TEE err: ffff0006, err:0
-E/TC:? 0 tee_ta_close_session:518 session id 0 to be removed is not found
-E/LD:  init_elf:494 sys_open_ta_bin(94cf71ad-80e6-40b5-a7c6-3dc501eb2803)
-E/TC:? 0 ldelf_init_with_ldelf:152 ldelf failed with res: 0xffff0009
-optee optee: PTA_BSEC invoke failed TEE err: ffff0006, err:0
-E/TC:? 0 tee_ta_close_session:518 session id 0 to be removed is not found
-CPU: STM32MP25??XX Rev.?
+CPU: STM32MP257FAK Rev.Y
 Model: STMicroelectronics STM32MP257F-EV1 Evaluation Board
 Board: stm32mp2 (st,stm32mp257f-ev1)
-E/LD:  init_elf:494 sys_open_ta_bin(94cf71ad-80e6-40b5-a7c6-3dc501eb2803)
-E/TC:? 0 ldelf_init_with_ldelf:152 ldelf failed with res: 0xffff0009
-optee optee: PTA_BSEC invoke failed TEE err: ffff0006, err:0
-E/TC:? 0 tee_ta_close_session:518 session id 0 to be removed is not found
+Board: MB1605 Var1.0 Rev.C-01
 DRAM:  4 GiB
-optee optee: OP-TEE: revision 4.10 (753afbbee1682f5d)
+optee optee: OP-TEE: revision 4.0 (2a5b1d12)
 I/TC: Reserved shared memory is disabled
 I/TC: Dynamic shared memory is enabled
 I/TC: Normal World virtualization support is disabled
 I/TC: Asynchronous notifications are enabled
-Core:  351 devices, 29 uclasses, devicetree: board
+Core:  372 devices, 29 uclasses, devicetree: board
 WDT:   Started watchdog with servicing every 1000ms (32s timeout)
 MMC:   STM32 SD/MMC: 0
-Loading Environment from MMC... *** Warning - bad CRC, using default environment
+Loading Environment from MMC... MMC: no card present
+*** Warning - No block device, using default environment
 
-Reading from MMC(0)... In:    serial
+In:    serial
 Out:   serial
 Err:   serial
-E/LD:  init_elf:494 sys_open_ta_bin(94cf71ad-80e6-40b5-a7c6-3dc501eb2803)
-E/TC:? 0 ldelf_init_with_ldelf:152 ldelf failed with res: 0xffff0009
-E/TC:? 0 tee_ta_close_session:518 session id 0 to be removed is not found
-E/LD:  init_elf:494 sys_open_ta_bin(94cf71ad-80e6-40b5-a7c6-3dc501eb2803)
-E/TC:? 0 ldelf_init_with_ldelf:152 ldelf failed with res: 0xffff0009
-optee optee: PTA_BSEC invoke failed TEE err: ffff0006, err:0
-E/TC:? 0 tee_ta_close_session:518 session id 0 to be removed is not found
 
 Hit any key to stop autoboot: 0
 Boot over mmc0!
-Saving Environment to MMC... Writing to MMC(0)... OK
-switch to partitions #0, OK
-mmc0 is current device
+Saving Environment to MMC... MMC: no card present
+No block device
+Failed (1)
+MMC: no card present
 STM32MP>

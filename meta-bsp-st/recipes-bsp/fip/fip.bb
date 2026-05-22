@@ -5,7 +5,7 @@ COMPATIBLE_MACHINE = "(mp2)"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 DEPENDS += "tf-a-tools-native"
-DEPENDS += "optee-os"
+DEPENDS += "virtual/optee-os"
 DEPENDS += "virtual/tf-a"
 DEPENDS += "stm32mp-ddr-phy"
 DEPENDS += "virtual/u-boot"
