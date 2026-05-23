@@ -4,18 +4,18 @@
 - `NOK`: means tested and not working
 - `?`: mean not tested yet but interested and should work
 
-| package | version    | mp1 | mp2         | comment                                                       |
-| ------- | ---------- | --- | ----------- | ------------------------------------------------------------- |
-| tf-a    | st-amy     | OK  |             |                                                               |
-| tf-a    | st         |     | OK          |                                                               |
-| u-boot  | 2026.01    | OK  | ?           |                                                               |
-| u-boot  | 2026.04    | ?   | OK          |                                                               |
-| u-boot  | st 2023.10 |     | ?           |                                                               |
-| optee   | 4.7.0      | OK  |             |                                                               |
-| optee   | 4.8.0      | NOK |             | stm32_rtc_init issue on mp1                                   |
-| optee   | 4.9.0      | NOK |             | stm32_rtc_init issue on mp1                                   |
-| optee   | 4.10.0     | ?   | NOK (bsec3) | is stm32_rtc_init issue fixed for mp1 ? bsec3 support for mp2 |
-| optee   | st 4.0.0   |     | OK          |                                                               |
+| package | version    | mp1 | mp2         | comment                                                                    |
+| ------- | ---------- | --- | ----------- | -------------------------------------------------------------------------- |
+| tf-a    | st-amy     | OK  |             |                                                                            |
+| tf-a    | st         |     | OK          |                                                                            |
+| u-boot  | 2026.01    | OK  | ?           |                                                                            |
+| u-boot  | 2026.04    | OK  | OK          |                                                                            |
+| u-boot  | st 2023.10 |     | ?           |                                                                            |
+| optee   | 4.7.0      | OK  |             |                                                                            |
+| optee   | 4.8.0      | NOK |             | stm32_rtc_init issue on mp1                                                |
+| optee   | 4.9.0      | NOK |             | stm32_rtc_init issue on mp1                                                |
+| optee   | 4.10.0     | NOK | NOK (bsec3) | stm32_rtc_init issue on mp1, partial bsec3 support for mp2 (need st patch) |
+| optee   | st 4.0.0   | ?   | OK          |                                                                            |
 
 
 # stm32mp15 from scratch with yocto
