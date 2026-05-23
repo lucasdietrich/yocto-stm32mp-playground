@@ -6,21 +6,25 @@ LIC_FILES_CHKSUM = "file://Licenses/README;md5=2ca5f2c35c8cc335f0a19756634782f1"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
+UBOOT_CONFIG ?= "stm32mp157f-dk2-amy_defconfig"
+UBOOT_DEVICETREE ?= "st/stm32mp157f-dk2"
+
 SRC_BRANCH ??= "master"
 SRC_URI = " \
     git://github.com/u-boot/u-boot.git;protocol=https;branch=${SRC_BRANCH} \
     file://fw_env.config \
     ${@bb.utils.contains('AMY_DEBUG', '1', 'file://debug.cfg', '', d)} \
+    file://${UBOOT_CONFIG} \
 "
 
 # specific to mp1
 SRC_URI:append:mp1 = " \
     file://0001-Disable-SCMI-for-stm32mp157f-dk2.patch \
     file://0002-Change-custom-boot-command.patch \
-    file://amy_defconfig \
     "
 
 S = "${WORKDIR}/git"
+B = "${WORKDIR}/build"
 
 PROVIDES += "virtual/u-boot"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
@@ -31,17 +35,12 @@ EXTRA_OEMAKE += 'STAGING_INCDIR=${STAGING_INCDIR_NATIVE} STAGING_LIBDIR=${STAGIN
 EXTRA_OEMAKE += "${PACKAGECONFIG_CONFARGS}"
 
 DEPENDS = "bison-native swig-native"
-DEPENDS:append:armv7a = " gcc-arm-none-eabi-native"
+DEPENDS:append:armv7ve = " gcc-arm-none-eabi-native"
 DEPENDS:append:aarch64 = " gcc-aarch64-none-elf-native"
 
-UBOOT_CONFIG ?= "amy_defconfig"
-UBOOT_DEVICETREE ?= "st/stm32mp157f-dk2"
+do_configure() {
+    cp ${WORKDIR}/${UBOOT_CONFIG} ${S}/configs/${UBOOT_CONFIG}
 
-do_configure:prepend:mp1() {
-    cp ${WORKDIR}/amy_defconfig ${S}/configs/amy_defconfig
-}
-
-do_configure:prepend() {
     # Use merge_config.sh to automatically merge config fragments if debug.cfg exists
     if [ -f ${WORKDIR}/debug.cfg ]; then
         ${S}/scripts/kconfig/merge_config.sh -m -O ${B} ${S}/configs/${UBOOT_CONFIG} ${WORKDIR}/debug.cfg
@@ -49,7 +48,7 @@ do_configure:prepend() {
     fi
 
     # Build config
-    oe_runmake DEVICE_TREE=${UBOOT_DEVICETREE} ${UBOOT_CONFIG}
+    oe_runmake -C ${S} O=${B} DEVICE_TREE=${UBOOT_DEVICETREE} ${UBOOT_CONFIG}
 }
 
 do_compile() {
@@ -84,13 +83,13 @@ export_binaries() {
     local dest="${1}"
 
     install -d ${dest}
-    install -m 0644 ${S}/u-boot ${dest}/
-    install -m 0644 ${S}/u-boot.bin ${dest}/
-    install -m 0644 ${S}/u-boot-dtb.bin ${dest}/
-    install -m 0644 ${S}/u-boot-nodtb.bin ${dest}/
-    install -m 0644 ${S}/u-boot.cfg ${dest}/
-    install -m 0644 ${S}/u-boot.dtb ${dest}/
-    install -m 0644 ${S}/u-boot.map ${dest}/
+    install -m 0644 ${B}/u-boot ${dest}/
+    install -m 0644 ${B}/u-boot.bin ${dest}/
+    install -m 0644 ${B}/u-boot-dtb.bin ${dest}/
+    install -m 0644 ${B}/u-boot-nodtb.bin ${dest}/
+    install -m 0644 ${B}/u-boot.cfg ${dest}/
+    install -m 0644 ${B}/u-boot.dtb ${dest}/
+    install -m 0644 ${B}/u-boot.map ${dest}/
 }
 
 u_boot_sysroot_populate() {

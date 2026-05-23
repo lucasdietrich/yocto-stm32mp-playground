@@ -35,11 +35,20 @@ SRC_URI += "file://${SDIMAGE_CONF}"
 
 DEPENDS += "dosfstools-native mtools-native genimage-native"
 DEPENDS += "virtual/tf-a"
-DEPENDS += "fip"
+DEPENDS:append:mp1 = " virtual/optee-os "
+DEPENDS:append:mp1 = " virtual/u-boot "
+DEPENDS:append:mp1 = " virtual/kernel "
+DEPENDS:append:mp2 = "fip"
 
-do_sdimage[depends] += "virtual/tf-a:do_deploy fip:do_deploy"
-do_sdimage[depends] += "fip:do_deploy"
-do_sdimage[depends] += "virtual/kernel:do_deploy"
+SDIMAGE_DEPENDS := "\
+    virtual/tf-a:do_deploy \
+    virtual/u-boot:do_deploy \
+    virtual/optee-os:do_deploy \
+    virtual/kernel:do_deploy \
+    "
+SDIMAGE_DEPENDS:append:mp2 = "fip:do_deploy"
+
+do_sdimage[depends] += "${SDIMAGE_DEPENDS}"
 addtask do_sdimage after do_image_ext4 before do_image_complete
 
 do_sdimage() {

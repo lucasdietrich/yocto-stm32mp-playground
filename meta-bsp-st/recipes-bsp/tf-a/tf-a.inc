@@ -8,7 +8,7 @@ PROVIDES += "virtual/tf-a"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 DEPENDS = "dtc-native"
-DEPENDS:append:armv7a = " gcc-arm-none-eabi-native"
+DEPENDS:append:armv7ve = " gcc-arm-none-eabi-native"
 DEPENDS:append:aarch64 = " gcc-aarch64-none-elf-native"
 
 TFA_PLATFORM:mp1  = "stm32mp1"
@@ -26,7 +26,7 @@ PACKAGECONFIG[debug] = "DEBUG=1 LOG_LEVEL=40,"
 
 EXTRA_OEMAKE = ""
 
-EXTRA_OEMAKE:append:armv7a = " CROSS_COMPILE=arm-none-eabi- "
+EXTRA_OEMAKE:append:armv7ve = " CROSS_COMPILE=arm-none-eabi- "
 EXTRA_OEMAKE:append:aarch64 = " CROSS_COMPILE=aarch64-none-elf- "
 
 EXTRA_OEMAKE += "PLAT=${TFA_PLATFORM}"
@@ -58,15 +58,16 @@ export_binaries() {
     install -d ${dest}
     install -m 0644 ${S}/build/${TFA_PLATFORM}/${dirname}/tf-a-${TFA_DEVICETREE}.stm32 ${dest}/
     
-    install -d ${dest}/bl31
-    if [ -f ${S}/build/${TFA_PLATFORM}/${dirname}/bl31.bin ]; then
-        install -m 0644 ${S}/build/${TFA_PLATFORM}/${dirname}/bl31.bin ${dest}/bl31/
-    fi
-
     install -d ${dest}/fdts
     install -m 0644 ${S}/build/${TFA_PLATFORM}/${dirname}/fdts/${TFA_DEVICETREE}-bl2.dtb ${dest}/fdts/
-    install -m 0644 ${S}/build/${TFA_PLATFORM}/${dirname}/fdts/${TFA_DEVICETREE}-bl31.dtb ${dest}/fdts/
+}
+
+export_binaries:append:mp2() {
+    install -d ${dest}/bl31
+    install -m 0644 ${S}/build/${TFA_PLATFORM}/${dirname}/bl31.bin ${dest}/bl31/
+
     install -m 0644 ${S}/build/${TFA_PLATFORM}/${dirname}/fdts/${TFA_DEVICETREE}-fw-config.dtb ${dest}/fdts/
+    install -m 0644 ${S}/build/${TFA_PLATFORM}/${dirname}/fdts/${TFA_DEVICETREE}-bl31.dtb ${dest}/fdts/
 }
 
 tf_a_sysroot_populate() {

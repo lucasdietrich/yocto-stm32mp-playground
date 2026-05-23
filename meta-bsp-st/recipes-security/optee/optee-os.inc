@@ -13,10 +13,11 @@ PROVIDES += "virtual/optee-os"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 DEPENDS = "dtc-native python3-cryptography-native python3-pyelftools-native"
-DEPENDS:append:armv7a  = " gcc-arm-none-eabi-native"
+DEPENDS:append:armv7ve  = " gcc-arm-none-eabi-native"
 DEPENDS:append:aarch64 = " gcc-aarch64-none-elf-native"
 
-PACKAGECONFIG ??= "scpfw"
+PACKAGECONFIG ??= ""
+PACKAGECONFIG:append:mp2 = " scpfw"
 PACKAGECONFIG[scpfw] = "\
     CFG_SCMI_SCPFW=y CFG_SCP_FIRMWARE=${RECIPE_SYSROOT}${SCP_FIRMWARE_SYSROOT_DIR},,\
     scp-firmware-src cmake-native ninja-native\
@@ -31,7 +32,7 @@ OPTEE_DEVICETREE:mp2 = "stm32mp257f-dk"
 
 EXTRA_OEMAKE = ""
 
-EXTRA_OEMAKE:append:armv7a  = " CROSS_COMPILE=arm-none-eabi-"
+EXTRA_OEMAKE:append:armv7ve  = " CROSS_COMPILE=arm-none-eabi-"
 EXTRA_OEMAKE:append:aarch64 = " CROSS_COMPILE64=aarch64-none-elf-"
 
 EXTRA_OEMAKE += "PLATFORM=${OPTEE_PLATFORM}"

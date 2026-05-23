@@ -1,6 +1,6 @@
 require u-boot.inc
 
-COMPATIBLE_MACHINE = "(dk2|mp1|mp2)"
+COMPATIBLE_MACHINE = "(mp1|mp2)"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files/2026.01:"
 
