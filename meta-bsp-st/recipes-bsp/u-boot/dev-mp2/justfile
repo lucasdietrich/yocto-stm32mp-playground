@@ -1,0 +1,35 @@
+prerequirements: venv
+    sudo apt-get update && \
+    sudo apt install libgnutls28-dev gnutls-bin
+
+venv:
+    python3 -m venv .venv
+    . .venv/bin/activate && \
+        pip install --upgrade pip && \
+        pip install setuptools
+
+# CONFIG_TRACE_EARLY=y make u-boot crash
+
+build:
+    bear -- make CROSS_COMPILE="/opt/arm-gnu-toolchain-14.3.rel1-x86_64-aarch64-none-elf/bin/aarch64-none-elf-" \
+        HOSTCC=gcc-12 HOSTCXX=g++-12 stm32mp25_defconfig && \
+        make CROSS_COMPILE="/opt/arm-gnu-toolchain-14.3.rel1-x86_64-aarch64-none-elf/bin/aarch64-none-elf-" \
+        DEVICE_TREE=st/stm32mp257f-dk \
+        all \
+        -j$(nproc)
+
+u-boot-initial-env:
+    make CROSS_COMPILE="/opt/arm-gnu-toolchain-14.3.rel1-x86_64-aarch64-none-elf/bin/aarch64-none-elf-"         HOSTCC=gcc-12 HOSTCXX=g++-12 u-boot-initial-env
+
+clear-env:
+    sudo dd if=/dev/random of=/dev/disk/by-partlabel/u-boot-env bs=128K count=1
+
+decompile:
+    dtc -I dtb -O dts -o u-boot-decompiled.dts u-boot.dtb
+
+menuconfig:
+    make CROSS_COMPILE="/opt/arm-gnu-toolchain-14.3.rel1-x86_64-aarch64-none-elf/bin/aarch64-none-elf-" \
+        HOSTCC=gcc-12 HOSTCXX=g++-12 menuconfig
+
+clean:
+    make mrproper
