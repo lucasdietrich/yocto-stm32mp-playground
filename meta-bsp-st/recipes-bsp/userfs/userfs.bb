@@ -9,7 +9,7 @@ SRC_URI = "git://github.com/lucasdietrich/userfs.git;protocol=https;branch=featu
 SRCREV = "e6a2aa306a501d0e35d654d6af03c7853d8128d7"
 
 DEPENDS += "util-linux"
-RDEPENDS:${PN} += "util-linux-libfdisk libubootenv btrfs-tools"
+RDEPENDS:${PN} += "util-linux-libfdisk libubootenv btrfs-tools parted"
 
 inherit meson pkgconfig update-rc.d
 

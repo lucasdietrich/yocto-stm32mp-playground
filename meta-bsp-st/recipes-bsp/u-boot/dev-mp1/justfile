@@ -19,6 +19,7 @@ build:
         -j$(nproc)
 
 u-boot-initial-env:
+    rm -f tools/printinitialenv
     make CROSS_COMPILE="/opt/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-"         HOSTCC=gcc-12 HOSTCXX=g++-12 u-boot-initial-env
 
 # flash depends on file "u-boot.bin" being present in the current directory

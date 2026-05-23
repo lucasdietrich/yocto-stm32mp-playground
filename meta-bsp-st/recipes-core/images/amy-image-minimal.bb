@@ -35,6 +35,7 @@ SRC_URI += "file://${SDIMAGE_CONF}"
 
 DEPENDS += "dosfstools-native mtools-native genimage-native"
 DEPENDS += "virtual/tf-a"
+DEPENDS += "u-boot-scr"
 DEPENDS:append:mp1 = " virtual/optee-os "
 DEPENDS:append:mp1 = " virtual/u-boot "
 DEPENDS:append:mp1 = " virtual/kernel "
@@ -43,6 +44,7 @@ DEPENDS:append:mp2 = "fip"
 SDIMAGE_DEPENDS := "\
     virtual/tf-a:do_deploy \
     virtual/u-boot:do_deploy \
+    u-boot-scr:do_deploy \
     virtual/optee-os:do_deploy \
     virtual/kernel:do_deploy \
     "

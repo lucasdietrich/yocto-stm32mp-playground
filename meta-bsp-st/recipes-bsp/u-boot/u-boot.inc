@@ -6,15 +6,19 @@ LIC_FILES_CHKSUM = "file://Licenses/README;md5=2ca5f2c35c8cc335f0a19756634782f1"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
-UBOOT_CONFIG ?= "stm32mp157f-dk2-amy_defconfig"
-UBOOT_DEVICETREE ?= "st/stm32mp157f-dk2"
+# if non-empty, this variable should point to a file in the recipe's files directory containing the u-boot defconfig to use
+UBOOT_CONFIG_SRC_URI ??= ""
+UBOOT_CONFIG ??= "stm32mp15_defconfig"
+UBOOT_DEVICETREE ??= "st/stm32mp157f-dk2"
 
 SRC_BRANCH ??= "master"
 SRC_URI = " \
     git://github.com/u-boot/u-boot.git;protocol=https;branch=${SRC_BRANCH} \
     file://fw_env.config \
+    file://amy.env \
+    file://amy-env.cfg \
     ${@bb.utils.contains('AMY_DEBUG', '1', 'file://debug.cfg', '', d)} \
-    file://${UBOOT_CONFIG} \
+    ${@oe.utils.conditional('UBOOT_CONFIG_SRC_URI', '', '', 'file://${UBOOT_CONFIG_SRC_URI}', d)} \
 "
 
 S = "${WORKDIR}/git"
@@ -33,16 +37,32 @@ DEPENDS:append:armv7ve = " gcc-arm-none-eabi-native"
 DEPENDS:append:aarch64 = " gcc-aarch64-none-elf-native"
 
 do_configure() {
-    cp ${WORKDIR}/${UBOOT_CONFIG} ${S}/configs/${UBOOT_CONFIG}
+    # copy the same .env for both supported platforms
+    cp ${WORKDIR}/amy.env ${S}/board/st/stm32mp1/amy.env
+    cp ${WORKDIR}/amy.env ${S}/board/st/stm32mp2/amy.env
 
-    # Use merge_config.sh to automatically merge config fragments if debug.cfg exists
-    if [ -f ${WORKDIR}/debug.cfg ]; then
-        ${S}/scripts/kconfig/merge_config.sh -m -O ${B} ${S}/configs/${UBOOT_CONFIG} ${WORKDIR}/debug.cfg
-        oe_runmake olddefconfig
+    # configuration
+    base_config="${S}/configs/${UBOOT_CONFIG}"
+    configs_to_merge="${base_config}"
+
+    if [ -n "${UBOOT_CONFIG_SRC_URI}" ]; then
+        cp ${WORKDIR}/${UBOOT_CONFIG_SRC_URI} ${base_config}
     fi
 
-    # Build config
-    oe_runmake -C ${S} O=${B} DEVICE_TREE=${UBOOT_DEVICETREE} ${UBOOT_CONFIG}
+    # Avoid stale state from previous configure runs.
+    rm -f ${B}/.config
+
+    # Merge fragments in precedence order: base -> debug (optional) -> amy-env
+    if [ -f ${WORKDIR}/debug.cfg ]; then
+        configs_to_merge="${configs_to_merge} ${WORKDIR}/debug.cfg"
+    fi
+
+    configs_to_merge="${configs_to_merge} ${WORKDIR}/amy-env.cfg"
+
+    ${S}/scripts/kconfig/merge_config.sh -m -O ${B} ${configs_to_merge}
+
+    # Finalize the merged .config in the out-of-tree build directory.
+    oe_runmake -C ${S} O=${B} DEVICE_TREE=${UBOOT_DEVICETREE} olddefconfig
 }
 
 do_compile() {
@@ -77,6 +97,7 @@ export_binaries() {
     local dest="${1}"
 
     install -d ${dest}
+    install -m 0644 ${B}/.config ${dest}/
     install -m 0644 ${B}/u-boot ${dest}/
     install -m 0644 ${B}/u-boot.bin ${dest}/
     install -m 0644 ${B}/u-boot-dtb.bin ${dest}/
@@ -84,6 +105,7 @@ export_binaries() {
     install -m 0644 ${B}/u-boot.cfg ${dest}/
     install -m 0644 ${B}/u-boot.dtb ${dest}/
     install -m 0644 ${B}/u-boot.map ${dest}/
+    install -m 0644 ${B}/u-boot-initial-env ${dest}/
 }
 
 u_boot_sysroot_populate() {

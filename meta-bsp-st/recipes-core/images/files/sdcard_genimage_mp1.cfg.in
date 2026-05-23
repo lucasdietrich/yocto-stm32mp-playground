@@ -56,6 +56,7 @@ image bootfs.vfat {
     vfat {
         label = "bootfs"
         files = {
+            "u-boot-scr/boot.scr",
             "kernel/zImage",
             "kernel/stm32mp157f-dk2-amy.dtb"
         }
