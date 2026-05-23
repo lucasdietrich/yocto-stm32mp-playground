@@ -28,7 +28,7 @@ I/TC: Primary CPU switching to normal world boot
 serial_stm32 serial@40010000: pinctrl_select_state_full: uclass_get_device_by_phandle_id: err=-19
 
 
-U-Boot 2026.01-dirty (Jan 05 2026 - 20:49:22 +0000)
+U-Boot 2026.04-dirty (Apr 06 2026 - 17:59:18 +0000)
 
 CPU: STM32MP157FAC Rev.Z
 Model: STMicroelectronics STM32MP157F-DK2 Discovery Board
@@ -42,19 +42,20 @@ Clocks:
 - AXI : 266.500 MHz
 - PER : 24 MHz
 - DDR : 533 MHz
-Core:  123 devices, 33 uclasses, devicetree: separate
+Core:  323 devices, 33 uclasses, devicetree: separate
 WDT:   Started watchdog@5a002000 with servicing every 1000ms (32s timeout)
 NAND:  0 MiB
 MMC:   STM32 SD/MMC: 0, STM32 SD/MMC: 1
-Loading Environment from MMC... Reading from MMC(0)... OK
+Loading Environment from MMC... Reading from MMC(0)... *** Warning - bad CRC, using default environment
+
 In:    serial@40010000
 Out:   serial@40010000
 Err:   serial@40010000
 Net:   eth0: ethernet@5800a000
 Hit any key to stop autoboot: 0
-9103040 bytes read in 385 ms (22.5 MiB/s)
+9102976 bytes read in 385 ms (22.5 MiB/s)
 55919 bytes read in 4 ms (13.3 MiB/s)
-Kernel image @ 0xc2000000 [ 0x000000 - 0x8ae6c0 ]
+Kernel image @ 0xc2000000 [ 0x000000 - 0x8ae680 ]
 ## Flattened Device Tree blob at c4000000
    Booting using the fdt blob at 0xc4000000
 Working FDT set to c4000000
@@ -67,7 +68,7 @@ Starting kernel ...(fake run for tracing)
 Starting kernel ...
 
 [    0.000000] Booting Linux on physical CPU 0x0
-[    0.000000] Linux version 6.19.0-rc5-yocto-standard-amy-g7b905b4c1354 (oe-user@oe-host) (arm-poky-linux-gnueabi-gcc (GCC) 13.4.0, GNU ld (GNU Binutils) 2.42.0.20240723) #1 SMP PREEMPT Mon Jan 12 03:03:14 UTC 2026
+[    0.000000] Linux version 6.19.0-rc5-yocto-standard-amy-ga4d7e1f3b6d6 (oe-user@oe-host) (arm-poky-linux-gnueabi-gcc (GCC) 13.4.0, GNU ld (GNU Binutils) 2.42.0.20240723) #1 SMP PREEMPT Mo6
 [    0.000000] CPU: ARMv7 Processor [410fc075] revision 5 (ARMv7), cr=50c5387d
 [    0.000000] CPU: div instructions available: patching division code
 [    0.000000] CPU: PIPT / VIPT nonaliasing data cache, VIPT aliasing instruction cache
@@ -127,287 +128,282 @@ Starting kernel ...
 [    0.000000] arch_timer: cp15 timer running at 24.00MHz (virt).
 [    0.000000] clocksource: arch_sys_counter: mask: 0xffffffffffffff max_cycles: 0x588fe9dc0, max_idle_ns: 440795202592 ns
 [    0.000001] sched_clock: 56 bits at 24MHz, resolution 41ns, wraps every 4398046511097ns
-[    0.008053] Switching to timer-based delay loop, resolution 41ns
-[    0.015017] Console: colour dummy device 80x30
-[    0.018596] Calibrating delay loop (skipped), value calculated using timer frequency.. 48.00 BogoMIPS (lpj=240000)
-[    0.028998] CPU: Testing write buffer coherency: ok
-[    0.033882] pid_max: default: 32768 minimum: 301
-[    0.038709] stackdepot: allocating hash table of 32768 entries via kvcalloc
-[    0.045928] stackdepot: allocating space for 8192 stack pools via kvcalloc
-[    0.052583] Mount-cache hash table entries: 1024 (order: 0, 4096 bytes, linear)
-[    0.059822] Mountpoint-cache hash table entries: 1024 (order: 0, 4096 bytes, linear)
-[    0.069023] CPU0: update cpu_capacity 1024
-[    0.071805] CPU0: thread -1, cpu 0, socket 0, mpidr 80000000
-[    0.077432] cacheinfo: Unable to detect cache hierarchy for CPU 0
-[    0.085807] Setting up static identity map for 0xc0100000 - 0xc0100054
-[    0.091243] rcu: Hierarchical SRCU implementation.
-[    0.095796] rcu:     Max phase no-delay instances is 1000.
-[    0.101557] Timer migration: 1 hierarchy levels; 8 children per group; 1 crossnode level
-[    0.110845] smp: Bringing up secondary CPUs ...
-I/TC: Secondary 1I/TC: Secondary CPU 1 switching to normal world boot
-[    0.121656] CPU1: update cpu_capacity 1024
-[    0.121684] CPU1: thread -1, cpu 1, socket 0, mpidr 80000001
-[    0.122050] smp: Brought up 1 node, 2 CPUs
-[    0.134551] SMP: Total of 2 processors activated (96.00 BogoMIPS).
-[    0.140777] CPU: All CPU(s) started in SVC mode.
-[    0.145741] Memory: 468640K/491520K available (9216K kernel code, 1179K rwdata, 3220K rodata, 1024K init, 191K bss, 20820K reserved, 0K cma-reserved)
-[    0.159722] devtmpfs: initialized
-[    0.189268] VFP support v0.3: implementor 41 architecture 2 part 30 variant 7 rev 5
-[    0.196534] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 19112604462750000 ns
-[    0.205549] posixtimers hash table entries: 1024 (order: 1, 8192 bytes, linear)
-[    0.212882] futex hash table entries: 512 (32768 bytes on 1 NUMA nodes, total 32 KiB, linear).
-[    0.224229] NET: Registered PF_NETLINK/PF_ROUTE protocol family
-[    0.229226] DMA: preallocated 256 KiB pool for atomic coherent allocations
-[    0.237999] cpuidle: using governor menu
-[    0.241089] hw-breakpoint: found 5 (+1 reserved) breakpoint and 4 watchpoint registers.
-[    0.248593] hw-breakpoint: maximum watchpoint size is 8 bytes.
-[    0.254912] Serial: AMBA PL011 UART driver
-[    0.276019] /soc/bus@5c007000/audio-controller@4000b000: Fixed dependency cycle(s) with /soc/bus@5c007000/i2c@40012000/hdmi-transmitter@39
-[    0.287364] /soc/bus@5c007000/i2c@40012000/hdmi-transmitter@39: Fixed dependency cycle(s) with /soc/bus@5c007000/audio-controller@4000b000
-[    0.299753] /soc/bus@5c007000/i2c@40012000/cs42l51@4a: Fixed dependency cycle(s) with /soc/bus@5c007000/sai@4400b000/audio-controller@4400b024
-[    0.312571] /soc/bus@5c007000/i2c@40012000/cs42l51@4a: Fixed dependency cycle(s) with /soc/bus@5c007000/sai@4400b000/audio-controller@4400b004
-[    0.325580] /soc/bus@5c007000/sai@4400b000/audio-controller@4400b004: Fixed dependency cycle(s) with /soc/bus@5c007000/i2c@40012000/cs42l51@4a
-[    0.338345] /soc/bus@5c007000/sai@4400b000/audio-controller@4400b024: Fixed dependency cycle(s) with /soc/bus@5c007000/i2c@40012000/cs42l51@4a
-[    0.351209] /soc/bus@5c007000/sai@4400b000/audio-controller@4400b024: Fixed dependency cycle(s) with /soc/bus@5c007000/sai@4400b000/audio-controller@4400b004
-[    0.372465] /soc/bus@5c007000/audio-controller@4000b000: Fixed dependency cycle(s) with /soc/bus@5c007000/i2c@40012000/hdmi-transmitter@39
-[    0.384046] /soc/bus@5c007000/i2c@40012000/hdmi-transmitter@39: Fixed dependency cycle(s) with /soc/bus@5c007000/audio-controller@4000b000
-[    0.396199] /soc/bus@5c007000/i2c@40012000/cs42l51@4a: Fixed dependency cycle(s) with /soc/bus@5c007000/sai@4400b000/audio-controller@4400b024
-[    0.409000] /soc/bus@5c007000/i2c@40012000/cs42l51@4a: Fixed dependency cycle(s) with /soc/bus@5c007000/sai@4400b000/audio-controller@4400b004
-[    0.422005] /soc/bus@5c007000/sai@4400b000/audio-controller@4400b004: Fixed dependency cycle(s) with /soc/bus@5c007000/i2c@40012000/cs42l51@4a
-[    0.434784] /soc/bus@5c007000/sai@4400b000/audio-controller@4400b024: Fixed dependency cycle(s) with /soc/bus@5c007000/i2c@40012000/cs42l51@4a
-[    0.447636] /soc/bus@5c007000/sai@4400b000/audio-controller@4400b024: Fixed dependency cycle(s) with /soc/bus@5c007000/sai@4400b000/audio-controller@4400b004
-[    0.462505] /soc/bus@5c007000/audio-controller@4000b000: Fixed dependency cycle(s) with /soc/bus@5c007000/i2c@40012000/hdmi-transmitter@39
-[    0.476673] /soc/bus@5c007000/i2c@40012000/hdmi-transmitter@39: Fixed dependency cycle(s) with /soc/bus@5c007000/audio-controller@4000b000
-[    0.488005] /soc/bus@5c007000/i2c@40012000/cs42l51@4a: Fixed dependency cycle(s) with /soc/bus@5c007000/sai@4400b000/audio-controller@4400b024
-[    0.500696] /soc/bus@5c007000/i2c@40012000/cs42l51@4a: Fixed dependency cycle(s) with /soc/bus@5c007000/sai@4400b000/audio-controller@4400b004
-[    0.514952] /soc/bus@5c007000/sai@4400b000/audio-controller@4400b004: Fixed dependency cycle(s) with /soc/bus@5c007000/i2c@40012000/cs42l51@4a
-[    0.526505] /soc/bus@5c007000/sai@4400b000/audio-controller@4400b024: Fixed dependency cycle(s) with /soc/bus@5c007000/i2c@40012000/cs42l51@4a
-[    0.539345] /soc/bus@5c007000/sai@4400b000/audio-controller@4400b024: Fixed dependency cycle(s) with /soc/bus@5c007000/sai@4400b000/audio-controller@4400b004
-[    0.568138] raid6: skipped pq benchmark and selected neonx8
-[    0.572299] raid6: using neon recovery algorithm
-[    0.579227] SCSI subsystem initialized
-[    0.582474] usbcore: registered new interface driver usbfs
-[    0.587253] usbcore: registered new interface driver hub
-[    0.592470] usbcore: registered new device driver usb
-[    0.598136] pps_core: LinuxPPS API ver. 1 registered
-[    0.602469] pps_core: Software ver. 5.3.6 - Copyright 2005-2007 Rodolfo Giometti <giometti@linux.it>
-[    0.611782] PTP clock support registered
-[    0.615888] scmi_core: SCMI protocol bus registered
-[    0.624007] clocksource: Switched to clocksource arch_sys_counter
-[    0.651224] NET: Registered PF_INET protocol family
-[    0.655066] IP idents hash table entries: 8192 (order: 4, 65536 bytes, linear)
-[    0.663901] tcp_listen_portaddr_hash hash table entries: 512 (order: 0, 4096 bytes, linear)
-[    0.671089] Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
-[    0.678696] TCP established hash table entries: 4096 (order: 2, 16384 bytes, linear)
-[    0.686528] TCP bind hash table entries: 4096 (order: 4, 65536 bytes, linear)
-[    0.693781] TCP: Hash tables configured (established 4096 bind 4096)
-[    0.700191] UDP hash table entries: 256 (order: 2, 14336 bytes, linear)
-[    0.706746] UDP-Lite hash table entries: 256 (order: 2, 14336 bytes, linear)
-[    0.714090] NET: Registered PF_UNIX/PF_LOCAL protocol family
-[    0.721984] Initialise system trusted keyrings
-[    0.725595] workingset: timestamp_bits=14 max_order=17 bucket_order=3
-[    0.732044] squashfs: version 4.0 (2009/01/31) Phillip Lougher
-[    0.737462] jffs2: version 2.2. (NAND) © 2001-2006 Red Hat, Inc.
-[    0.744961] cryptd: max_cpu_qlen set to 1000
-[    1.114362] NET: Registered PF_ALG protocol family
-[    1.117826] xor: measuring software checksum speed
-[    1.126496]    arm4regs        :   832 MB/sec
-[    1.136018]    8regs           :   496 MB/sec
-[    1.145533]    32regs          :   496 MB/sec
-[    1.152260]    neon            :   859 MB/sec
-[    1.155188] xor: using function: neon (859 MB/sec)
-[    1.159996] Key type asymmetric registered
-[    1.164128] Asymmetric key parser 'x509' registered
-[    1.169158] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 240)
-[    1.176509] io scheduler mq-deadline registered
-[    1.181000] io scheduler kyber registered
-[    1.185138] io scheduler bfq registered
-[    1.189341] /soc/interrupt-controller@5000d000: bank0
-[    1.193958] /soc/interrupt-controller@5000d000: bank1
-[    1.199036] /soc/interrupt-controller@5000d000: bank2
-[    1.204871] Registering stm32-etzpc firewall controller
-[    1.214984] ledtrig-cpu: registered to indicate activity on CPUs
-[    1.225429] STM32 USART driver initialized
-[    1.248668] brd: module loaded
-[    1.262462] loop: module loaded
-[    1.272194] CAN device driver interface
-[    1.276192] usbcore: registered new interface driver asix
-[    1.280223] usbcore: registered new interface driver ax88179_178a
-[    1.286434] usbcore: registered new interface driver cdc_ether
-[    1.292217] usbcore: registered new interface driver net1080
-[    1.297941] usbcore: registered new interface driver cdc_subset
-[    1.303862] usbcore: registered new interface driver zaurus
-[    1.309502] usbcore: registered new interface driver cdc_ncm
-[    1.315188] usbcore: registered new interface driver r8153_ecm
-[    1.323268] usbcore: registered new interface driver cdc_acm
-[    1.327576] cdc_acm: USB Abstract Control Model driver for USB modems and ISDN adapters
-[    1.336063] usbcore: registered new interface driver uas
-[    1.340968] usbcore: registered new interface driver usb-storage
-[    1.347189] usbcore: registered new interface driver ftdi_sio
-[    1.352790] usbserial: USB Serial support registered for FTDI USB Serial Device
-[    1.362294] UDC core: g_ether: couldn't find an available UDC
-[    1.367168] usbcore: registered new device driver usbip-host
-[    1.375941] device-mapper: ioctl: 4.50.0-ioctl (2025-04-28) initialised: dm-devel@lists.linux.dev
-[    1.384102] sdhci: Secure Digital Host Controller Interface driver
-[    1.389647] sdhci: Copyright(c) Pierre Ossman
-[    1.394051] Synopsys Designware Multimedia Card Interface Driver
-[    1.400593] sdhci-pltfm: SDHCI platform and OF driver helper
-[    1.408004] usbcore: registered new interface driver usbhid
-[    1.412152] usbhid: USB HID core driver
-[    1.420808] hw perfevents: enabled with armv7_cortex_a7 PMU driver, 5 (8000000f) counters available
-[    1.430614] optee: probing for conduit method.
+[    0.008049] Switching to timer-based delay loop, resolution 41ns
+[    0.015015] Console: colour dummy device 80x30
+[    0.018585] Calibrating delay loop (skipped), value calculated using timer frequency.. 48.00 BogoMIPS (lpj=240000)
+[    0.028981] CPU: Testing write buffer coherency: ok
+[    0.033862] pid_max: default: 32768 minimum: 301
+[    0.038685] stackdepot: allocating hash table of 32768 entries via kvcalloc
+[    0.045902] stackdepot: allocating space for 8192 stack pools via kvcalloc
+[    0.052552] Mount-cache hash table entries: 1024 (order: 0, 4096 bytes, linear)
+[    0.059795] Mountpoint-cache hash table entries: 1024 (order: 0, 4096 bytes, linear)
+[    0.068992] CPU0: update cpu_capacity 1024
+[    0.071767] CPU0: thread -1, cpu 0, socket 0, mpidr 80000000
+[    0.077388] cacheinfo: Unable to detect cache hierarchy for CPU 0
+[    0.085773] Setting up static identity map for 0xc0100000 - 0xc0100054
+[    0.091214] rcu: Hierarchical SRCU implementation.
+[    0.095752] rcu:     Max phase no-delay instances is 1000.
+[    0.101522] Timer migration: 1 hierarchy levels; 8 children per group; 1 crossnode level
+[    0.110799] smp: Bringing up secondary CPUs ...
+I/TC: Secondary nI/TC: Secondary CPU 1 switching to normal world boot
+[    0.121598] CPU1: update cpu_capacity 1024
+[    0.121627] CPU1: thread -1, cpu 1, socket 0, mpidr 80000001
+[    0.121996] smp: Brought up 1 node, 2 CPUs
+[    0.134495] SMP: Total of 2 processors activated (96.00 BogoMIPS).
+[    0.140714] CPU: All CPU(s) started in SVC mode.
+[    0.145676] Memory: 468640K/491520K available (9216K kernel code, 1179K rwdata, 3220K rodata, 1024K init, 191K bss, 20820K reserved, 0K cma-reserved)
+[    0.159657] devtmpfs: initialized
+[    0.189207] VFP support v0.3: implementor 41 architecture 2 part 30 variant 7 rev 5
+[    0.196487] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 19112604462750000 ns
+[    0.205482] posixtimers hash table entries: 1024 (order: 1, 8192 bytes, linear)
+[    0.212809] futex hash table entries: 512 (32768 bytes on 1 NUMA nodes, total 32 KiB, linear).
+[    0.224148] NET: Registered PF_NETLINK/PF_ROUTE protocol family
+[    0.229143] DMA: preallocated 256 KiB pool for atomic coherent allocations
+[    0.237899] cpuidle: using governor menu
+[    0.240988] hw-breakpoint: found 5 (+1 reserved) breakpoint and 4 watchpoint registers.
+[    0.248479] hw-breakpoint: maximum watchpoint size is 8 bytes.
+[    0.254805] Serial: AMBA PL011 UART driver
+[    0.275957] /soc/bus@5c007000/audio-controller@4000b000: Fixed dependency cycle(s) with /soc/bus@5c007000/i2c@40012000/hdmi-transmitter@39
+[    0.287297] /soc/bus@5c007000/i2c@40012000/hdmi-transmitter@39: Fixed dependency cycle(s) with /soc/bus@5c007000/audio-controller@4000b000
+[    0.299675] /soc/bus@5c007000/i2c@40012000/cs42l51@4a: Fixed dependency cycle(s) with /soc/bus@5c007000/sai@4400b000/audio-controller@4400b024
+[    0.312488] /soc/bus@5c007000/i2c@40012000/cs42l51@4a: Fixed dependency cycle(s) with /soc/bus@5c007000/sai@4400b000/audio-controller@4400b004
+[    0.325493] /soc/bus@5c007000/sai@4400b000/audio-controller@4400b004: Fixed dependency cycle(s) with /soc/bus@5c007000/i2c@40012000/cs42l51@4a
+[    0.338250] /soc/bus@5c007000/sai@4400b000/audio-controller@4400b024: Fixed dependency cycle(s) with /soc/bus@5c007000/i2c@40012000/cs42l51@4a
+[    0.351104] /soc/bus@5c007000/sai@4400b000/audio-controller@4400b024: Fixed dependency cycle(s) with /soc/bus@5c007000/sai@4400b000/audio-controller@4400b004
+[    0.372369] /soc/bus@5c007000/audio-controller@4000b000: Fixed dependency cycle(s) with /soc/bus@5c007000/i2c@40012000/hdmi-transmitter@39
+[    0.383952] /soc/bus@5c007000/i2c@40012000/hdmi-transmitter@39: Fixed dependency cycle(s) with /soc/bus@5c007000/audio-controller@4000b000
+[    0.396092] /soc/bus@5c007000/i2c@40012000/cs42l51@4a: Fixed dependency cycle(s) with /soc/bus@5c007000/sai@4400b000/audio-controller@4400b024
+[    0.408884] /soc/bus@5c007000/i2c@40012000/cs42l51@4a: Fixed dependency cycle(s) with /soc/bus@5c007000/sai@4400b000/audio-controller@4400b004
+[    0.421880] /soc/bus@5c007000/sai@4400b000/audio-controller@4400b004: Fixed dependency cycle(s) with /soc/bus@5c007000/i2c@40012000/cs42l51@4a
+[    0.434656] /soc/bus@5c007000/sai@4400b000/audio-controller@4400b024: Fixed dependency cycle(s) with /soc/bus@5c007000/i2c@40012000/cs42l51@4a
+[    0.447503] /soc/bus@5c007000/sai@4400b000/audio-controller@4400b024: Fixed dependency cycle(s) with /soc/bus@5c007000/sai@4400b000/audio-controller@4400b004
+[    0.462374] /soc/bus@5c007000/audio-controller@4000b000: Fixed dependency cycle(s) with /soc/bus@5c007000/i2c@40012000/hdmi-transmitter@39
+[    0.476532] /soc/bus@5c007000/i2c@40012000/hdmi-transmitter@39: Fixed dependency cycle(s) with /soc/bus@5c007000/audio-controller@4000b000
+[    0.487857] /soc/bus@5c007000/i2c@40012000/cs42l51@4a: Fixed dependency cycle(s) with /soc/bus@5c007000/sai@4400b000/audio-controller@4400b024
+[    0.500540] /soc/bus@5c007000/i2c@40012000/cs42l51@4a: Fixed dependency cycle(s) with /soc/bus@5c007000/sai@4400b000/audio-controller@4400b004
+[    0.514783] /soc/bus@5c007000/sai@4400b000/audio-controller@4400b004: Fixed dependency cycle(s) with /soc/bus@5c007000/i2c@40012000/cs42l51@4a
+[    0.526330] /soc/bus@5c007000/sai@4400b000/audio-controller@4400b024: Fixed dependency cycle(s) with /soc/bus@5c007000/i2c@40012000/cs42l51@4a
+[    0.539160] /soc/bus@5c007000/sai@4400b000/audio-controller@4400b024: Fixed dependency cycle(s) with /soc/bus@5c007000/sai@4400b000/audio-controller@4400b004
+[    0.568082] raid6: skipped pq benchmark and selected neonx8
+[    0.572243] raid6: using neon recovery algorithm
+[    0.579169] SCSI subsystem initialized
+[    0.582428] usbcore: registered new interface driver usbfs
+[    0.587189] usbcore: registered new interface driver hub
+[    0.592405] usbcore: registered new device driver usb
+[    0.598069] pps_core: LinuxPPS API ver. 1 registered
+[    0.602399] pps_core: Software ver. 5.3.6 - Copyright 2005-2007 Rodolfo Giometti <giometti@linux.it>
+[    0.611713] PTP clock support registered
+[    0.615808] scmi_core: SCMI protocol bus registered
+[    0.623926] clocksource: Switched to clocksource arch_sys_counter
+[    0.661118] NET: Registered PF_INET protocol family
+[    0.664968] IP idents hash table entries: 8192 (order: 4, 65536 bytes, linear)
+[    0.673801] tcp_listen_portaddr_hash hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    0.680915] Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+[    0.688602] TCP established hash table entries: 4096 (order: 2, 16384 bytes, linear)
+[    0.696418] TCP bind hash table entries: 4096 (order: 4, 65536 bytes, linear)
+[    0.703669] TCP: Hash tables configured (established 4096 bind 4096)
+[    0.710075] UDP hash table entries: 256 (order: 2, 14336 bytes, linear)
+[    0.716632] UDP-Lite hash table entries: 256 (order: 2, 14336 bytes, linear)
+[    0.723967] NET: Registered PF_UNIX/PF_LOCAL protocol family
+[    0.731869] Initialise system trusted keyrings
+[    0.735452] workingset: timestamp_bits=14 max_order=17 bucket_order=3
+[    0.741921] squashfs: version 4.0 (2009/01/31) Phillip Lougher
+[    0.747359] jffs2: version 2.2. (NAND) © 2001-2006 Red Hat, Inc.
+[    0.754874] cryptd: max_cpu_qlen set to 1000
+[    1.124427] NET: Registered PF_ALG protocol family
+[    1.127890] xor: measuring software checksum speed
+[    1.136551]    arm4regs        :   833 MB/sec
+[    1.146071]    8regs           :   496 MB/sec
+[    1.155584]    32regs          :   496 MB/sec
+[    1.162311]    neon            :   859 MB/sec
+[    1.165262] xor: using function: neon (859 MB/sec)
+[    1.170047] Key type asymmetric registered
+[    1.174177] Asymmetric key parser 'x509' registered
+[    1.179206] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 240)
+[    1.186530] io scheduler mq-deadline registered
+[    1.191043] io scheduler kyber registered
+[    1.195178] io scheduler bfq registered
+[    1.199381] /soc/interrupt-controller@5000d000: bank0
+[    1.204055] /soc/interrupt-controller@5000d000: bank1
+[    1.209072] /soc/interrupt-controller@5000d000: bank2
+[    1.214905] Registering stm32-etzpc firewall controller
+[    1.225090] ledtrig-cpu: registered to indicate activity on CPUs
+[    1.235560] STM32 USART driver initialized
+[    1.258961] brd: module loaded
+[    1.272610] loop: module loaded
+[    1.282349] CAN device driver interface
+[    1.286354] usbcore: registered new interface driver asix
+[    1.290386] usbcore: registered new interface driver ax88179_178a
+[    1.296592] usbcore: registered new interface driver cdc_ether
+[    1.302376] usbcore: registered new interface driver net1080
+[    1.308100] usbcore: registered new interface driver cdc_subset
+[    1.314042] usbcore: registered new interface driver zaurus
+[    1.319619] usbcore: registered new interface driver cdc_ncm
+[    1.325347] usbcore: registered new interface driver r8153_ecm
+[    1.333420] usbcore: registered new interface driver cdc_acm
+[    1.337718] cdc_acm: USB Abstract Control Model driver for USB modems and ISDN adapters
+[    1.346193] usbcore: registered new interface driver uas
+[    1.351112] usbcore: registered new interface driver usb-storage
+[    1.357325] usbcore: registered new interface driver ftdi_sio
+[    1.362926] usbserial: USB Serial support registered for FTDI USB Serial Device
+[    1.372422] UDC core: g_ether: couldn't find an available UDC
+[    1.377299] usbcore: registered new device driver usbip-host
+[    1.386047] device-mapper: ioctl: 4.50.0-ioctl (2025-04-28) initialised: dm-devel@lists.linux.dev
+[    1.394217] sdhci: Secure Digital Host Controller Interface driver
+[    1.399745] sdhci: Copyright(c) Pierre Ossman
+[    1.404158] Synopsys Designware Multimedia Card Interface Driver
+[    1.410683] sdhci-pltfm: SDHCI platform and OF driver helper
+[    1.418098] usbcore: registered new interface driver usbhid
+[    1.422246] usbhid: USB HID core driver
+[    1.430944] hw perfevents: enabled with armv7_cortex_a7 PMU driver, 5 (8000000f) counters available
+[    1.440764] optee: probing for conduit method.
 I/TC: Reserved shared memory is enabled
 I/TC: Dynamic shared memory is enabled
 I/TC: Normal World virtualization support is disabled
 I/TC: Asynchronous notifications are disabled
-[    1.433640] optee: revision 4.7 (86846f4f)
-[    1.451835] optee: dynamic shared memory is enabled
-[    1.466764] arm-scmi arm-scmi.0.auto: Using scmi_optee_transport
-[    1.471368] arm-scmi arm-scmi.0.auto: SCMI max-rx-timeout: 30ms / max-msg-size: 104bytes / max-msg: 20
-[    1.482059] scmi_protocol scmi_dev.1: Enabled polling mode TX channel - prot_id:16
-[    1.488742] arm-scmi arm-scmi.0.auto: SCMI Notifications - Core Enabled.
-[    1.510890] arm-scmi arm-scmi.0.auto: SCMI Protocol v2.0 'ST:' Firmware version 0x0
-[    1.517388] arm-scmi arm-scmi.0.auto: Enabling SCMI Quirk [quirk_clock_rates_triplet_out_of_spec]
-[    1.922062] scmi-regulator scmi_dev.4: Regulator reg11 registered for domain [0]
-[    1.928973] scmi-regulator scmi_dev.4: Regulator reg18 registered for domain [1]
-[    1.936384] scmi-regulator scmi_dev.4: Regulator usb33 registered for domain [2]
-[    1.943974] scmi-regulator scmi_dev.4: Regulator vddcore registered for domain [3]
-[    1.951638] scmi-regulator scmi_dev.4: Regulator vdd registered for domain [5]
-[    1.958982] scmi-regulator scmi_dev.4: Regulator v3v3 registered for domain [6]
-[    1.966357] scmi-regulator scmi_dev.4: Regulator v1v8_audio registered for domain [7]
-[    1.974163] scmi-regulator scmi_dev.4: Regulator v3v3_hdmi registered for domain [8]
-[    1.981705] scmi-regulator scmi_dev.4: Regulator vdd_usb registered for domain [10]
-[    1.989688] scmi-regulator scmi_dev.4: Regulator vdda registered for domain [11]
-[    1.997276] scmi-regulator scmi_dev.4: Regulator v1v2_hdmi registered for domain [12]
-[    2.004746] scmi-regulator scmi_dev.4: Regulator vbus_otg registered for domain [15]
-[    2.012487] scmi-regulator scmi_dev.4: Regulator vbus_sw registered for domain [16]
-[    2.023109] optee: initialized driver
-[    2.027373] NET: Registered PF_PACKET protocol family
-[    2.031064] can: controller area network core
-[    2.035574] NET: Registered PF_CAN protocol family
-[    2.040216] can: raw protocol
-[    2.043183] can: broadcast manager protocol
-[    2.047494] can: netlink gateway - max_hops=1
-[    2.052109] Key type dns_resolver registered
-[    2.056207] ThumbEE CPU extension supported.
-[    2.060353] Registering SWP/SWPB emulation handler
-[    2.085502] Loading compiled-in X.509 certificates
-[    2.111790] Btrfs loaded, debug=on, zoned=no, fsverity=no
-[    2.144753] stm32mp157-pinctrl soc:pinctrl@50002000: GPIOA bank added
-[    2.150849] stm32mp157-pinctrl soc:pinctrl@50002000: GPIOB bank added
-[    2.157237] stm32mp157-pinctrl soc:pinctrl@50002000: GPIOC bank added
-[    2.163787] stm32mp157-pinctrl soc:pinctrl@50002000: GPIOD bank added
-[    2.170211] stm32mp157-pinctrl soc:pinctrl@50002000: GPIOE bank added
-[    2.176890] stm32mp157-pinctrl soc:pinctrl@50002000: GPIOF bank added
-[    2.183297] stm32mp157-pinctrl soc:pinctrl@50002000: GPIOG bank added
-[    2.189881] stm32mp157-pinctrl soc:pinctrl@50002000: GPIOH bank added
-[    2.196283] stm32mp157-pinctrl soc:pinctrl@50002000: GPIOI bank added
-[    2.201731] stm32mp157-pinctrl soc:pinctrl@50002000: Pinctrl STM32 initialized
-[    2.212999] stm32mp157-pinctrl soc:pinctrl@54004000: GPIOZ bank added
-[    2.218243] stm32mp157-pinctrl soc:pinctrl@54004000: Pinctrl STM32 initialized
-[    2.228449] stm32-dma 48000000.dma-controller: STM32 DMA driver registered
-[    2.236862] stm32-dma 48001000.dma-controller: STM32 DMA driver registered
-[    2.247461] stm32-mdma 58000000.dma-controller: STM32 MDMA driver registered
-[    2.259163] 4000e000.serial: ttySTM3 at MMIO 0x4000e000 (irq = 47, base_baud = 4000000) is a stm32-usart
-[    2.267991] serial serial0: tty port ttySTM3 registered
-[    2.275627] random: crng init done
-[    2.276990] stm32-dwmac 5800a000.ethernet: IRQ eth_wake_irq not found
-[    2.284202] stm32-dwmac 5800a000.ethernet: IRQ eth_lpi not found
-[    2.290164] stm32-dwmac 5800a000.ethernet: IRQ sfty not found
-[    2.297655] stm32-dwmac 5800a000.ethernet: User ID: 0x40, Synopsys ID: 0x42
-[    2.303228] stm32-dwmac 5800a000.ethernet:   DWMAC4/5
-[    2.308324] stm32-dwmac 5800a000.ethernet: DMA HW capability register supported
-[    2.315620] stm32-dwmac 5800a000.ethernet: RX Checksum Offload Engine supported
-[    2.322920] stm32-dwmac 5800a000.ethernet: TX Checksum insertion supported
-[    2.329873] stm32-dwmac 5800a000.ethernet: Wake-Up On Lan supported
-[    2.336339] stm32-dwmac 5800a000.ethernet: TSO supported
-[    2.341487] stm32-dwmac 5800a000.ethernet: Enable RX Mitigation via HW Watchdog Timer
-[    2.349402] stm32-dwmac 5800a000.ethernet: Enabled L3L4 Flow TC (entries=2)
-[    2.356397] stm32-dwmac 5800a000.ethernet: Enabled RFS Flow TC (entries=10)
-[    2.363378] stm32-dwmac 5800a000.ethernet: TSO feature enabled
-[    2.369273] stm32-dwmac 5800a000.ethernet: Using 32/32 bits DMA host/device width
-[    2.391379] stm32_rtc 5c004000.rtc: rtc_ck is slow
-[    2.393493] ehci-platform 5800d000.usb: EHCI Host Controller
-[    2.400510] ehci-platform 5800d000.usb: new USB bus registered, assigned bus number 1
-[    2.408578] ehci-platform 5800d000.usb: irq 49, io mem 0x5800d000
-[    2.434057] ehci-platform 5800d000.usb: USB 2.0 started, EHCI 1.00
-[    2.440390] hub 1-0:1.0: USB hub found
-[    2.442779] hub 1-0:1.0: 2 ports detected
-[    2.498376] stm32_rtc 5c004000.rtc: Can't enter in init mode. Prescaler config failed.
-[    2.505265] stm32_rtc 5c004000.rtc: probe with driver stm32_rtc failed with error -110
-[    2.526324] mmci-pl18x 58005000.mmc: Got CD GPIO
-[    2.534692] mmci-pl18x 58007000.mmc: allocated mmc-pwrseq
-[    2.534695] stm32-hash 54002000.hash: will run requests pump with realtime priority
-[    2.535896] mmci-pl18x 58007000.mmc: mmc1: PL180 manf 53 rev2 at 0x58007000 irq 54,0 (pio)
-[    2.538879] stm32-hash 54002000.hash: Init HASH done HW ver 23 DMA mode 1
-[    2.555014] mmci-pl18x 58005000.mmc: mmc0: PL180 manf 53 rev2 at 0x58005000 irq 53,0 (pio)
-[    2.563900] stm32-cryp 54001000.cryp: will run requests pump with realtime priority
-[    2.577824] stm32-cryp 54001000.cryp: Initialized
-[    2.585596] stm32-ipcc 4c001000.mailbox: ipcc rev:1.0 enabled, 6 chans, proc 0
-[    2.592774] stm32-rproc 10000000.m4: wdg irq registered
-[    2.597888] remoteproc remoteproc0: m4 is available
-[    2.612456] stm32-usart 40010000.serial: interrupt mode for rx (no dma)
-[    2.617774] stm32-usart 40010000.serial: interrupt mode for tx (no dma)
-[    2.625020] 40010000.serial: ttySTM0 at MMIO 0x40010000 (irq = 62, base_baud = 4000000) is a stm32-usart
-[    2.635504] printk: legacy console [ttySTM0] enabled
-[    2.635504] printk: legacy console [ttySTM0] enabled
-[    2.644140] printk: legacy bootconsole [stm32] disabled
-[    2.644140] printk: legacy bootconsole [stm32] disabled
-[    2.666417] mmc0: new high speed SDHC card at address 59b4
-[    2.672413] mmcblk0: mmc0:59b4 USDU1 14.9 GiB
-[    2.684176] clk: Disabling unused clocks
-[    2.690736]  mmcblk0: p1 p2 p3 p4 p5 p6 p7 p8 p9 p10
-[    2.744065] usb 1-1: new high-speed USB device number 2 using ehci-platform
-[    2.747958] PM: genpd: Disabling unused power domains
-[    2.756299] check access for rdinit=/init failed: -2, ignoring
-[    2.799231] mmc1: new high speed SDIO card at address 0001
-[    2.851608] EXT4-fs (mmcblk0p9): mounted filesystem a39c3e8e-95d9-4ef2-8273-e361999f35cd r/w with ordered data mode. Quota mode: disabled.
-[    2.862994] VFS: Mounted root (ext4 filesystem) on device 179:9.
-[    2.871095] devtmpfs: mounted
-[    2.874928] Freeing unused kernel image (initmem) memory: 1024K
-[    2.879954] Run /sbin/init as init process
-[    2.925886] hub 1-1:1.0: USB hub found
-[    2.928436] hub 1-1:1.0: 4 ports detected
+[    1.443789] optee: revision 4.7 (86846f4f)
+[    1.461973] optee: dynamic shared memory is enabled
+[    1.476919] arm-scmi arm-scmi.0.auto: Using scmi_optee_transport
+[    1.481520] arm-scmi arm-scmi.0.auto: SCMI max-rx-timeout: 30ms / max-msg-size: 104bytes / max-msg: 20
+[    1.492221] scmi_protocol scmi_dev.1: Enabled polling mode TX channel - prot_id:16
+[    1.498887] arm-scmi arm-scmi.0.auto: SCMI Notifications - Core Enabled.
+[    1.521033] arm-scmi arm-scmi.0.auto: SCMI Protocol v2.0 'ST:' Firmware version 0x0
+[    1.527524] arm-scmi arm-scmi.0.auto: Enabling SCMI Quirk [quirk_clock_rates_triplet_out_of_spec]
+[    1.932180] scmi-regulator scmi_dev.4: Regulator reg11 registered for domain [0]
+[    1.939105] scmi-regulator scmi_dev.4: Regulator reg18 registered for domain [1]
+[    1.946505] scmi-regulator scmi_dev.4: Regulator usb33 registered for domain [2]
+[    1.954180] scmi-regulator scmi_dev.4: Regulator vddcore registered for domain [3]
+[    1.961746] scmi-regulator scmi_dev.4: Regulator vdd registered for domain [5]
+[    1.969081] scmi-regulator scmi_dev.4: Regulator v3v3 registered for domain [6]
+[    1.976459] scmi-regulator scmi_dev.4: Regulator v1v8_audio registered for domain [7]
+[    1.984289] scmi-regulator scmi_dev.4: Regulator v3v3_hdmi registered for domain [8]
+[    1.991803] scmi-regulator scmi_dev.4: Regulator vdd_usb registered for domain [10]
+[    1.999786] scmi-regulator scmi_dev.4: Regulator vdda registered for domain [11]
+[    2.007363] scmi-regulator scmi_dev.4: Regulator v1v2_hdmi registered for domain [12]
+[    2.014833] scmi-regulator scmi_dev.4: Regulator vbus_otg registered for domain [15]
+[    2.022572] scmi-regulator scmi_dev.4: Regulator vbus_sw registered for domain [16]
+[    2.033169] optee: initialized driver
+[    2.037416] NET: Registered PF_PACKET protocol family
+[    2.041106] can: controller area network core
+[    2.045614] NET: Registered PF_CAN protocol family
+[    2.050256] can: raw protocol
+[    2.053221] can: broadcast manager protocol
+[    2.057542] can: netlink gateway - max_hops=1
+[    2.062121] Key type dns_resolver registered
+[    2.066240] ThumbEE CPU extension supported.
+[    2.070384] Registering SWP/SWPB emulation handler
+[    2.095551] Loading compiled-in X.509 certificates
+[    2.121850] Btrfs loaded, debug=on, zoned=no, fsverity=no
+[    2.154926] stm32mp157-pinctrl soc:pinctrl@50002000: GPIOA bank added
+[    2.161034] stm32mp157-pinctrl soc:pinctrl@50002000: GPIOB bank added
+[    2.167392] stm32mp157-pinctrl soc:pinctrl@50002000: GPIOC bank added
+[    2.174050] stm32mp157-pinctrl soc:pinctrl@50002000: GPIOD bank added
+[    2.180321] stm32mp157-pinctrl soc:pinctrl@50002000: GPIOE bank added
+[    2.187017] stm32mp157-pinctrl soc:pinctrl@50002000: GPIOF bank added
+[    2.193440] stm32mp157-pinctrl soc:pinctrl@50002000: GPIOG bank added
+[    2.200039] stm32mp157-pinctrl soc:pinctrl@50002000: GPIOH bank added
+[    2.206433] stm32mp157-pinctrl soc:pinctrl@50002000: GPIOI bank added
+[    2.211890] stm32mp157-pinctrl soc:pinctrl@50002000: Pinctrl STM32 initialized
+[    2.223349] stm32mp157-pinctrl soc:pinctrl@54004000: GPIOZ bank added
+[    2.228504] stm32mp157-pinctrl soc:pinctrl@54004000: Pinctrl STM32 initialized
+[    2.238821] stm32-dma 48000000.dma-controller: STM32 DMA driver registered
+[    2.247199] stm32-dma 48001000.dma-controller: STM32 DMA driver registered
+[    2.257790] stm32-mdma 58000000.dma-controller: STM32 MDMA driver registered
+[    2.269426] 4000e000.serial: ttySTM3 at MMIO 0x4000e000 (irq = 47, base_baud = 4000000) is a stm32-usart
+[    2.278260] serial serial0: tty port ttySTM3 registered
+[    2.285773] random: crng init done
+[    2.289832] stm32-dwmac 5800a000.ethernet: IRQ eth_wake_irq not found
+[    2.294927] stm32-dwmac 5800a000.ethernet: IRQ eth_lpi not found
+[    2.300906] stm32-dwmac 5800a000.ethernet: IRQ sfty not found
+[    2.307941] stm32-dwmac 5800a000.ethernet: User ID: 0x40, Synopsys ID: 0x42
+[    2.313692] stm32-dwmac 5800a000.ethernet:   DWMAC4/5
+[    2.318740] stm32-dwmac 5800a000.ethernet: DMA HW capability register supported
+[    2.326108] stm32-dwmac 5800a000.ethernet: RX Checksum Offload Engine supported
+[    2.333376] stm32-dwmac 5800a000.ethernet: TX Checksum insertion supported
+[    2.340328] stm32-dwmac 5800a000.ethernet: Wake-Up On Lan supported
+[    2.346777] stm32-dwmac 5800a000.ethernet: TSO supported
+[    2.351933] stm32-dwmac 5800a000.ethernet: Enable RX Mitigation via HW Watchdog Timer
+[    2.359843] stm32-dwmac 5800a000.ethernet: Enabled L3L4 Flow TC (entries=2)
+[    2.366850] stm32-dwmac 5800a000.ethernet: Enabled RFS Flow TC (entries=10)
+[    2.373817] stm32-dwmac 5800a000.ethernet: TSO feature enabled
+[    2.379706] stm32-dwmac 5800a000.ethernet: Using 32/32 bits DMA host/device width
+[    2.401714] stm32_rtc 5c004000.rtc: rtc_ck is slow
+[    2.403830] ehci-platform 5800d000.usb: EHCI Host Controller
+[    2.410841] ehci-platform 5800d000.usb: new USB bus registered, assigned bus number 1
+[    2.418934] ehci-platform 5800d000.usb: irq 49, io mem 0x5800d000
+[    2.443961] ehci-platform 5800d000.usb: USB 2.0 started, EHCI 1.00
+[    2.450314] hub 1-0:1.0: USB hub found
+[    2.452700] hub 1-0:1.0: 2 ports detected
+[    2.508542] stm32_rtc 5c004000.rtc: Can't enter in init mode. Prescaler config failed.
+[    2.515417] stm32_rtc 5c004000.rtc: probe with driver stm32_rtc failed with error -110
+[    2.536370] mmci-pl18x 58005000.mmc: Got CD GPIO
+[    2.544708] mmci-pl18x 58005000.mmc: mmc0: PL180 manf 53 rev2 at 0x58005000 irq 53,0 (pio)
+[    2.544787] mmci-pl18x 58007000.mmc: allocated mmc-pwrseq
+[    2.554157] stm32-hash 54002000.hash: will run requests pump with realtime priority
+[    2.558298] mmci-pl18x 58007000.mmc: mmc1: PL180 manf 53 rev2 at 0x58007000 irq 54,0 (pio)
+[    2.566043] stm32-hash 54002000.hash: Init HASH done HW ver 23 DMA mode 1
+[    2.584422] stm32-cryp 54001000.cryp: will run requests pump with realtime priority
+[    2.591925] stm32-cryp 54001000.cryp: Initialized
+[    2.599267] stm32-ipcc 4c001000.mailbox: ipcc rev:1.0 enabled, 6 chans, proc 0
+[    2.607823] stm32-rproc 10000000.m4: wdg irq registered
+[    2.612797] remoteproc remoteproc0: m4 is available
+[    2.627833] stm32-usart 40010000.serial: interrupt mode for rx (no dma)
+[    2.633122] stm32-usart 40010000.serial: interrupt mode for tx (no dma)
+[    2.640446] 40010000.serial: ttySTM0 at MMIO 0x40010000 (irq = 62, base_baud = 4000000) is a stm32-usart
+[    2.650809] printk: legacy console [ttySTM0] enabled
+[    2.650809] printk: legacy console [ttySTM0] enabled
+[    2.659387] printk: legacy bootconsole [stm32] disabled
+[    2.659387] printk: legacy bootconsole [stm32] disabled
+[    2.673112] mmc0: new high speed SDHC card at address 59b4
+[    2.678912] mmcblk0: mmc0:59b4 USDU1 14.9 GiB
+[    2.693035] GPT:Primary header thinks Alt. header is not at the end of the disk.
+[    2.699241] GPT:563023 != 31176703
+[    2.702529] GPT:Alternate GPT header not at the end of the disk.
+[    2.703673] clk: Disabling unused clocks
+[    2.708606] GPT:563023 != 31176703
+[    2.715958] GPT: Use GNU Parted to correct GPT errors.
+[    2.721099]  mmcblk0: p1 p2 p3 p4 p5 p6 p7 p8 p9
+[    2.734849] usb 1-1: new high-speed USB device number 2 using ehci-platform
+[    2.779159] PM: genpd: Disabling unused power domains
+[    2.784453] check access for rdinit=/init failed: -2, ignoring
+[    2.831402] EXT4-fs (mmcblk0p9): mounted filesystem d3013a20-74cd-4b8f-a2ac-77953b0bc606 r/w with ordered data mode. Quota mode: disabled.
+[    2.842748] VFS: Mounted root (ext4 filesystem) on device 179:9.
+[    2.849422] devtmpfs: mounted
+[    2.853879] Freeing unused kernel image (initmem) memory: 1024K
+[    2.859996] Run /sbin/init as init process
+[    2.867774] mmc1: new high speed SDIO card at address 0001
+[    2.905728] hub 1-1:1.0: USB hub found
+[    2.908293] hub 1-1:1.0: 4 ports detected
 INIT: version 3.04 booting
 Starting udev
-[    3.672083] udevd[100]: starting version 3.2.14
-[    3.722447] udevd[101]: starting eudev-3.2.14
-[    6.420868] BTRFS: device fsid fbab6996-e5b1-4544-b114-65c83f3fe536 devid 1 transid 10 /dev/mmcblk0p10 (179:10) scanned by userfs (125)
-[    6.457023] BTRFS info (device mmcblk0p10): first mount of filesystem fbab6996-e5b1-4544-b114-65c83f3fe536
-[    6.471086] BTRFS info (device mmcblk0p10): using crc32c (crc32c-lib) checksum algorithm
-[    6.499273] BTRFS info (device mmcblk0p10): enabling ssd optimizations
-[    6.504529] BTRFS info (device mmcblk0p10): turning on async discard
-[    6.510889] BTRFS info (device mmcblk0p10): enabling free space tree
-[    6.674145] EXT4-fs (mmcblk0p9): re-mounted a39c3e8e-95d9-4ef2-8273-e361999f35cd.
-sysctl: cannot stat /proc/sys/net/ipv4/tcp_syncookies: No such file or directory
-hwclock: Cannot access the Hardware Clock via any known method.
-hwclock: Use the --verbose option to see the details of our search for an access method.
-Fri Mar  9 12:35:18 UTC 2018
-hwclock: Cannot access the Hardware Clock via any known method.
-hwclock: Use the --verbose option to see the details of our search for an access method.
-hwclock: Cannot access the Hardware Clock via any known method.
+[    3.429310] udevd[99]: starting version 3.2.14
+[    3.477907] udevd[100]: starting eudev-3.2.14
+Cannot read environment, using default
+Cannot read environment, using default
+[    4.794278] EXT4-fs (mmcblk0p9): re-mounted d3013a20-74cd-4b8f-a2ac-77953b0bc606.
+hwclock: can't open '/dev/misc/rtc': No such file or directory
+Fri Mar  9 12:34:56 UTC 2018
+hwclock: can't open '/dev/misc/rtc': No such file or directory
+hwclock: can't open '/dev/misc/rtc': No such file or directory
 INIT: Entering runlevel: 5
-Configuring network interfaces... udhcpc: started, v1.36.1
-[    7.883740] stm32-dwmac 5800a000.ethernet eth0: Register MEM_TYPE_PAGE_POOL RxQ-0
-[    7.924077] stm32-dwmac 5800a000.ethernet eth0: PHY [stmmac-0:00] driver [RTL8211F Gigabit Ethernet] (irq=POLL)
-[    7.936522] dwmac4: Master AXI performs any burst length
-[    7.941519] stm32-dwmac 5800a000.ethernet eth0: No Safety Features support found
-[    7.953859] stm32-dwmac 5800a000.ethernet eth0: IEEE 1588-2008 Advanced Timestamp supported
-[    7.961818] stm32-dwmac 5800a000.ethernet eth0: registered PTP clock
-[    7.967379] stm32-dwmac 5800a000.ethernet eth0: configuring for phy/rgmii-id link mode
+Configuring network interfaces... [    5.903535] stm32-dwmac 5800a000.ethernet eth0: Register MEM_TYPE_PAGE_POOL RxQ-0
+[    5.953980] stm32-dwmac 5800a000.ethernet eth0: PHY [stmmac-0:00] driver [RTL8211F Gigabit Ethernet] (irq=POLL)
+[    5.966291] dwmac4: Master AXI performs any burst length
+[    5.971245] stm32-dwmac 5800a000.ethernet eth0: No Safety Features support found
+[    5.983124] stm32-dwmac 5800a000.ethernet eth0: IEEE 1588-2008 Advanced Timestamp supported
+[    5.990722] stm32-dwmac 5800a000.ethernet eth0: registered PTP clock
+[    5.996565] stm32-dwmac 5800a000.ethernet eth0: configuring for phy/rgmii-id link mode
+udhcpc: started, v1.36.1
 udhcpc: broadcasting discover
 udhcpc: broadcasting discover
-[   12.216194] stm32-dwmac 5800a000.ethernet eth0: Link is Up - 1Gbps/Full - flow control rx/tx
+[   10.216105] stm32-dwmac 5800a000.ethernet eth0: Link is Up - 1Gbps/Full - flow control rx/tx
 udhcpc: broadcasting discover
 udhcpc: broadcasting select for 192.168.10.180, server 192.168.10.6
 udhcpc: lease of 192.168.10.180 obtained from 192.168.10.6, lease time 43000
 /etc/udhcpc.d/50default: Adding DNS 192.168.10.6
-done.
-Starting Dropbear SSH server: dropbear.
+ip: SIOCGIFFLAGS: No such device
 Starting syslogd/klogd: done
-Starting internet superserver: xinetd.
-Starting kea-dhcp4-server: done.
 
-Amy distribution 1.0 dk2 ttySTM0
+Amy distribution 1.0 dk2 /dev/ttySTM0
 
 dk2 login:

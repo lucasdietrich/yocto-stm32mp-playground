@@ -17,12 +17,6 @@ SRC_URI = " \
     file://${UBOOT_CONFIG} \
 "
 
-# specific to mp1
-SRC_URI:append:mp1 = " \
-    file://0001-Disable-SCMI-for-stm32mp157f-dk2.patch \
-    file://0002-Change-custom-boot-command.patch \
-    "
-
 S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
 
