@@ -1,4 +1,4 @@
-SUMMARIZE = "tool to generate multiple filesystem and flash images from a tree"
+SUMMARY = "tool to generate multiple filesystem and flash images from a tree"
 HOMEPAGE = "https://github.com/pengutronix/genimage/tree/master"
 LICENSE = "GPL-2.0-only"
 

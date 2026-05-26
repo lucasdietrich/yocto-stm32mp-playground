@@ -43,7 +43,7 @@ image @IMAGE@-@MACHINE@-sdcard.img {
     }
 
     partition bootfs {
-        image = "bootfs.vfat"
+        image = "bootfs-@IMAGE@-@MACHINE@.vfat"
     }
 
     partition rootfs {
@@ -52,10 +52,11 @@ image @IMAGE@-@MACHINE@-sdcard.img {
     }
 }
 
-image bootfs.vfat {
+image bootfs-@IMAGE@-@MACHINE@.vfat {
     vfat {
         label = "bootfs"
         files = {
+            "u-boot-scr/boot.scr",
             "kernel/zImage",
             "kernel/stm32mp157f-dk2-amy.dtb"
         }

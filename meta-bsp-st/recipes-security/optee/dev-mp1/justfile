@@ -1,0 +1,42 @@
+# 3, 4
+LOG_LEVEL := "3"
+
+build:
+    . /opt/amy/1.0/environment-setup-cortexa7t2hf-neon-vfpv4-poky-linux-gnueabi && \
+        . .venv/bin/activate && \
+        unset LDFLAGS && unset CFLAGS && unset CPPFLAGS && \
+        make CROSS_COMPILE=arm-none-eabi- \
+        PLATFORM=stm32mp1-157C_DK2 \
+        CFG_EMBED_DTB_SOURCE_FILE=stm32mp157c-dk2.dts \
+        DEBUG=y \
+        CFG_TEE_CORE_DEBUG=y \
+        CFG_TEE_CORE_LOG_LEVEL={{LOG_LEVEL}} \
+        CFG_TEE_CORE_NB_CORE=2 \
+        CFG_STM32MP_REMOTEPROC=y \
+        CFG_CORE_RESERVED_SHM=y \
+        CFG_CORE_DYN_SHM=y \
+        CFG_WITH_PAGER=y \
+        -j16 \
+        all && \
+        ./scripts/gen_compile_commands.py && \
+        arm-none-eabi-objdump -S out/arm-plat-stm32mp1/core/tee.elf > dis.S
+
+header: build
+    hexdump -C out/arm-plat-stm32mp1/core/tee-header_v2.bin
+
+flash: build
+    if [ -b /dev/disk/by-partlabel/tee-header ]; then \
+        sudo dd if=out/arm-plat-stm32mp1/core/tee-header_v2.bin of=/dev/disk/by-partlabel/tee-header bs=4K; \
+        sudo dd if=out/arm-plat-stm32mp1/core/tee-pager_v2.bin of=/dev/disk/by-partlabel/tee-pager bs=256K; \
+        sudo dd if=out/arm-plat-stm32mp1/core/tee-pageable_v2.bin of=/dev/disk/by-partlabel/tee-pageable bs=256K; \
+    else \
+        echo "Error: /dev/disk/by-partlabel/tee-header not found. Please ensure the device is connected and mounted correctly."; \
+        exit 1; \
+    fi
+
+clean:
+    . /opt/amy/1.0/environment-setup-cortexa7t2hf-neon-vfpv4-poky-linux-gnueabi && \
+        . .venv/bin/activate && \
+        unset LDFLAGS && unset CFLAGS && unset CPPFLAGS && \
+        make clean && \
+        rm -rf out

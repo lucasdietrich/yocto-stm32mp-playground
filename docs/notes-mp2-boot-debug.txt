@@ -1,0 +1,61 @@
+# STM32MP257F-DK Boot Debug Notes
+
+## Bugs Fixed
+
+### 1. TF-A: BL31 not initializing BL32 (OP-TEE)
+- File: meta-bsp-st/recipes-bsp/tf-a/tf-a.inc
+- Fix: Added `SPD=opteed` to EXTRA_OEMAKE for mp2
+  - Without it, BL31 was compiled without the OP-TEE dispatcher and skipped BL32 entirely
+
+### 2. OP-TEE: SCMI TA not found
+- File: meta-bsp-st/recipes-security/optee/optee-os.inc
+- Fix: Added `CFG_SCMI_SCPFW=y` and pointed OP-TEE to the SCP-firmware source tree
+  - Previously had CFG_SCMI_SCPFW=n
+  - Also added scp-firmware-src to DEPENDS for mp2
+
+### 3. SCP-firmware: product/optee/sub.mk not found
+- File: meta-bsp-st/recipes-bsp/scp-firmware/scp-firmware-src_git.bb (new file)
+- Fix: Created a recipe that fetches post-v2.14.0 SCP-firmware (SRCREV f76402df...)
+  - v2.14.0 tag (3267f296) lacks the product/optee/stm32mp2/ directory entirely
+  - Uses gitsm:// (submodules) and applies 0001-OPTEE-Private-Includes.patch
+  - Installs source tree to /usr/src/scp-firmware in sysroot for OP-TEE build
+
+### 4. U-Boot: "scmi-over-optee scmi: Buffer to small" (~125 occurrences)
+- Root cause: SCP-firmware (post-2.14.0) implements clock protocol v2.0, which
+  adds a clock_enable_delay field to the CLOCK_ATTRIBUTES response (28 bytes
+  payload). U-Boot expected only 24 bytes (missing the extra field), so the
+  size check in smt.c:204 flagged every single SCMI clock/reset call as an error.
+- Upstream patch (NOT yet in v2023.10-stm32mp-r3):
+    [PATCH v1 01/13] clk: scmi: add compatibility with clock protocol 2.0
+    https://lists.denx.de/pipermail/u-boot/2025-May/590141.html
+    Part of series: "[PATCH v1 00/13] stm32mp25: Add clock and reset drivers support"
+    Author: Valentin Caron / Patrice Chotard (STMicroelectronics), posted 2025-05-21
+- Fix applied locally to /home/lucas/yocto/mp2/u-boot/ (v2023.10-stm32mp-r3):
+  - include/scmi_protocols.h:
+      Added struct scmi_protocol_version_out (generic PROTOCOL_VERSION response)
+      Added struct scmi_clk_attribute_out_v2 (original 24 bytes + clock_enable_delay)
+  - drivers/clk/clk_scmi.c:
+      Added `u32 version` to scmi_clk_priv
+      Added scmi_clk_get_protocol_version() which sends SCMI_PROTOCOL_VERSION
+      Probe fetches clock protocol version at startup (fallback to 0 on error)
+      scmi_clk_get_attribute() uses the v2 struct when version >= 0x20000
+
+---
+
+## TODO / Reminders
+
+[ ] CHECK if recent U-Boot includes the upstream patches:
+    The 13-patch series "[PATCH v1 00/13] stm32mp25: Add clock and reset drivers
+    support" was sent to the u-boot mailing list on 2025-05-21. Check whether it
+    (or a later revision) has been merged into mainline U-Boot 2026.x.
+    => If merged, switch to a recent mainline U-Boot (e.g. 2026.01 or later)
+       to avoid carrying local patches. The recipe skeleton already exists at:
+       meta-bsp-st/recipes-bsp/u-boot/u-boot_2026.01.bb
+    => This would also bring proper STM32MP25 clock and reset drivers which may
+       be needed for a complete boot.
+
+[ ] VERIFY after rebuild: confirm U-Boot completes boot with no "Buffer to small"
+    or "clk_register: failed" errors in the serial log.
+
+[ ] VERIFY reset domain SCMI: struct scmi_rd_attr_out was already 28 bytes on
+    both sides — no fix was needed there, but confirm resets work at runtime.

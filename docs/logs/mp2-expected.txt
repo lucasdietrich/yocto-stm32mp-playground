@@ -1,0 +1,121 @@
+NOTICE:  CPU: STM32MP257FAK Rev.Y
+NOTICE:  Model: STMicroelectronics STM32MP257F-DK Discovery Board
+NOTICE:  Board: MB1605 Var1.0 Rev.C-01
+NOTICE:  Reset reason: Power-on reset (por_rstn) (0x2035)
+INFO:    PMIC2 version = 0x11
+INFO:    PMIC2 product ID = 0x20
+INFO:    FCONF: Reading TB_FW firmware configuration file from: 0xe011000
+INFO:    FCONF: Reading firmware configuration information for: stm32mp_io
+INFO:    FCONF: Reading firmware configuration information for: stm32mp_fuse
+INFO:    Using SDMMC
+INFO:      Instance 1
+INFO:    Boot used partition fsbl1
+NOTICE:  BL2: v2.10-stm32mp2-r2.0(debug):lts-v2.10.24-dirty(a07367a1)
+NOTICE:  BL2: Built : 16:16:36, Oct  3 2025
+INFO:    BL2: Loading image id 26
+INFO:    Loading image id=26 at address 0xe041000
+INFO:    Image id=26 loaded: 0xe041000 - 0xe049650
+INFO:    BL2: Doing platform setup
+INFO:    RAM: LPDDR4 1x32Gbits 1x32bits 1200MHz
+INFO:    Memory size = 0x100000000 (4096 MB)
+INFO:    BL2: Loading image id 1
+INFO:    Loading image id=1 at address 0xe000000
+INFO:    Image id=1 loaded: 0xe000000 - 0xe000326
+INFO:    FCONF: Reading FW_CONFIG firmware configuration file from: 0xe000000
+INFO:    FCONF: Reading firmware configuration information for: dyn_cfg
+INFO:    FCONF: Reading firmware configuration information for: risaf_config
+INFO:    RISAF2: No configuration in DT, use default
+INFO:    BL31 max size = 0x17000 (94208B)
+INFO:    BL2: Loading image id 3
+INFO:    Loading image id=3 at address 0xe000000
+INFO:    Image id=3 loaded: 0xe000000 - 0xe0169f0
+INFO:    BL2: Loading image id 19
+INFO:    Loading image id=19 at address 0x81fc0000
+INFO:    Image id=19 loaded: 0x81fc0000 - 0x81fc3958
+INFO:    BL2: Loading image id 4
+INFO:    Loading image id=4 at address 0x82000000
+INFO:    Image id=4 loaded: 0x82000000 - 0x8200001c
+INFO:    OPTEE ep=0x82000000
+INFO:    OPTEE header info:
+INFO:          magic=0x4554504f
+INFO:          version=0x2
+INFO:          arch=0x1
+INFO:          flags=0x0
+INFO:          nb_images=0x1
+INFO:    BL2: Loading image id 8
+INFO:    Loading image id=8 at address 0x82000000
+INFO:    Image id=8 loaded: 0x82000000 - 0x82100e48
+INFO:    BL2: Loading image id 2
+INFO:    Loading image id=2 at address 0x84400000
+INFO:    Image id=2 loaded: 0x84400000 - 0x8441d488
+INFO:    BL2: Loading image id 5
+INFO:    Loading image id=5 at address 0x84000000
+INFO:    Image id=5 loaded: 0x84000000 - 0x841c53b0
+NOTICE:  BL2: Booting BL31
+INFO:    Entry point address = 0xe000000
+INFO:    SPSR = 0x3cd
+INFO:    ARM GICv2 driver initialized
+NOTICE:  BL31: v2.10-stm32mp2-r2.0(debug):lts-v2.10.24-dirty(a07367a1)
+NOTICE:  BL31: Built : 16:16:36, Oct  3 2025
+INFO:    BL31: Initializing runtime services
+INFO:    BL31: Initializing BL32
+I/TC: Early console on UART#2
+I/TC:
+I/TC: Embedded DTB found
+I/TC: OP-TEE version: 4.0.0-dev (gcc version 13.4.0 (GCC)) #1 Fri Oct 20 18:29:31 UTC 2023 aarch64
+I/TC: WARNING: This OP-TEE configuration might be insecure!
+I/TC: WARNING: Please check https://optee.readthedocs.io/en/latest/architecture/porting_guidelines.html
+I/TC: Primary CPU initializing
+I/TC: WARNING: All debug access are allowed
+I/TC: Override the OTP 124: 0 to 0x18db6
+I/TC: WARNING: Embeds insecure stm32mp_provisioning driver
+I/TC: PMIC STPMIC REFID:2.@ V1.1
+I/TC: Platform stm32mp2: flavor PLATFORM_FLAVOR - DT stm32mp257f-dk.dts
+I/TC: OP-TEE ST profile: secure_and_system_services
+[    0.000000] SCP-firmware 2.13.0-intree-optee-os-4.0.0-dev
+[    0.000000]
+[    0.000000] [FWK] Module initialization complete!
+I/TC: Primary CPU switching to normal world boot
+INFO:    BL31: Preparing for EL3 exit to normal world
+INFO:    Entry point address = 0x84000000
+INFO:    SPSR = 0x3c9
+I/TC: Reserved shared memory is disabled
+I/TC: Dynamic shared memory is enabled
+I/TC: Normal World virtualization support is disabled
+I/TC: Asynchronous notifications are enabled
+
+
+U-Boot 2023.10-stm32mp-r3 (Oct 02 2023 - 14:39:59 +0000)
+
+CPU: STM32MP257FAK Rev.Y
+Model: STMicroelectronics STM32MP257F-DK Discovery Board
+Board: stm32mp2 (st,stm32mp257f-dk)
+Board: MB1605 Var1.0 Rev.C-01
+DRAM:  4 GiB
+optee optee: OP-TEE: revision 4.0 (2a5b1d12)
+I/TC: Reserved shared memory is disabled
+I/TC: Dynamic shared memory is enabled
+I/TC: Normal World virtualization support is disabled
+I/TC: Asynchronous notifications are enabled
+Core:  420 devices, 42 uclasses, devicetree: board
+WDT:   Started watchdog with servicing every 1000ms (32s timeout)
+NAND:  0 MiB
+MMC:   STM32 SD/MMC: 0, STM32 SD/MMC: 1
+Loading Environment from MMC... *** Warning - bad CRC, using default environment
+
+In:    serial
+Out:   serial
+Err:   serial
+Net:   eth0: eth1@482c0000
+FWU metadata read failed
+No EFI system partition
+No EFI system partition
+Failed to persist EFI variables
+Hit any key to stop autoboot:  0
+Boot over mmc0!
+Saving Environment to MMC... Writing to MMC(0)... OK
+switch to partitions #0, OK
+mmc0 is current device
+STM32MP>
+STM32MP>
+STM32MP>

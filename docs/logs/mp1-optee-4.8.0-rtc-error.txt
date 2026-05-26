@@ -1,0 +1,32 @@
+NOTICE:  CPU: STM32MP157FAC Rev.Z
+NOTICE:  Model: STMicroelectronics STM32MP157F-DK2 Discovery Board
+NOTICE:  Board: MB1272 Var4.0 Rev.C-02
+NOTICE:  BL2: v2.10-stm32mp1-r2.0(release):lts-v2.10.13-dirty(b1f57509)
+NOTICE:  BL2: Built : 17:10:59, Feb 14 2025
+NOTICE:  BL2: Booting BL32
+I/TC: Early console on UART#4
+I/TC:
+I/TC:
+I/TC: Pager is enabled. Hashes: 3360 bytes
+I/TC: Pager pool size: 84kB
+I/TC: No non-secure external DT
+I/TC: Embedded DTB found
+I/TC: OP-TEE version: 4.10.0 (gcc version 13.2.1 20231009 (Arm GNU Toolchain 13.2.rel1 (Build arm-13.7))) #1 Fri Apr 17 09:49:20 UTC 2026 arm
+I/TC: WARNING: This OP-TEE configuration might be insecure!
+I/TC: WARNING: Please check https://optee.readthedocs.io/en/latest/architecture/porting_guidelines.html
+I/TC: Primary CPU initializing
+I/TC: RCC is non-secure
+I/TC: WARNING: RCC tzen:0, insecure ETZPC hardening 10:ETZPC_DECPROT_NS_R_S_W
+I/TC: WARNING: RCC tzen:0, insecure ETZPC hardening 11:ETZPC_DECPROT_NS_R_S_W
+I/TC: WARNING: RCC tzen:0, insecure ETZPC hardening 0:ETZPC_DECPROT_S_RW
+I/TC: WARNING: RCC tzen:0, insecure ETZPC hardening 1:ETZPC_DECPROT_S_RW
+I/TC: WARNING: RCC tzen:0, insecure ETZPC hardening 2:ETZPC_DECPROT_S_RW
+E/TC:0 0 stm32_rtc_init:630 Can't enter init mode. Fail to initialize RTC.
+E/TC:0 0 probe_driver_node:522 Failed to probe stm32-rtc on node rtc@5c004000: 0xffff000d
+E/TC:0 0 print_probe_list:475 |- Driver stm32-rtc on node rtc@5c004000 failed
+I/TC: Platform stm32mp1: flavor 157C_DK2 - DT stm32mp157c-dk2.dts
+I/TC: DTB enables console
+I/TC: HUK unlocked
+E/TC:0 0 probe_dt_drivers:859 Probe sequence result: 0
+E/TC:0 0 print_probe_list:475 |- Driver stm32-rtc on node rtc@5c004000 failed
+E/TC:0 0 Panic

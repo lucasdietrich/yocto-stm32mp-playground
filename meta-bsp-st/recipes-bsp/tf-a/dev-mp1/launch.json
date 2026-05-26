@@ -1,0 +1,22 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug BL2 (STM32MP1)",
+            "type": "cortex-debug",
+            "request": "attach",
+            "device": "stm32mp157c",
+            "executable": "${workspaceFolder}/build/stm32mp1/debug/bl2/bl2.elf",
+            "servertype": "external",
+            // "gdbPath": "gdb-multiarch",
+            "gdbPath": "/opt/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gdb",
+            "gdbTarget": "localhost:3333",
+            "postAttachCommands": [
+                "hbreak plat_get_image_source",
+            ]
+        }
+    ]
+}

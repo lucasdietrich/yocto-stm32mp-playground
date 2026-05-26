@@ -1,0 +1,53 @@
+# to I need AARCH32_SP ?
+
+build:
+        unset LDFLAGS && unset CFLAGS && unset CPPFLAGS && \
+        bear -- make CROSS_COMPILE=aarch64-none-elf- \
+        STM32MP_SDMMC=1 \
+        PLAT=stm32mp2 \
+        ARCH=aarch64 ARM_ARCH_MAJOR=8 \
+        DTB_FILE_NAME=stm32mp257f-dk.dtb \
+        STM32MP_LPDDR4_TYPE=1 \
+        LOG_LEVEL=40 \
+        DEBUG=1 \
+        -j16
+
+genimage:
+    ~/yocto/mp1/genimage/genimage --config sd_genimage.cfg --root . --inputpath .
+
+flash-layout:
+    if [ -b /dev/sdd ]; then \
+        sudo dd if=images/stm32mp2dk-sdcard.img of=/dev/sdd bs=1M conv=fsync; \
+    else \
+        echo "Error: /dev/sdd not found. Please insert the SD card and try again."; \
+    fi
+
+flash: build
+    if [ -b "/dev/disk/by-partlabel/fsbla1" ]; then \
+        sudo dd if=build/stm32mp2/debug/tf-a-stm32mp257f-dk.stm32 of=/dev/disk/by-partlabel/fsbla1 bs=256K ; \
+        sudo dd if=build/stm32mp2/debug/tf-a-stm32mp257f-dk.stm32 of=/dev/disk/by-partlabel/fsbla2 bs=256K ; \
+    else \
+        echo "Error: /dev/disk/by-partlabel/fsbla1 not found. Is the SD card mounted?" ; \
+    fi
+
+openocd:
+     openocd -f board/stm32mp15x_dk2.cfg
+
+gdb:
+    arm-none-eabi-gdb \
+        -ex "set confirm off" \
+        -ex "target extended-remote :3333" \
+        -ex "add-symbol-file ../optee_os/out/arm-plat-stm32mp1/core/tee.elf" \
+        -ex "add-symbol-file ../u-boot/u-boot" \
+        -ex "add-symbol-file ../linux/vmlinux" \
+        build/stm32mp1/debug/bl2/bl2.elf
+
+clean:
+    make realclean
+
+decompile:
+    dtc -I dtb -O dts -o stm32mp257f-dk-bl2.dts build/stm32mp2/debug/fdts/stm32mp257f-dk-bl2.dtb
+
+# AARCH32_SP_OPTEE ?
+# IMAGE_BL32 ?
+# PSA_FWU_SUPPORT=0
