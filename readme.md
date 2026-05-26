@@ -4,18 +4,35 @@
 - `NOK`: means tested and not working
 - `?`: mean not tested yet but interested and should work
 
-| package | version    | mp1 | mp2         | comment                                                                    |
-| ------- | ---------- | --- | ----------- | -------------------------------------------------------------------------- |
-| tf-a    | st-amy     | OK  |             |                                                                            |
-| tf-a    | st         |     | OK          |                                                                            |
-| u-boot  | 2026.01    | OK  | ?           |                                                                            |
-| u-boot  | 2026.04    | OK  | OK          |                                                                            |
-| u-boot  | st 2023.10 |     | ?           |                                                                            |
-| optee   | 4.7.0      | OK  |             |                                                                            |
-| optee   | 4.8.0      | NOK |             | stm32_rtc_init issue on mp1                                                |
-| optee   | 4.9.0      | NOK |             | stm32_rtc_init issue on mp1                                                |
-| optee   | 4.10.0     | NOK | NOK (bsec3) | stm32_rtc_init issue on mp1, partial bsec3 support for mp2 (need st patch) |
-| optee   | st 4.0.0   | ?   | OK          |                                                                            |
+| package | version      | mp1 | mp2         | comment                                                                    |
+| ------- | ------------ | --- | ----------- | -------------------------------------------------------------------------- |
+| tf-a    | st-amy       | OK  |             |                                                                            |
+| tf-a    | st           |     | OK          |                                                                            |
+| u-boot  | 2026.01      | OK  | ?           |                                                                            |
+| u-boot  | 2026.04      | OK  | OK          |                                                                            |
+| u-boot  | st 2023.10   |     | ?           |                                                                            |
+| optee   | 4.7.0        | OK  |             |                                                                            |
+| optee   | 4.8.0        | NOK |             | stm32_rtc_init issue on mp1                                                |
+| optee   | 4.9.0        | NOK |             | stm32_rtc_init issue on mp1                                                |
+| optee   | 4.10.0       | NOK | NOK (bsec3) | stm32_rtc_init issue on mp1, partial bsec3 support for mp2 (need st patch) |
+| optee   | st 4.0.0     | ?   | OK          |                                                                            |
+| linux   | amy 6.18     | OK  |             |                                                                            |
+| linux   | amy 6.19-rc5 | OK  |             |                                                                            |
+| linux   | amy 7.0.10   | OK  | ?           |                                                                            |
+| linux   | st 6.6.116   | ?   | ?           | ST adaptation of linux LTS, next will be 6.18                              |
+
+- note from ST about maintenance of the ST fork of linux: <https://community.st.com/t5/stm32-mpus-embedded-software-and/kernel-version-for-openstlinux-on-stm32mp25-series/td-p/855852>
+- notes about linux LTS: <https://www.kernel.org/category/releases.html>
+
+    ```
+    Version	Maintainer	Released	Projected EOL
+    6.18	Greg Kroah-Hartman & Sasha Levin	2025-11-30	Dec, 2028
+    6.12	Greg Kroah-Hartman & Sasha Levin	2024-11-17	Dec, 2028
+    6.6	Greg Kroah-Hartman & Sasha Levin	2023-10-29	Dec, 2027
+    6.1	Greg Kroah-Hartman & Sasha Levin	2022-12-11	Dec, 2027
+    5.15	Greg Kroah-Hartman & Sasha Levin	2021-10-31	Dec, 2026
+    5.10	Greg Kroah-Hartman & Sasha Levin	2020-12-13	Dec, 2026
+    ```
 
 
 # stm32mp15 from scratch with yocto
