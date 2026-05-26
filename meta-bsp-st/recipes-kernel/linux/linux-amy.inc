@@ -32,5 +32,5 @@ KCONFIG_MODE = "alldefconfig"
 DEPENDS += " lz4-native "
 
 do_deploy:append() {
-    install -m 0644 ${B}/.config ${DEPLOYDIR}/.config
+    install -m 0644 ${B}/.config ${DEPLOYDIR}/${KERNEL_DEPLOYSUBDIR}/.config
 }

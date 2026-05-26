@@ -63,12 +63,12 @@ do_sdimage() {
         -e "s|@MACHINE@|${MACHINE}|g" \
         -e "s|@TFA_DEVICETREE@|${TFA_DEVICETREE}|g" \
         -e "s|@IMAGE_ROOTFS@|${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.ext4|g" \
-        ${FILE_DIRNAME}/files/${SDIMAGE_CONF} > ${WORKDIR}/sdcard_genimage.cfg
+        ${FILE_DIRNAME}/files/${SDIMAGE_CONF} > ${WORKDIR}/sdcard_genimage-${IMAGE_BASENAME}-${MACHINE}.cfg
 
     mkdir -p ${WORKDIR}/genimage/tmp ${WORKDIR}/genimage/root
 
     genimage \
-        --config ${WORKDIR}/sdcard_genimage.cfg \
+        --config ${WORKDIR}/sdcard_genimage-${IMAGE_BASENAME}-${MACHINE}.cfg \
         --root ${WORKDIR}/genimage/root \
         --tmppath ${WORKDIR}/genimage/tmp \
         --inputpath ${DEPLOY_DIR_IMAGE} \
@@ -76,7 +76,7 @@ do_sdimage() {
 
     gzip -k -9 ${IMGDEPLOYDIR}/*.img
 
-    cp ${WORKDIR}/sdcard_genimage.cfg ${IMGDEPLOYDIR}
+    cp ${WORKDIR}/sdcard_genimage-${IMAGE_BASENAME}-${MACHINE}.cfg ${IMGDEPLOYDIR}
 }
 
 IMAGE_OVERHEAD_FACTOR = "1.0"
