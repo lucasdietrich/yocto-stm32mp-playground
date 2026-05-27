@@ -37,7 +37,7 @@ image @IMAGE@-@MACHINE@-sdcard.img {
     }
 
     partition bootfs {
-        image = "bootfs-@IMAGE@-@MACHINE@.vfat"
+        image = "@IMAGE@-@MACHINE@-bootfs.vfat"
     }
 
     partition rootfs {
@@ -46,13 +46,13 @@ image @IMAGE@-@MACHINE@-sdcard.img {
     }
 }
 
-image bootfs-@IMAGE@-@MACHINE@.vfat {
+image @IMAGE@-@MACHINE@-bootfs.vfat {
     vfat {
         label = "bootfs"
         files = {
             "u-boot-scr/boot.scr",
             "kernel/Image",
-            "kernel/stm32mp257f-dk-mp2.dtb"
+            "kernel/stm32mp257f-dk.dtb"
         }
     }
     size = 32M

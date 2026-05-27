@@ -43,7 +43,7 @@ image @IMAGE@-@MACHINE@-sdcard.img {
     }
 
     partition bootfs {
-        image = "bootfs-@IMAGE@-@MACHINE@.vfat"
+        image = "@IMAGE@-@MACHINE@-bootfs.vfat"
     }
 
     partition rootfs {
@@ -52,7 +52,7 @@ image @IMAGE@-@MACHINE@-sdcard.img {
     }
 }
 
-image bootfs-@IMAGE@-@MACHINE@.vfat {
+image @IMAGE@-@MACHINE@-bootfs.vfat {
     vfat {
         label = "bootfs"
         files = {

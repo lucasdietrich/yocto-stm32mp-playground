@@ -3,9 +3,21 @@ require linux-amy.inc
 FILESEXTRAPATHS:prepend := "${THISDIR}/files/7.0:"
 
 SRC_URI += " \
-        file://defconfig \
         file://0001-Add-custom-amy-devicetree.patch \
 "
+
+SRC_URI:append:mp1 = " file://amy-stm32mp1_defconfig "
+
+# TODO this needs to be reviewed and made common with the mp1 configuration
+SRC_URI:append:mp2 = " file://amy-stm32mp2_defconfig "
+
+do_configure:prepend:mp1() {
+    cp ${WORKDIR}/amy-stm32mp1_defconfig defconfig
+}
+
+do_configure:prepend:mp2() {
+    cp ${WORKDIR}/amy-stm32mp2_defconfig defconfig
+}
 
 PV = "7.0.10"
 SRC_URI[sha256sum] = "573690074720e5703db81074ac4c0102d8e135252af59ee4511c59b20c3c2a46"

@@ -17,9 +17,11 @@ SRC_URI = " \
     file://fw_env.config \
     file://amy.env \
     file://amy-env.cfg \
-    ${@bb.utils.contains('AMY_DEBUG', '1', 'file://debug.cfg', '', d)} \
     ${@oe.utils.conditional('UBOOT_CONFIG_SRC_URI', '', '', 'file://${UBOOT_CONFIG_SRC_URI}', d)} \
 "
+
+# mp2 does not support CONFIG_DEBUG_UART
+SRC_URI:append:mp1 = " ${@bb.utils.contains('AMY_DEBUG', '1', 'file://debug.cfg', '', d)}"
 
 S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
