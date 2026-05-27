@@ -1,5 +1,17 @@
 echo Boot script for @@MACHINE@@ from bootfs partition
-setenv bootargs 'console=ttySTM0,115200 earlycon root=PARTLABEL=rootfs rootfstype=ext4 rw rootwait'
-fatload mmc 0:${bootfs_part} ${kernel_addr_r} @@KERNEL_IMAGE@@
-fatload mmc 0:${bootfs_part} ${fdt_addr_r} @@DTB_FILE@@
+
+if part number mmc ${bootdev} rootfs rootfs_part; then
+    echo rootfs partition found at index ${rootfs_part}
+else
+    echo Unable to locate rootfs partition
+    exit
+fi
+
+part uuid mmc ${bootdev}:${rootfs_part} rootfs_partuuid
+echo rootfs PARTUUID=${rootfs_partuuid}
+
+setenv bootargs "console=ttySTM0,115200 earlycon root=PARTUUID=${rootfs_partuuid} rootfstype=ext4 rw rootwait"
+
+fatload mmc ${bootdev}:${bootfs_part} ${kernel_addr_r} @@KERNEL_IMAGE@@
+fatload mmc ${bootdev}:${bootfs_part} ${fdt_addr_r} @@DTB_FILE@@
 @@BOOT_CMD@@ ${kernel_addr_r} - ${fdt_addr_r}
