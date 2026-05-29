@@ -1,0 +1,599 @@
+NOTICE:  CPU: STM32MP257FAK Rev.Y
+NOTICE:  Model: STMicroelectronics STM32MP257F-DK Discovery Board
+NOTICE:  Board: MB1605 Var1.0 Rev.C-01
+NOTICE:  Reset reason: Power-on reset (por_rstn) (0x2035)
+INFO:    PMIC2 version = 0x11
+INFO:    PMIC2 product ID = 0x20
+INFO:    FCONF: Reading TB_FW firmware configuration file from: 0xe011000
+INFO:    FCONF: Reading firmware configuration information for: stm32mp_io
+INFO:    FCONF: Reading firmware configuration information for: stm32mp_fuse
+INFO:    Using SDMMC
+INFO:      Instance 1
+INFO:    Boot used partition fsbl1
+NOTICE:  BL2: v2.10-stm32mp2-r2.0(debug):lts-v2.10.24-dirty(a07367a1)
+NOTICE:  BL2: Built : 16:16:36, Oct  3 2025
+INFO:    BL2: Loading image id 26
+INFO:    Loading image id=26 at address 0xe041000
+INFO:    Image id=26 loaded: 0xe041000 - 0xe049650
+INFO:    BL2: Doing platform setup
+INFO:    RAM: LPDDR4 1x32Gbits 1x32bits 1200MHz
+INFO:    Memory size = 0x100000000 (4096 MB)
+INFO:    BL2: Loading image id 1
+INFO:    Loading image id=1 at address 0xe000000
+INFO:    Image id=1 loaded: 0xe000000 - 0xe000326
+INFO:    FCONF: Reading FW_CONFIG firmware configuration file from: 0xe000000
+INFO:    FCONF: Reading firmware configuration information for: dyn_cfg
+INFO:    FCONF: Reading firmware configuration information for: risaf_config
+INFO:    RISAF2: No configuration in DT, use default
+INFO:    BL31 max size = 0x17000 (94208B)
+INFO:    BL2: Loading image id 3
+INFO:    Loading image id=3 at address 0xe000000
+INFO:    Image id=3 loaded: 0xe000000 - 0xe0169f0
+INFO:    BL2: Loading image id 19
+INFO:    Loading image id=19 at address 0x81fc0000
+INFO:    Image id=19 loaded: 0x81fc0000 - 0x81fc3958
+INFO:    BL2: Loading image id 4
+INFO:    Loading image id=4 at address 0x82000000
+INFO:    Image id=4 loaded: 0x82000000 - 0x8200001c
+INFO:    OPTEE ep=0x82000000
+INFO:    OPTEE header info:
+INFO:          magic=0x4554504f
+INFO:          version=0x2
+INFO:          arch=0x1
+INFO:          flags=0x0
+INFO:          nb_images=0x1
+INFO:    BL2: Loading image id 8
+INFO:    Loading image id=8 at address 0x82000000
+INFO:    Image id=8 loaded: 0x82000000 - 0x820f76e8
+INFO:    BL2: Loading image id 2
+INFO:    Loading image id=2 at address 0x84400000
+INFO:    Image id=2 loaded: 0x84400000 - 0x8440fc00
+INFO:    BL2: Loading image id 5
+INFO:    Loading image id=5 at address 0x84000000
+INFO:    Image id=5 loaded: 0x84000000 - 0x84114588
+NOTICE:  BL2: Booting BL31
+INFO:    Entry point address = 0xe000000
+INFO:    SPSR = 0x3cd
+INFO:    ARM GICv2 driver initialized
+NOTICE:  BL31: v2.10-stm32mp2-r2.0(debug):lts-v2.10.24-dirty(a07367a1)
+NOTICE:  BL31: Built : 16:16:36, Oct  3 2025
+INFO:    BL31: Initializing runtime services
+INFO:    BL31: Initializing BL32
+I/TC: Early console on UART#2
+I/TC:
+I/TC: Embedded DTB found
+I/TC: OP-TEE version: 4.0.0-dev (gcc version 13.2.1 20231009 (Arm GNU Toolchain 13.2.rel1 (Build arm-13.7))) #1 Fri Oct 20 18:29:31 UTC 2023 aarch64
+I/TC: WARNING: This OP-TEE configuration might be insecure!
+I/TC: WARNING: Please check https://optee.readthedocs.io/en/latest/architecture/porting_guidelines.html
+I/TC: Primary CPU initializing
+I/TC: WARNING: All debug access are allowed
+I/TC: Override the OTP 124: 0 to 0x18db6
+I/TC: WARNING: Embeds insecure stm32mp_provisioning driver
+I/TC: PMIC STPMIC REFID:2.@ V1.1
+I/TC: Platform stm32mp2: flavor 257F_DK - DT stm32mp257f-dk.dts
+I/TC: OP-TEE ST profile: secure_and_system_services
+[    0.000000] SCP-firmware 2.13.0-intree-optee-os-4.0.0-dev
+[    0.000000]
+[    0.000000] [FWK] Module initialization complete!
+I/TC: Primary CPU switching to normal world boot
+INFO:    BL31: Preparing for EL3 exit to normal world
+INFO:    Entry point address = 0x84000000
+INFO:    SPSR = 0x3c9
+I/TC: Reserved shared memory is disabled
+I/TC: Dynamic shared memory is enabled
+I/TC: Normal World virtualization support is disabled
+I/TC: Asynchronous notifications are enabled
+
+
+U-Boot 2026.04-dirty (Apr 06 2026 - 17:59:18 +0000)
+
+CPU: STM32MP257FAK Rev.Y
+Model: STMicroelectronics STM32MP257F-DK Discovery Board
+Board: stm32mp2 (st,stm32mp257f-dk)
+Board: MB1605 Var1.0 Rev.C-01
+DRAM:  4 GiB
+optee optee: OP-TEE: revision 4.0 (2a5b1d12)
+I/TC: Reserved shared memory is disabled
+I/TC: Dynamic shared memory is enabled
+I/TC: Normal World virtualization support is disabled
+I/TC: Asynchronous notifications are enabled
+Core:  359 devices, 26 uclasses, devicetree: board
+WDT:   Started watchdog with servicing every 1000ms (32s timeout)
+MMC:   STM32 SD/MMC: 0
+Loading Environment from MMC... *** Warning - bad CRC, using default environment
+
+Reading from MMC(0)... In:    serial
+Out:   serial
+Err:   serial
+
+Hit any key to stop autoboot: 0
+Booting Amy board...
+Looking for bootfs on mmc 0...
+TODO: use bootfs partition UUID instead of GPT partition name.
+bootfs partition found on mmc 0:0x6
+672 bytes read in 1 ms (656.3 KiB/s)
+Running /boot.scr from mmc 0:0x6...
+## Executing script at 90100000
+Boot script for mp2 from bootfs partition
+rootfs partition found at index 0x7
+rootfs PARTUUID=6fd65744-f376-48ad-bffc-cda83df4d37e
+27269632 bytes read in 1133 ms (23 MiB/s)
+119359 bytes read in 7 ms (16.3 MiB/s)
+## Flattened Device Tree blob at 90000000
+   Booting using the fdt blob at 0x90000000
+Working FDT set to 90000000
+   Loading Device Tree to 000000008ffdf000, end 000000008ffff23e ... OK
+Working FDT set to 8ffdf000
+
+Starting kernel ...
+
+[    0.000000] Booting Linux on physical CPU 0x0000000000 [0x411fd040]
+[    0.000000] Linux version 6.6.116-yocto-standard-amy-gbcd8ee2768d7 (oe-user@oe-host) (aarch64-poky-linux-gcc (GCC) 13.4.0, GNU ld (GNU Binutils) 2.42.0.20240723) #1 SMP PREEMPT Sun Nov  5
+[    0.000000] KASLR enabled
+[    0.000000] Machine model: STMicroelectronics STM32MP257F-DK Discovery Board
+[    0.000000] efi: UEFI not found.
+[    0.000000] Reserved memory: created CMA memory pool at 0x00000000f2800000, size 128 MiB
+[    0.000000] OF: reserved mem: initialized node linux,cma, compatible id shared-dma-pool
+[    0.000000] OF: reserved mem: 0x00000000f2800000..0x00000000fa7fffff (131072 KiB) map reusable linux,cma
+[    0.000000] OF: reserved mem: 0x000000000a000000..0x000000000a01ffff (128 KiB) nomap non-reusable tfa-bl31@a000000
+[    0.000000] OF: reserved mem: 0x000000000a020000..0x000000000a02ffff (64 KiB) nomap non-reusable hpdma1-lli@a020000
+[    0.000000] OF: reserved mem: 0x000000000a030000..0x000000000a03dfff (56 KiB) nomap non-reusable hpdma2-lli@a030000
+[    0.000000] OF: reserved mem: 0x000000000a03e000..0x000000000a03ffff (8 KiB) nomap non-reusable hpdma3-lli@a03e000
+[    0.000000] OF: reserved mem: 0x000000000a040000..0x000000000a040fff (4 KiB) nomap non-reusable bsec-mirror@a040000
+[    0.000000] OF: reserved mem: 0x000000000a041000..0x000000000a041fff (4 KiB) nomap non-reusable scmi-cid2-s@a041000
+[    0.000000] OF: reserved mem: 0x000000000a042000..0x000000000a042fff (4 KiB) nomap non-reusable scmi-cid2-ns@a042000
+[    0.000000] OF: reserved mem: 0x000000000a043000..0x000000000a05ffff (116 KiB) nomap non-reusable cm33-sram1@a043000
+[    0.000000] OF: reserved mem: 0x000000000a060000..0x000000000a07ffff (128 KiB) nomap non-reusable cm33-sram2@a060000
+[    0.000000] OF: reserved mem: 0x000000000a080000..0x000000000a09efff (124 KiB) nomap non-reusable cm33-retram@a080000
+[    0.000000] OF: reserved mem: 0x000000000a09f000..0x000000000a09ffff (4 KiB) nomap non-reusable ddr-param@a09f000
+[    0.000000] Reserved memory: created DMA memory pool at 0x00000000200c0000, size 0 MiB
+[    0.000000] OF: reserved mem: initialized node cm0-cube-fw@200C0000, compatible id shared-dma-pool
+[    0.000000] OF: reserved mem: 0x00000000200c0000..0x00000000200c3fff (16 KiB) nomap non-reusable cm0-cube-fw@200C0000
+[    0.000000] Reserved memory: created DMA memory pool at 0x00000000200c4000, size 0 MiB
+[    0.000000] OF: reserved mem: initialized node cm0-cube-data@200C4000, compatible id shared-dma-pool
+[    0.000000] OF: reserved mem: 0x00000000200c4000..0x00000000200c5fff (8 KiB) nomap non-reusable cm0-cube-data@200C4000
+[    0.000000] Reserved memory: created DMA memory pool at 0x00000000200c6000, size 0 MiB
+[    0.000000] OF: reserved mem: initialized node ipc-shmem-2@200C6000, compatible id shared-dma-pool
+[    0.000000] OF: reserved mem: 0x00000000200c6000..0x00000000200c7fff (8 KiB) nomap non-reusable ipc-shmem-2@200C6000
+[    0.000000] OF: reserved mem: 0x0000000042000000..0x0000000042000fff (4 KiB) nomap non-reusable bl31-lowpower@42000000
+[    0.000000] OF: reserved mem: 0x0000000042001000..0x0000000042001fff (4 KiB) nomap non-reusable tfm-its@42001000
+[    0.000000] OF: reserved mem: 0x0000000060000000..0x000000006fffffff (262144 KiB) nomap non-reusable mm-ospi@60000000
+[    0.000000] OF: reserved mem: 0x0000000080000000..0x00000000800fffff (1024 KiB) nomap non-reusable tfm-code@80000000
+[    0.000000] OF: reserved mem: 0x0000000080100000..0x00000000808fffff (8192 KiB) nomap non-reusable cm33-cube-fw@80100000
+[    0.000000] OF: reserved mem: 0x0000000080900000..0x00000000809fffff (1024 KiB) nomap non-reusable tfm-data@80900000
+[    0.000000] OF: reserved mem: 0x0000000080a00000..0x00000000811fffff (8192 KiB) nomap non-reusable cm33-cube-data@80a00000
+[    0.000000] Reserved memory: created DMA memory pool at 0x0000000081200000, size 0 MiB
+[    0.000000] OF: reserved mem: initialized node ipc-shmem-1@81200000, compatible id shared-dma-pool
+[    0.000000] OF: reserved mem: 0x0000000081200000..0x00000000812f7fff (992 KiB) nomap non-reusable ipc-shmem-1@81200000
+[    0.000000] Reserved memory: created DMA memory pool at 0x00000000812f8000, size 0 MiB
+[    0.000000] OF: reserved mem: initialized node vdev0vring0@812f8000, compatible id shared-dma-pool
+[    0.000000] OF: reserved mem: 0x00000000812f8000..0x00000000812f8fff (4 KiB) nomap non-reusable vdev0vring0@812f8000
+[    0.000000] Reserved memory: created DMA memory pool at 0x00000000812f9000, size 0 MiB
+[    0.000000] OF: reserved mem: initialized node vdev0vring1@812f9000, compatible id shared-dma-pool
+[    0.000000] OF: reserved mem: 0x00000000812f9000..0x00000000812f9fff (4 KiB) nomap non-reusable vdev0vring1@812f9000
+[    0.000000] Reserved memory: created DMA memory pool at 0x00000000812fa000, size 0 MiB
+[    0.000000] OF: reserved mem: initialized node vdev0buffer@812fa000, compatible id shared-dma-pool
+[    0.000000] OF: reserved mem: 0x00000000812fa000..0x00000000812fffff (24 KiB) nomap non-reusable vdev0buffer@812fa000
+[    0.000000] OF: reserved mem: 0x0000000081300000..0x0000000081fbffff (13056 KiB) nomap non-reusable spare1@81300000
+[    0.000000] OF: reserved mem: 0x0000000081fc0000..0x0000000081ffffff (256 KiB) nomap non-reusable bl31-context@81fc0000
+[    0.000000] OF: reserved mem: 0x0000000082000000..0x0000000083ffffff (32768 KiB) nomap non-reusable op-tee@82000000
+[    0.000000] OF: reserved mem: 0x00000000fa800000..0x00000000fe7fffff (65536 KiB) nomap non-reusable gpu-reserved@fa800000
+[    0.000000] OF: reserved mem: 0x00000000fe800000..0x00000000feffffff (8192 KiB) nomap non-reusable ltdc-sec-layer@fe800000
+[    0.000000] OF: reserved mem: 0x00000000ff000000..0x00000000ffffffff (16384 KiB) nomap non-reusable ltdc-sec-rotation@ff000000
+[    0.000000] earlycon: stm32 at MMIO 0x00000000400e0000 (options '115200n8')
+[    0.000000] printk: bootconsole [stm32] enabled
+[    0.000000] NUMA: No NUMA configuration found
+[    0.000000] NUMA: Faking a node at [mem 0x0000000080000000-0x000000017fffffff]
+[    0.000000] NUMA: NODE_DATA [mem 0x17f7a49c0-0x17f7a6fff]
+[    0.000000] Zone ranges:
+[    0.000000]   DMA      [mem 0x0000000080000000-0x00000000ffffffff]
+[    0.000000]   DMA32    empty
+[    0.000000]   Normal   [mem 0x0000000100000000-0x000000017fffffff]
+[    0.000000] Movable zone start for each node
+[    0.000000] Early memory node ranges
+[    0.000000]   node   0: [mem 0x0000000080000000-0x0000000083ffffff]
+[    0.000000]   node   0: [mem 0x0000000084000000-0x00000000fa7fffff]
+[    0.000000]   node   0: [mem 0x00000000fa800000-0x00000000ffffffff]
+[    0.000000]   node   0: [mem 0x0000000100000000-0x000000017fffffff]
+[    0.000000] Initmem setup node 0 [mem 0x0000000080000000-0x000000017fffffff]
+[    0.000000] psci: probing for conduit method from DT.
+[    0.000000] psci: PSCIv1.1 detected in firmware.
+[    0.000000] psci: Using standard PSCI v0.2 function IDs
+[    0.000000] psci: Trusted OS migration not required
+[    0.000000] psci: SMC Calling Convention v1.4
+[    0.000000] psci: OSI mode supported.
+[    0.000000] percpu: Embedded 22 pages/cpu s49384 r8192 d32536 u90112
+[    0.000000] Detected VIPT I-cache on CPU0
+[    0.000000] CPU features: kernel page table isolation forced ON by KASLR
+[    0.000000] CPU features: detected: Kernel page table isolation (KPTI)
+[    0.000000] alternatives: applying boot alternatives
+[    0.000000] Kernel command line: console=ttySTM0,115200 earlycon root=PARTUUID=6fd65744-f376-48ad-bffc-cda83df4d37e rootfstype=ext4 rw rootwait
+[    0.000000] Dentry cache hash table entries: 524288 (order: 10, 4194304 bytes, linear)
+[    0.000000] Inode-cache hash table entries: 262144 (order: 9, 2097152 bytes, linear)
+[    0.000000] Fallback order for Node 0: 0
+[    0.000000] Built 1 zonelists, mobility grouping on.  Total pages: 1032192
+[    0.000000] Policy zone: Normal
+[    0.000000] mem auto-init: stack:all(zero), heap alloc:off, heap free:off
+[    0.000000] software IO TLB: area num 2.
+[    0.000000] software IO TLB: mapped [mem 0x00000000ee800000-0x00000000f2800000] (64MB)
+[    0.000000] Memory: 3733612K/4194304K available (15104K kernel code, 1670K rwdata, 5940K rodata, 3776K init, 473K bss, 329620K reserved, 131072K cma-reserved)
+[    0.000000] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=2, Nodes=1
+[    0.000000] rcu: Preemptible hierarchical RCU implementation.
+[    0.000000] rcu:     RCU event tracing is enabled.
+[    0.000000]  Trampoline variant of Tasks RCU enabled.
+[    0.000000]  Tracing variant of Tasks RCU enabled.
+[    0.000000] rcu: RCU calculated value of scheduler-enlistment delay is 25 jiffies.
+[    0.000000] NR_IRQS: 64, nr_irqs: 64, preallocated irqs: 0
+[    0.000000] GIC: enabling workaround for 4kB GICC access disabled
+[    0.000000] Root IRQ handler: gic_handle_irq
+[    0.000000] GIC: Using split EOI/Deactivate mode
+[    0.000000] GICv2m: range[mem 0x48090000-0x48090fff], SPI[362:392]
+[    0.000000] rcu: srcu_init: Setting srcu_struct sizes based on contention.
+[    0.000000] arch_timer: cp15 timer(s) running at 40.00MHz (phys).
+[    0.000000] clocksource: arch_sys_counter: mask: 0xffffffffffffff max_cycles: 0x939a85c40, max_idle_ns: 440795202120 ns
+[    0.000000] sched_clock: 56 bits at 40MHz, resolution 25ns, wraps every 4398046511100ns
+[    0.009065] Console: colour dummy device 80x25
+[    0.012505] Calibrating delay loop (skipped), value calculated using timer frequency.. 80.00 BogoMIPS (lpj=160000)
+[    0.022774] pid_max: default: 32768 minimum: 301
+[    0.027448] LSM: initializing lsm=capability,integrity
+[    0.032603] Mount-cache hash table entries: 8192 (order: 4, 65536 bytes, linear)
+[    0.039898] Mountpoint-cache hash table entries: 8192 (order: 4, 65536 bytes, linear)
+[    0.048575] cacheinfo: Unable to detect cache hierarchy for CPU 0
+[    0.054691] RCU Tasks: Setting shift to 1 and lim to 1 rcu_task_cb_adjust=1 rcu_task_cpu_ids=2.
+[    0.062566] RCU Tasks Trace: Setting shift to 1 and lim to 1 rcu_task_cb_adjust=1 rcu_task_cpu_ids=2.
+[    0.071909] rcu: Hierarchical SRCU implementation.
+[    0.076473] rcu:     Max phase no-delay instances is 1000.
+[    0.083585] EFI services will not be available.
+[    0.086536] smp: Bringing up secondary CPUs ...
+I/TC: Secondary CPU 1 initializing
+I/TC: Secondary CPU 1 switching to normal world boot
+[    0.104228] Detected VIPT I-cache on CPU1
+[    0.104323] CPU1: Booted secondary processor 0x0000000001 [0x411fd040]
+[    0.104440] smp: Brought up 1 node, 2 CPUs
+[    0.113419] SMP: Total of 2 processors activated.
+[    0.118099] CPU features: detected: 32-bit EL0 Support
+[    0.123235] CPU features: detected: 32-bit EL1 Support
+[    0.128346] CPU features: detected: CRC32 instructions
+[    0.133529] CPU: All CPU(s) started at EL2
+[    0.137573] alternatives: applying system-wide alternatives
+[    0.145406] devtmpfs: initialized
+[    0.168628] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645041785100000 ns
+[    0.172769] futex hash table entries: 512 (order: 3, 32768 bytes, linear)
+[    0.183693] pinctrl core: initialized pinctrl subsystem
+[    0.185382] DMI not present or invalid.
+[    0.189335] NET: Registered PF_NETLINK/PF_ROUTE protocol family
+[    0.195327] DMA: preallocated 512 KiB GFP_KERNEL pool for atomic allocations
+[    0.201613] DMA: preallocated 512 KiB GFP_KERNEL|GFP_DMA pool for atomic allocations
+[    0.209399] DMA: preallocated 512 KiB GFP_KERNEL|GFP_DMA32 pool for atomic allocations
+[    0.217179] audit: initializing netlink subsys (disabled)
+[    0.222761] audit: type=2000 audit(0.156:1): state=initialized audit_enabled=0 res=1
+[    0.223343] thermal_sys: Registered thermal governor 'step_wise'
+[    0.230246] thermal_sys: Registered thermal governor 'power_allocator'
+[    0.236393] cpuidle: using governor menu
+[    0.246860] hw-breakpoint: found 6 breakpoint and 4 watchpoint registers.
+[    0.253480] ASID allocator initialised with 32768 entries
+[    0.259021] Serial: AMBA PL011 UART driver
+[    0.280463] /soc@0/bus@42080000/audio-controller@400b0000: Fixed dependency cycle(s) with /soc@0/bus@42080000/i2c@40130000/hdmi@3d
+[    0.286639] /soc@0/bus@42080000/audio-controller@400b0000: Fixed dependency cycle(s) with /soc@0/clock-controller@44200000
+[    0.297795] /soc@0/bus@42080000/i2c@40130000/camera@1a: Fixed dependency cycle(s) with /soc@0/bus@42080000/csi@48020000
+[    0.308434] /soc@0/bus@42080000/i2c@40130000/hdmi@3d: Fixed dependency cycle(s) with /soc@0/bus@42080000/audio-controller@400b0000
+[    0.320150] /soc@0/bus@42080000/i2c@40130000/hdmi@3d: Fixed dependency cycle(s) with /soc@0/bus@42080000/dsi@48000000
+[    0.331057] /soc@0/bus@42080000/display-controller@48010000: Fixed dependency cycle(s) with /soc@0/bus@42080000/dsi@48000000
+[    0.341963] /soc@0/bus@42080000/display-controller@48010000: Fixed dependency cycle(s) with /soc@0/bus@42080000/lvds@48060000
+[    0.353225] /soc@0/bus@42080000/display-controller@48010000: Fixed dependency cycle(s) with /soc@0/clock-controller@44200000
+[    0.364455] /soc@0/bus@42080000/csi@48020000: Fixed dependency cycle(s) with /soc@0/bus@42080000/dcmipp@48030000
+[    0.374577] /soc@0/bus@42080000/csi@48020000: Fixed dependency cycle(s) with /soc@0/bus@42080000/i2c@40130000/camera@1a
+[    0.385437] /soc@0/bus@42080000/dcmipp@48030000: Fixed dependency cycle(s) with /soc@0/bus@42080000/csi@48020000
+[    0.396128] /soc@0/bus@42080000/dsi@48000000: Fixed dependency cycle(s) with /soc@0/bus@42080000/i2c@40130000/hdmi@3d
+[    0.406132] /soc@0/bus@42080000/dsi@48000000: Fixed dependency cycle(s) with /soc@0/bus@42080000/display-controller@48010000
+[    0.417328] /soc@0/bus@42080000/dsi@48000000: Fixed dependency cycle(s) with /soc@0/clock-controller@44200000
+[    0.427270] /soc@0/bus@42080000/lvds@48060000: Fixed dependency cycle(s) with /soc@0/bus@42080000/display-controller@48010000
+[    0.438546] /soc@0/bus@42080000/lvds@48060000: Fixed dependency cycle(s) with /soc@0/clock-controller@44200000
+[    0.448806] /soc@0/clock-controller@44200000: Fixed dependency cycle(s) with /soc@0/bus@42080000/dsi@48000000
+[    0.458682] /soc@0/bus@4a000000/funnel@4a020000: Fixed dependency cycle(s) with /soc@0/bus@4a000000/etf@4a030000
+[    0.468567] /soc@0/bus@4a000000/funnel@4a020000: Fixed dependency cycle(s) with /soc@0/bus@4a000000/etm@4a340000
+[    0.478720] /soc@0/bus@4a000000/funnel@4a020000: Fixed dependency cycle(s) with /soc@0/bus@4a000000/stm@4a080000
+[    0.488874] /soc@0/bus@4a000000/funnel@4a020000: Fixed dependency cycle(s) with /soc@0/bus@4a000000/etm@4a240000
+[    0.499056] /soc@0/bus@4a000000/etf@4a030000: Fixed dependency cycle(s) with /soc@0/bus@4a000000/replicator@4a060000
+[    0.509542] /soc@0/bus@4a000000/etf@4a030000: Fixed dependency cycle(s) with /soc@0/bus@4a000000/funnel@4a020000
+[    0.519718] /soc@0/bus@4a000000/etr@4a040000: Fixed dependency cycle(s) with /soc@0/bus@4a000000/replicator@4a060000
+[    0.530221] /soc@0/bus@4a000000/tpiu@4a050000: Fixed dependency cycle(s) with /soc@0/bus@4a000000/replicator@4a060000
+[    0.540795] /soc@0/bus@4a000000/replicator@4a060000: Fixed dependency cycle(s) with /soc@0/bus@4a000000/tpiu@4a050000
+[    0.551375] /soc@0/bus@4a000000/replicator@4a060000: Fixed dependency cycle(s) with /soc@0/bus@4a000000/etr@4a040000
+[    0.561886] /soc@0/bus@4a000000/replicator@4a060000: Fixed dependency cycle(s) with /soc@0/bus@4a000000/etf@4a030000
+[    0.572404] /soc@0/bus@4a000000/stm@4a080000: Fixed dependency cycle(s) with /soc@0/bus@4a000000/funnel@4a020000
+[    0.582582] /soc@0/bus@4a000000/etm@4a240000: Fixed dependency cycle(s) with /soc@0/bus@4a000000/funnel@4a020000
+[    0.592719] /soc@0/bus@4a000000/etm@4a340000: Fixed dependency cycle(s) with /soc@0/bus@4a000000/funnel@4a020000
+[    0.603896] /soc@0/bus@42080000/audio-controller@400b0000: Fixed dependency cycle(s) with /soc@0/bus@42080000/i2c@40130000/hdmi@3d
+[    0.614594] /soc@0/bus@42080000/audio-controller@400b0000: Fixed dependency cycle(s) with /soc@0/clock-controller@44200000
+[    0.625743] /soc@0/bus@42080000/i2c@40130000/camera@1a: Fixed dependency cycle(s) with /soc@0/bus@42080000/csi@48020000
+[    0.636383] /soc@0/bus@42080000/i2c@40130000/hdmi@3d: Fixed dependency cycle(s) with /soc@0/bus@42080000/audio-controller@400b0000
+[    0.648089] /soc@0/bus@42080000/i2c@40130000/hdmi@3d: Fixed dependency cycle(s) with /soc@0/bus@42080000/dsi@48000000
+[    0.658979] /soc@0/bus@42080000/display-controller@48010000: Fixed dependency cycle(s) with /soc@0/bus@42080000/dsi@48000000
+[    0.669880] /soc@0/bus@42080000/display-controller@48010000: Fixed dependency cycle(s) with /soc@0/bus@42080000/lvds@48060000
+[    0.681151] /soc@0/bus@42080000/display-controller@48010000: Fixed dependency cycle(s) with /soc@0/clock-controller@44200000
+[    0.692365] /soc@0/bus@42080000/csi@48020000: Fixed dependency cycle(s) with /soc@0/bus@42080000/dcmipp@48030000
+[    0.702478] /soc@0/bus@42080000/csi@48020000: Fixed dependency cycle(s) with /soc@0/bus@42080000/i2c@40130000/camera@1a
+[    0.713313] /soc@0/bus@42080000/dcmipp@48030000: Fixed dependency cycle(s) with /soc@0/bus@42080000/csi@48020000
+[    0.723967] /soc@0/bus@42080000/dsi@48000000: Fixed dependency cycle(s) with /soc@0/bus@42080000/i2c@40130000/hdmi@3d
+[    0.733968] /soc@0/bus@42080000/dsi@48000000: Fixed dependency cycle(s) with /soc@0/bus@42080000/display-controller@48010000
+[    0.745151] /soc@0/bus@42080000/dsi@48000000: Fixed dependency cycle(s) with /soc@0/clock-controller@44200000
+[    0.755084] /soc@0/bus@42080000/lvds@48060000: Fixed dependency cycle(s) with /soc@0/bus@42080000/display-controller@48010000
+[    0.766347] /soc@0/bus@42080000/lvds@48060000: Fixed dependency cycle(s) with /soc@0/clock-controller@44200000
+[    0.776974] /soc@0/bus@42080000/audio-controller@400b0000: Fixed dependency cycle(s) with /soc@0/bus@42080000/i2c@40130000/hdmi@3d
+[    0.788179] /soc@0/bus@42080000/audio-controller@400b0000: Fixed dependency cycle(s) with /soc@0/clock-controller@44200000
+[    0.799666] /soc@0/bus@42080000/i2c@40130000: Fixed dependency cycle(s) with /soc@0/clock-controller@44200000
+[    0.809028] /soc@0/bus@42080000/i2c@40130000/camera@1a: Fixed dependency cycle(s) with /soc@0/bus@42080000/csi@48020000
+[    0.819747] /soc@0/bus@42080000/i2c@40130000/hdmi@3d: Fixed dependency cycle(s) with /soc@0/bus@42080000/audio-controller@400b0000
+[    0.831530] /soc@0/bus@42080000/i2c@40130000/hdmi@3d: Fixed dependency cycle(s) with /soc@0/bus@42080000/dsi@48000000
+[    0.843672] /soc@0/bus@42080000/display-controller@48010000: Fixed dependency cycle(s) with /soc@0/bus@42080000/dsi@48000000
+[    0.853381] /soc@0/bus@42080000/display-controller@48010000: Fixed dependency cycle(s) with /soc@0/bus@42080000/lvds@48060000
+[    0.864552] /soc@0/bus@42080000/display-controller@48010000: Fixed dependency cycle(s) with /soc@0/clock-controller@44200000
+[    0.875958] /soc@0/bus@42080000/i2c@40130000/camera@1a: Fixed dependency cycle(s) with /soc@0/bus@42080000/csi@48020000
+[    0.886606] /soc@0/bus@42080000/csi@48020000: Fixed dependency cycle(s) with /soc@0/bus@42080000/dcmipp@48030000
+[    0.896707] /soc@0/bus@42080000/csi@48020000: Fixed dependency cycle(s) with /soc@0/bus@42080000/i2c@40130000/camera@1a
+[    0.907772] /soc@0/bus@42080000/csi@48020000: Fixed dependency cycle(s) with /soc@0/bus@42080000/dcmipp@48030000
+[    0.917727] /soc@0/bus@42080000/dcmipp@48030000: Fixed dependency cycle(s) with /soc@0/bus@42080000/csi@48020000
+[    0.930423] /soc@0/bus@42080000/display-controller@48010000: Fixed dependency cycle(s) with /soc@0/bus@42080000/dsi@48000000
+[    0.939018] /soc@0/bus@42080000/i2c@40130000/hdmi@3d: Fixed dependency cycle(s) with /soc@0/bus@42080000/dsi@48000000
+[    0.949596] /soc@0/bus@42080000/dsi@48000000: Fixed dependency cycle(s) with /soc@0/bus@42080000/i2c@40130000/hdmi@3d
+[    0.960121] /soc@0/bus@42080000/dsi@48000000: Fixed dependency cycle(s) with /soc@0/bus@42080000/display-controller@48010000
+[    0.971476] /soc@0/bus@42080000/dsi@48000000: Fixed dependency cycle(s) with /soc@0/clock-controller@44200000
+[    0.981385] /soc@0/bus@42080000/display-controller@48010000: Fixed dependency cycle(s) with /soc@0/bus@42080000/lvds@48060000
+[    0.992594] /soc@0/bus@42080000/lvds@48060000: Fixed dependency cycle(s) with /soc@0/bus@42080000/display-controller@48010000
+[    1.003968] /soc@0/bus@42080000/lvds@48060000: Fixed dependency cycle(s) with /soc@0/clock-controller@44200000
+[    1.017028] /soc@0/bus@42080000/lvds@48060000: Fixed dependency cycle(s) with /soc@0/clock-controller@44200000
+[    1.023784] /soc@0/bus@42080000/dsi@48000000: Fixed dependency cycle(s) with /soc@0/clock-controller@44200000
+[    1.034569] /soc@0/bus@42080000/display-controller@48010000: Fixed dependency cycle(s) with /soc@0/clock-controller@44200000
+[    1.045311] /soc@0/bus@42080000/i2c@40130000: Fixed dependency cycle(s) with /soc@0/clock-controller@44200000
+[    1.054907] /soc@0/bus@42080000/audio-controller@400b0000: Fixed dependency cycle(s) with /soc@0/clock-controller@44200000
+[    1.066220] /soc@0/clock-controller@44200000: Fixed dependency cycle(s) with /soc@0/bus@42080000/dsi@48000000
+[    1.078797] /soc@0/bus@4a000000/funnel@4a020000: Fixed dependency cycle(s) with /soc@0/bus@4a000000/etf@4a030000
+[    1.085827] /soc@0/bus@4a000000/funnel@4a020000: Fixed dependency cycle(s) with /soc@0/bus@4a000000/etm@4a340000
+[    1.095979] /soc@0/bus@4a000000/funnel@4a020000: Fixed dependency cycle(s) with /soc@0/bus@4a000000/stm@4a080000
+[    1.106140] /soc@0/bus@4a000000/funnel@4a020000: Fixed dependency cycle(s) with /soc@0/bus@4a000000/etm@4a240000
+[    1.116321] /soc@0/bus@4a000000/etf@4a030000: Fixed dependency cycle(s) with /soc@0/bus@4a000000/replicator@4a060000
+[    1.126821] /soc@0/bus@4a000000/etf@4a030000: Fixed dependency cycle(s) with /soc@0/bus@4a000000/funnel@4a020000
+[    1.137005] /soc@0/bus@4a000000/etr@4a040000: Fixed dependency cycle(s) with /soc@0/bus@4a000000/replicator@4a060000
+[    1.147497] /soc@0/bus@4a000000/tpiu@4a050000: Fixed dependency cycle(s) with /soc@0/bus@4a000000/replicator@4a060000
+[    1.158069] /soc@0/bus@4a000000/replicator@4a060000: Fixed dependency cycle(s) with /soc@0/bus@4a000000/tpiu@4a050000
+[    1.168656] /soc@0/bus@4a000000/replicator@4a060000: Fixed dependency cycle(s) with /soc@0/bus@4a000000/etr@4a040000
+[    1.179174] /soc@0/bus@4a000000/replicator@4a060000: Fixed dependency cycle(s) with /soc@0/bus@4a000000/etf@4a030000
+[    1.189699] /soc@0/bus@4a000000/stm@4a080000: Fixed dependency cycle(s) with /soc@0/bus@4a000000/funnel@4a020000
+[    1.199880] /soc@0/bus@4a000000/etm@4a240000: Fixed dependency cycle(s) with /soc@0/bus@4a000000/funnel@4a020000
+[    1.210026] /soc@0/bus@4a000000/etm@4a340000: Fixed dependency cycle(s) with /soc@0/bus@4a000000/funnel@4a020000
+[    1.220931] /ahb@1/i2c@2/typec@35/connector: Fixed dependency cycle(s) with /soc@0/bus@42080000/usb@48300000/usb@48300000
+[    1.231758] /ahb@1/i2c@2/typec@35/connector: Fixed dependency cycle(s) with /soc@0/bus@42080000/usb@48300000/usb@48300000
+[    1.243420] /soc@0/bus@42080000/mdf@404d0000/filter@84/mdf-dai: Fixed dependency cycle(s) with /dmic-0
+[    1.251533] /dmic-0: Fixed dependency cycle(s) with /soc@0/bus@42080000/mdf@404d0000/filter@84/mdf-dai
+[    1.260804] /soc@0/bus@42080000/mdf@404d0000/filter@104/mdf-dai: Fixed dependency cycle(s) with /dmic-1
+[    1.270208] /dmic-1: Fixed dependency cycle(s) with /soc@0/bus@42080000/mdf@404d0000/filter@104/mdf-dai
+[    1.279949] /soc@0/bus@42080000/i2c@40130000/hdmi@3d: Fixed dependency cycle(s) with /connector
+[    1.288251] /connector: Fixed dependency cycle(s) with /soc@0/bus@42080000/i2c@40130000/hdmi@3d
+[    1.297067] /soc@0/bus@42080000/lvds@48060000: Fixed dependency cycle(s) with /panel-lvds
+[    1.305136] /panel-lvds: Fixed dependency cycle(s) with /soc@0/bus@42080000/lvds@48060000
+[    1.313372] /panel-lvds: Fixed dependency cycle(s) with /panel-lvds-backlight
+[    1.320356] /panel-lvds-backlight: Fixed dependency cycle(s) with /soc@0/bus@42080000/timer@40010000/pwm
+[    1.330352] Modules: 2G module region forced by RANDOMIZE_MODULE_REGION_FULL
+[    1.336738] Modules: 0 pages in range for non-PLT usage
+[    1.336743] Modules: 517504 pages in range for PLT usage
+[    1.342770] HugeTLB: registered 1.00 GiB page size, pre-allocated 0 pages
+[    1.354011] HugeTLB: 0 KiB vmemmap can be freed for a 1.00 GiB page
+[    1.360263] HugeTLB: registered 32.0 MiB page size, pre-allocated 0 pages
+[    1.367039] HugeTLB: 0 KiB vmemmap can be freed for a 32.0 MiB page
+[    1.373297] HugeTLB: registered 2.00 MiB page size, pre-allocated 0 pages
+[    1.380076] HugeTLB: 0 KiB vmemmap can be freed for a 2.00 MiB page
+[    1.386337] HugeTLB: registered 64.0 KiB page size, pre-allocated 0 pages
+[    1.393112] HugeTLB: 0 KiB vmemmap can be freed for a 64.0 KiB page
+[    1.401133] ACPI: Interpreter disabled.
+[    1.403880] iommu: Default domain type: Translated
+[    1.407967] iommu: DMA domain TLB invalidation policy: strict mode
+[    1.414413] SCSI subsystem initialized
+[    1.418308] usbcore: registered new interface driver usbfs
+[    1.423387] usbcore: registered new interface driver hub
+[    1.428674] usbcore: registered new device driver usb
+[    1.434095] pps_core: LinuxPPS API ver. 1 registered
+[    1.438636] pps_core: Software ver. 5.3.6 - Copyright 2005-2007 Rodolfo Giometti <giometti@linux.it>
+[    1.447772] PTP clock support registered
+[    1.451845] EDAC MC: Ver: 3.0.0
+[    1.455208] CPUidle PSCI: Initialized CPU PM domain topology using OSI mode
+[    1.462425] scmi_core: SCMI protocol bus registered
+[    1.467035] FPGA manager framework
+[    1.470100] Advanced Linux Sound Architecture Driver Initialized.
+[    1.477100] vgaarb: loaded
+[    1.479121] clocksource: Switched to clocksource arch_sys_counter
+[    1.485110] VFS: Disk quotas dquot_6.6.0
+[    1.488797] VFS: Dquot-cache hash table entries: 512 (order 0, 4096 bytes)
+[    1.495993] pnp: PnP ACPI: disabled
+[    1.507831] NET: Registered PF_INET protocol family
+[    1.508110] IP idents hash table entries: 65536 (order: 7, 524288 bytes, linear)
+[    1.519205] tcp_listen_portaddr_hash hash table entries: 2048 (order: 3, 32768 bytes, linear)
+[    1.523044] Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+[    1.530724] TCP established hash table entries: 32768 (order: 6, 262144 bytes, linear)
+[    1.538860] TCP bind hash table entries: 32768 (order: 8, 1048576 bytes, linear)
+[    1.546936] TCP: Hash tables configured (established 32768 bind 32768)
+[    1.552659] UDP hash table entries: 2048 (order: 4, 65536 bytes, linear)
+[    1.559291] UDP-Lite hash table entries: 2048 (order: 4, 65536 bytes, linear)
+[    1.566552] NET: Registered PF_UNIX/PF_LOCAL protocol family
+[    1.572449] RPC: Registered named UNIX socket transport module.
+[    1.577877] RPC: Registered udp transport module.
+[    1.582555] RPC: Registered tcp transport module.
+[    1.587252] RPC: Registered tcp-with-tls transport module.
+[    1.592746] RPC: Registered tcp NFSv4.1 backchannel transport module.
+[    1.599155] PCI: CLS 0 bytes, default 64
+[    1.603498] kvm [1]: IPA Size Limit: 40 bits
+[    1.608823] kvm [1]: vgic interrupt IRQ9
+[    1.611227] kvm [1]: Hyp mode initialized successfully
+[    1.617740] Initialise system trusted keyrings
+[    1.620971] workingset: timestamp_bits=42 max_order=20 bucket_order=0
+[    1.627542] squashfs: version 4.0 (2009/01/31) Phillip Lougher
+[    1.633265] NFS: Registering the id_resolver key type
+[    1.638063] Key type id_resolver registered
+[    1.642189] Key type id_legacy registered
+[    1.646199] nfs4filelayout_init: NFSv4 File Layout Driver Registering...
+[    1.652861] nfs4flexfilelayout_init: NFSv4 Flexfile Layout Driver Registering...
+[    1.660257] jffs2: version 2.2. (NAND) © 2001-2006 Red Hat, Inc.
+[    1.666583] 9p: Installing v9fs 9p2000 file system support
+[    1.724294] Key type asymmetric registered
+[    1.724316] Asymmetric key parser 'x509' registered
+[    1.727661] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 246)
+[    1.734987] io scheduler mq-deadline registered
+[    1.739500] io scheduler kyber registered
+[    1.743516] io scheduler bfq registered
+[    1.747680] /soc@0/interrupt-controller@44220000: bank0
+[    1.752518] /soc@0/interrupt-controller@44220000: bank1
+[    1.757718] /soc@0/interrupt-controller@44220000: bank2
+[    1.763133] /soc@0/interrupt-controller@46230000: bank0
+[    1.768124] /soc@0/interrupt-controller@46230000: bank1
+[    1.773328] /soc@0/interrupt-controller@46230000: bank2
+[    1.779014] Registering stm32-rifsc firewall controller
+[    1.789390] EINJ: ACPI disabled.
+[    1.797797] Serial: 8250/16550 driver, 4 ports, IRQ sharing enabled
+[    1.801261] STM32 USART driver initialized
+[    1.809030] loop: module loaded
+[    1.810125] megasas: 07.725.01.00-rc1
+[    1.815259] tun: Universal TUN/TAP device driver, 1.6
+[    1.816148] thunder_xcv, ver 1.0
+[    1.818467] thunder_bgx, ver 1.0
+[    1.821701] nicpf, ver 1.0
+[    1.824897] hns3: Hisilicon Ethernet Network Driver for Hip08 Family - version
+[    1.831529] hns3: Copyright (c) 2017 Huawei Corporation.
+[    1.836884] hclge is initializing
+[    1.840151] e1000: Intel(R) PRO/1000 Network Driver
+[    1.844970] e1000: Copyright (c) 1999-2006 Intel Corporation.
+[    1.850749] e1000e: Intel(R) PRO/1000 Network Driver
+[    1.855638] e1000e: Copyright(c) 1999 - 2015 Intel Corporation.
+[    1.861584] igb: Intel(R) Gigabit Ethernet Network Driver
+[    1.866914] igb: Copyright (c) 2007-2014 Intel Corporation.
+[    1.872514] igbvf: Intel(R) Gigabit Virtual Function Network Driver
+[    1.878713] igbvf: Copyright (c) 2009 - 2012 Intel Corporation.
+[    1.884778] sky2: driver version 1.30
+[    1.888877] VFIO - User Level meta-driver version: 0.3
+[    1.894828] usbcore: registered new interface driver usb-storage
+[    1.899576] usbcore: registered new device driver onboard-usb-hub
+[    1.908017] i2c_dev: i2c /dev entries driver
+[    1.911512] arm_smc_wdt watchdog: Watchdog registered (timeout=32 sec, nowayout=0)
+[    1.918618] sdhci: Secure Digital Host Controller Interface driver
+[    1.923411] sdhci: Copyright(c) Pierre Ossman
+[    1.928227] Synopsys Designware Multimedia Card Interface Driver
+[    1.934315] sdhci-pltfm: SDHCI platform and OF driver helper
+[    1.940559] ledtrig-cpu: registered to indicate activity on CPUs
+[    1.946151] SMCCC: SOC_ID: ID = jep106:0020:0505 Revision = 0x00000011
+[    1.952830] usbcore: registered new interface driver usbhid
+[    1.957410] usbhid: USB HID core driver
+[    1.963024] hw perfevents: enabled with armv8_cortex_a35 PMU driver, 7 counters available
+[    1.971487] optee: probing for conduit method.
+I/TC: Reserved shared memory is disabled
+I/TC: Dynamic shared memory is enabled
+I/TC: Normal World virtualization support is disabled
+I/TC: Asynchronous notifications are enabled
+[    1.973809] optee: revision 4.0 (2a5b1d12)
+[    1.996101] optee: Asynchronous notifications enabled
+[    2.000170] optee: dynamic shared memory is enabled
+[    2.005299] random: crng init done
+[    2.008206] optee: initialized driver
+[    2.013627] NET: Registered PF_PACKET protocol family
+[    2.016676] 9pnet: Installing 9P2000 support
+[    2.020834] Key type dns_resolver registered
+[    2.038175] registered taskstats version 1
+[    2.038302] Loading compiled-in X.509 certificates
+[    2.058249] scmi_protocol scmi_dev.1: Enabled polling mode TX channel - prot_id:16
+[    2.060390] arm-scmi firmware:scmi: SCMI Notifications - Core Enabled.
+[    2.066823] arm-scmi firmware:scmi: SCMI Protocol v2.0 'ST:ST' Firmware version 0x20d0000
+[    2.076157] cpu cpu0: EM: created perf domain
+[    2.079906] scmi-perf-domain scmi_dev.4: Initialized 2 performance domains
+[    2.105818] scmi-regulator scmi_dev.7: Regulator vddio1 registered for domain [0]
+[    2.107859] scmi-regulator scmi_dev.7: Regulator vddio2 registered for domain [1]
+[    2.115293] scmi-regulator scmi_dev.7: Regulator vddio3 registered for domain [2]
+[    2.122744] scmi-regulator scmi_dev.7: Regulator vddio4 registered for domain [3]
+[    2.130203] scmi-regulator scmi_dev.7: Regulator reserved registered for domain [5]
+[    2.137851] scmi-regulator scmi_dev.7: Regulator vdda18adc registered for domain [7]
+[    2.145580] scmi-regulator scmi_dev.7: Regulator vddcore registered for domain [11]
+[    2.153201] scmi-regulator scmi_dev.7: Regulator v1v8 registered for domain [14]
+[    2.160595] scmi-regulator scmi_dev.7: Regulator v3v3 registered for domain [16]
+[    2.167951] scmi-regulator scmi_dev.7: Regulator vdd_emmc registered for domain [18]
+[    2.175677] scmi-regulator scmi_dev.7: Regulator vdd3v3_usb registered for domain [20]
+[    2.183581] scmi-regulator scmi_dev.7: Regulator v5v_hdmi registered for domain [21]
+[    2.191311] scmi-regulator scmi_dev.7: Regulator v5v_vconn registered for domain [22]
+[    2.199106] scmi-regulator scmi_dev.7: Regulator vdd_sdcard registered for domain [23]
+[    2.210039] stm32-ipcc 40490000.mailbox: ipcc rev:2.0 enabled, 16 chans, proc 0
+[    2.237507] Registering stm32mp25_rcc firewall controller
+[    2.239551] stm32-ipcc 46250000.mailbox: ipcc rev:2.0 enabled, 4 chans, proc 1
+[    2.246076] stm32mp257-pinctrl soc@0:pinctrl@44240000: GPIOA bank added
+[    2.252007] stm32mp257-pinctrl soc@0:pinctrl@44240000: GPIOB bank added
+[    2.258039] stm32mp257-pinctrl soc@0:pinctrl@44240000: GPIOC bank added
+[    2.264647] stm32mp257-pinctrl soc@0:pinctrl@44240000: GPIOD bank added
+[    2.271217] stm32mp257-pinctrl soc@0:pinctrl@44240000: GPIOE bank added
+[    2.277802] stm32mp257-pinctrl soc@0:pinctrl@44240000: GPIOF bank added
+[    2.284529] stm32mp257-pinctrl soc@0:pinctrl@44240000: GPIOG bank added
+[    2.291049] stm32mp257-pinctrl soc@0:pinctrl@44240000: GPIOH bank added
+[    2.297723] stm32mp257-pinctrl soc@0:pinctrl@44240000: GPIOI bank added
+[    2.303940] stm32mp257-pinctrl soc@0:pinctrl@44240000: Pinctrl STM32 initialized
+[    2.312969] stm32mp257-pinctrl soc@0:pinctrl@46200000: GPIOZ bank added
+[    2.317882] stm32mp257-pinctrl soc@0:pinctrl@46200000: Pinctrl STM32 initialized
+[    2.325731] stm32-dma3 40400000.dma-controller: created LLI gen_pool at 0x000000000a020000, size 64KiB
+[    2.336678] stm32-dma3 40400000.dma-controller: STM32 DMA3 registered rev:1.3
+[    2.342141] stm32-dma3 40410000.dma-controller: created LLI gen_pool at 0x000000000a030000, size 56KiB
+[    2.353013] stm32-dma3 40410000.dma-controller: STM32 DMA3 registered rev:1.3
+[    2.358550] stm32-dma3 40420000.dma-controller: created LLI gen_pool at 0x000000000a03e000, size 8KiB
+[    2.367674] stm32-dma3 40420000.dma-controller: STM32 DMA3 registered rev:1.3
+[    2.376618] stm32-usart 40330000.serial: Wakeup might not be available: No autonomous clock
+[    2.383026] 40330000.serial: ttySTM2 at MMIO 0x40330000 (irq = 55, base_baud = 4000000) is a stm32-usart
+[    2.392481] serial serial0: tty port ttySTM2 registered
+[    2.398964] stm32_rtc 46000000.rtc: registered as rtc0
+[    2.402547] stm32_rtc 46000000.rtc: setting system clock to 2018-03-09T14:31:06 UTC (1520605866)
+[    2.412549] stm32_rtc 46000000.rtc: registered rev:3.4
+[    2.418955] mmci-pl18x 48220000.mmc: Got CD GPIO
+[    2.420929] mmci-pl18x 48240000.mmc: allocated mmc-pwrseq
+[    2.421098] stm32-usart 400e0000.serial: Wakeup might not be available: No autonomous clock
+[    2.426527] mmci-pl18x 48230000.mmc: mmc1: PL180 manf 53 rev3 at 0x48230000 irq 59,0 (pio)
+[    2.435909] stm32-usart 400e0000.serial: interrupt mode for rx (no dma)
+[    2.444794] mmci-pl18x 48240000.mmc: mmc2: PL180 manf 53 rev3 at 0x48240000 irq 60,0 (pio)
+[    2.449669] mmci-pl18x 48220000.mmc: mmc0: PL180 manf 53 rev3 at 0x48220000 irq 57,0 (pio)
+[    2.459155] stm32-usart 400e0000.serial: interrupt mode for tx (no dma)
+[    2.475168] 400e0000.serial: ttySTM0 at MMIO 0x400e0000 (irq = 58, base_baud = 4000000) is a stm32-usart
+[    2.487861] printk: console [ttySTM0] enabled
+[    2.487861] printk: console [ttySTM0] enabled
+[    2.490957] printk: bootconsole [stm32] disabled
+[    2.490957] printk: bootconsole [stm32] disabled
+[    2.502707] input: gpio-keys as /devices/platform/gpio-keys/input/input0
+[    2.507572] clk: Disabling unused clocks
+[    2.511026] ALSA device list:
+[    2.513818]   No soundcards found.
+[    2.522876] Waiting for root device PARTUUID=6fd65744-f376-48ad-bffc-cda83df4d37e...
+[    2.565300] mmc0: new ultra high speed SDR104 SDHC card at address 59b4
+[    2.567041] mmcblk0: mmc0:59b4 USDU1 14.9 GiB
+[    2.577396] GPT:Primary header thinks Alt. header is not at the end of the disk.
+[    2.579270] GPT:607559 != 31176703
+[    2.582593] GPT:Alternate GPT header not at the end of the disk.
+[    2.588651] GPT:607559 != 31176703
+[    2.595080] GPT: Use GNU Parted to correct GPT errors.
+[    2.597216] mmc1: new HS200 MMC card at address 0001
+[    2.602095]  mmcblk0: p1 p2 p3 p4 p5 p6 p7
+[    2.606929] mmcblk1: mmc1:0001 008GB1 7.28 GiB
+[    2.615238]  mmcblk1: p1 p2 p3 p4 p5 p6 p7 p8
+[    2.616705] mmcblk1boot0: mmc1:0001 008GB1 4.00 MiB
+[    2.621197] mmcblk1boot1: mmc1:0001 008GB1 4.00 MiB
+[    2.625864] mmcblk1rpmb: mmc1:0001 008GB1 4.00 MiB, chardev (240:0)
+[    2.664248] mmc2: new high speed SDIO card at address 0001
+[    2.668482] EXT4-fs (mmcblk0p7): mounted filesystem 1d308504-bb0f-40f2-81c2-d78944fe2cca r/w with ordered data mode. Quota mode: none.
+[    2.676323] VFS: Mounted root (ext4 filesystem) on device 179:7.
+[    2.682727] devtmpfs: mounted
+[    2.686596] Freeing unused kernel memory: 3776K
+[    2.689745] Run /sbin/init as init process
+INIT: version 3.04 booting
+WARNING: partition bootfs not found, skipping /boot mount
+Starting udev
+[    3.074826] udevd[109]: starting version 3.2.14
+[    3.101884] udevd[110]: starting eudev-3.2.14
+Cannot read environment, using default
+Cannot read environment, using default
+[    6.839477] EXT4-fs (mmcblk0p7): re-mounted 1d308504-bb0f-40f2-81c2-d78944fe2cca.
+INIT: Entering runlevel: 5
+Configuring network interfaces... ip: SIOCGIFFLAGS: No such device
+ip: SIOCGIFFLAGS: No such device
+Starting syslogd/klogd: done
+
+Amy distribution 1.0 mp2 /dev/ttySTM0
+
+mp2 login:
