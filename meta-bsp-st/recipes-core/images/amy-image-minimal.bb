@@ -7,6 +7,9 @@ IMAGE_INSTALL = "\
     ${CORE_IMAGE_EXTRA_INSTALL} \
 "
 
+# install all the kernel modules
+IMAGE_INSTALL += "kernel-modules"
+
 inherit core-image
 
 IMAGE_ROOTFS_SIZE ?= "8192"
@@ -40,6 +43,10 @@ DEPENDS:append:mp1 = " virtual/optee-os "
 DEPENDS:append:mp1 = " virtual/u-boot "
 DEPENDS:append:mp1 = " virtual/kernel "
 DEPENDS:append:mp2 = "fip"
+
+TOOLCHAIN_HOST_TASK += "\
+    nativesdk-tf-a-tools \
+"
 
 SDIMAGE_DEPENDS := "\
     virtual/tf-a:do_deploy \
@@ -81,7 +88,7 @@ do_sdimage() {
 
 IMAGE_OVERHEAD_FACTOR = "1.0"
 IMAGE_ROOTFS_EXTRA_SPACE = "32768"
-IMAGE_ROOTFS_MAXSIZE = "262400"
+IMAGE_ROOTFS_MAXSIZE = "524288"
 
 # userfs directory
 rootfs_prepare_userfs() {

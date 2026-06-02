@@ -7,6 +7,10 @@
     [x] u-boot
     [ ] kernel
 
+- [x] fix finding of bootfs (among /dev/mmcblkX) in fstab 
+    avoid `/dev/mmcblk0p8       /boot                vfat       defaults              1  2`
+    -> use init custom init script
+
 [ ] fip
     [ ] /home/lucas/yocto/yocto-dk2/build/tmp/deploy/images/stm32mp2/fip/fip-stm32mp257f-dk-optee-sdcard.txt
     [ ] /home/lucas/yocto/yocto-dk2/build/tmp/deploy/images/stm32mp2/fip/fip-stm32mp257f-dk-optee-sdcard.bin

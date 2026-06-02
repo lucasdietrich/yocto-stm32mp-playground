@@ -31,3 +31,9 @@ stm32mp_ddr_phy_sysroot_populate() {
 }
 SYSROOT_PREPROCESS_FUNCS =+ "stm32mp_ddr_phy_sysroot_populate"
 SYSROOT_DIRS:append = " ${FIP_DIR_DDR_PHY_BASE}"
+
+inherit deploy
+do_deploy() {
+    export_binaries ${DEPLOYDIR}${FIP_DIR_DDR_PHY_BASE}
+}
+addtask deploy before do_build after do_compile

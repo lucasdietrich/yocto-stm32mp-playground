@@ -44,13 +44,14 @@ image @IMAGE@-@MACHINE@-sdcard.img {
 
     partition bootfs {
         image = "@IMAGE@-@MACHINE@-bootfs.vfat"
+        size = 16M
     }
 
     partition rootfs {
         image = "@IMAGE_ROOTFS@"
         # generated with uuidgen
         partition-uuid = "6fd65744-f376-48ad-bffc-cda83df4d37e"
-        size = 256M
+        size = 512M
     }
 }
 

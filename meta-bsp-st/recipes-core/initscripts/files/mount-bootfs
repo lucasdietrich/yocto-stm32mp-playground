@@ -1,0 +1,25 @@
+#!/bin/sh
+
+PARTLABEL=bootfs
+MOUNTPOINT=/boot
+DEVLINK="/dev/disk/by-partlabel/$PARTLABEL"
+
+case "$1" in
+    start)
+        if ! mountpoint -q "$MOUNTPOINT"; then
+            DEV=$(readlink -f "$DEVLINK" 2>/dev/null)
+            if [ -b "$DEV" ]; then
+                mount -t vfat "$DEV" "$MOUNTPOINT"
+            else
+                echo "WARNING: partition $PARTLABEL not found, skipping $MOUNTPOINT mount"
+            fi
+        fi
+        ;;
+    stop)
+        umount "$MOUNTPOINT" 2>/dev/null
+        ;;
+    *)
+        echo "Usage: $0 {start|stop}"
+        exit 1
+        ;;
+esac
