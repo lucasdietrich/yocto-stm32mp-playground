@@ -19,7 +19,7 @@
 | linux   | amy 6.18     | OK  |             |                                                                            |
 | linux   | amy 6.19-rc5 | OK  |             |                                                                            |
 | linux   | amy 7.0.10   | OK  | NOK         |                                                                            |
-| linux   | st 6.6.116   | ?   | almost OK          | ST adaptation of linux LTS, next will be 6.18                              |
+| linux   | st 6.6.116   | ?   | OK          | ST adaptation of linux LTS, next will be 6.18                              |
 
 - note from ST about maintenance of the ST fork of linux: <https://community.st.com/t5/stm32-mpus-embedded-software-and/kernel-version-for-openstlinux-on-stm32mp25-series/td-p/855852>
 - notes about linux LTS: <https://www.kernel.org/category/releases.html>
