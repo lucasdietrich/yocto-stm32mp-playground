@@ -1,19 +1,27 @@
 # MP2
 
-[ ] use sysroot instead of deploydir for inter-recipe build-time inputs
+[x] allow to persistent ethernet MAC address
+    [ ] u-boot
+    [ ] indus area
+[x] fix userfs
+    [x] mount /var/volatile as tmpfs
+
+[x] use sysroot instead of deploydir for inter-recipe build-time inputs
     [x] tf-a
     [x] op-tee
     [x] bl31
     [x] u-boot
-    [ ] kernel
+    [x] kernel
+
+[ ] OP-TEE FS
 
 - [x] fix finding of bootfs (among /dev/mmcblkX) in fstab 
     avoid `/dev/mmcblk0p8       /boot                vfat       defaults              1  2`
     -> use init custom init script
 
-[ ] fip
-    [ ] /home/lucas/yocto/yocto-dk2/build/tmp/deploy/images/stm32mp2/fip/fip-stm32mp257f-dk-optee-sdcard.txt
-    [ ] /home/lucas/yocto/yocto-dk2/build/tmp/deploy/images/stm32mp2/fip/fip-stm32mp257f-dk-optee-sdcard.bin
+[x] fip
+    [x] /home/lucas/yocto/yocto-dk2/build/tmp/deploy/images/stm32mp2/fip/fip-stm32mp257f-dk-optee-sdcard.txt
+    [x] /home/lucas/yocto/yocto-dk2/build/tmp/deploy/images/stm32mp2/fip/fip-stm32mp257f-dk-optee-sdcard.bin
 
 # MP1
 
@@ -86,6 +94,7 @@
     [ ] container system
 
 Going further:
+
 [ ] SCMI (u-boot/OP-TEE)
 [ ] boot kernel from network with u-boot
 [ ] custom rust toolchain

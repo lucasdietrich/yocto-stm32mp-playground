@@ -13,5 +13,5 @@ echo rootfs PARTUUID=${rootfs_partuuid}
 setenv bootargs "console=ttySTM0,115200 earlycon root=PARTUUID=${rootfs_partuuid} rootfstype=ext4 rw rootwait"
 
 fatload mmc ${bootdev}:${bootfs_part} ${kernel_addr_r} @@KERNEL_IMAGE@@
-fatload mmc ${bootdev}:${bootfs_part} ${fdt_addr_r} @@DTB_FILE@@
+fatload mmc ${bootdev}:${bootfs_part} ${fdt_addr_r} @@KERNEL_DEVICETREE_NAME@@.dtb
 @@BOOT_CMD@@ ${kernel_addr_r} - ${fdt_addr_r}

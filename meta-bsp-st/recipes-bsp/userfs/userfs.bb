@@ -6,7 +6,7 @@ SRC_URI = "git://github.com/lucasdietrich/userfs.git;protocol=https;branch=featu
            file://init-user-fs.sh \
            file://factory_reset.sh \
            "
-SRCREV = "e6a2aa306a501d0e35d654d6af03c7853d8128d7"
+SRCREV = "727dbad4ff7dcdea42fecd06ad5b0bc3725bf7b6"
 
 DEPENDS += "util-linux"
 RDEPENDS:${PN} += "util-linux-libfdisk libubootenv btrfs-tools parted"
@@ -16,6 +16,7 @@ inherit meson pkgconfig update-rc.d
 # create overlay for /opt
 EXTRA_OEMESON += "-Dpartition_table=gpt"
 EXTRA_OEMESON += "-Doverlay_opt=true"
+EXTRA_OEMESON += "-Ddefault_block_device_name=/dev/mmcblk0"
 
 S = "${WORKDIR}/git"
 

@@ -14,12 +14,12 @@ SRC_URI = "\
         https://cdn.kernel.org/pub/linux/kernel/v${LINUX_VERSION_MAJOR}.x/linux-${PV}.tar.gz \
         file://features/veth.scc \
         file://features/veth.cfg \
-        file://features/btrfs.scc \
-        file://features/btrfs.cfg \
+        file://features/fs.scc \
+        file://features/fs.cfg \
         "
 
 KERNEL_FEATURES += "veth.scc"
-KERNEL_FEATURES += "btrfs.scc"
+KERNEL_FEATURES += "fs.scc"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 

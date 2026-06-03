@@ -55,7 +55,7 @@ image @IMAGE@-@MACHINE@-bootfs.vfat {
         files = {
             "u-boot-scr/boot.scr",
             "kernel/Image",
-            "kernel/stm32mp257f-dk.dtb"
+            "kernel/@KERNEL_DEVICETREE_NAME@.dtb"
         }
     }
     size = 32M

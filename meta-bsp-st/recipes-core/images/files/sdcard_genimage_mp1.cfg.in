@@ -61,7 +61,7 @@ image @IMAGE@-@MACHINE@-bootfs.vfat {
         files = {
             "u-boot-scr/boot.scr",
             "kernel/zImage",
-            "kernel/stm32mp157f-dk2-amy.dtb"
+            "kernel/@KERNEL_DEVICETREE_NAME@.dtb"
         }
     }
     size = 16M

@@ -14,7 +14,6 @@ SRC_URI = " \
 "
 
 UBOOTSCR_KERNEL_IMAGE ??= "${KERNEL_IMAGETYPE}"
-UBOOTSCR_DTB ??= "${@((d.getVar('KERNEL_DEVICETREE') or '').split()[0].split('/')[-1]) if (d.getVar('KERNEL_DEVICETREE') or '').strip() else ''}"
 UBOOTSCR_BOOT_CMD ??= "${@'bootz' if 'zImage' in (d.getVar('KERNEL_IMAGETYPE') or '').split() else ('bootm' if 'uImage' in (d.getVar('KERNEL_IMAGETYPE') or '').split() else 'booti')}"
 
 inherit kernel-arch deploy nopackages
@@ -22,7 +21,7 @@ inherit kernel-arch deploy nopackages
 do_compile() {
     sed -e 's|@@MACHINE@@|${MACHINE}|' \
         -e 's|@@KERNEL_IMAGE@@|${UBOOTSCR_KERNEL_IMAGE}|' \
-        -e 's|@@DTB_FILE@@|${UBOOTSCR_DTB}|' \
+        -e 's|@@KERNEL_DEVICETREE_NAME@@|${KERNEL_DEVICETREE_NAME}|' \
         -e 's|@@BOOT_CMD@@|${UBOOTSCR_BOOT_CMD}|' \
         ${WORKDIR}/boot.cmd.in > ${WORKDIR}/boot.cmd
 

@@ -1,0 +1,48 @@
+From 372925fa3e19ea9290e2b9c97877933f9fd644d8 Mon Sep 17 00:00:00 2001
+From: Lucas Dietrich <lucas.dietrich.git@proton.me>
+Date: Wed, 3 Jun 2026 19:38:50 +0200
+Subject: [PATCH] stm32mp257-dk-amy: add custom devicetree
+
+---
+ arch/arm64/boot/dts/st/Makefile               |  1 +
+ arch/arm64/boot/dts/st/stm32mp257f-dk-amy.dts | 17 +++++++++++++++++
+ 2 files changed, 18 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/st/stm32mp257f-dk-amy.dts
+
+diff --git a/arch/arm64/boot/dts/st/Makefile b/arch/arm64/boot/dts/st/Makefile
+index 63908113a..a57327cae 100644
+--- a/arch/arm64/boot/dts/st/Makefile
++++ b/arch/arm64/boot/dts/st/Makefile
+@@ -3,4 +3,5 @@ dtb-$(CONFIG_ARCH_STM32) += \
+ 	stm32mp215f-dk.dtb \
+ 	stm32mp235f-dk.dtb \
+ 	stm32mp257f-dk.dtb \
++	stm32mp257f-dk-amy.dtb \
+ 	stm32mp257f-ev1.dtb
+diff --git a/arch/arm64/boot/dts/st/stm32mp257f-dk-amy.dts b/arch/arm64/boot/dts/st/stm32mp257f-dk-amy.dts
+new file mode 100644
+index 000000000..356facad5
+--- /dev/null
++++ b/arch/arm64/boot/dts/st/stm32mp257f-dk-amy.dts
+@@ -0,0 +1,17 @@
++// SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-3-Clause)
++/*
++ * Copyright (C) STMicroelectronics 2026 - All Rights Reserved
++ */
++
++/dts-v1/;
++
++#include "stm32mp257f-dk.dts"
++
++/ {
++	model = "STMicroelectronics STM32MP257F-DK Discovery Board (Amy Board)";
++
++	aliases {
++		mmc0 = &sdmmc1; // Force SD CARD as mmc0
++		mmc1 = &sdmmc2; // Force eMMC as mmc1
++	};
++};
+\ No newline at end of file
+-- 
+2.39.5
+
