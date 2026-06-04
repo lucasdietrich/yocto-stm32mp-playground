@@ -39,7 +39,7 @@ SWUPDATE_SRC_URI_EXCLUDE += "${SDIMAGE_CONF}"
 # include bootloader artifacts in the SWU for MP2 (A-slot only)
 SWUPDATE_IMAGES:append:mp2 = " tf-a/tf-a-${TFA_DEVICETREE}.stm32"
 SWUPDATE_IMAGES:append:mp2 = " fip/fip-${MACHINE}.bin"
-SWUPDATE_IMAGES:append:mp2 = " ${IMAGE_BASENAME}-${MACHINE}-bootfs.vfat"
+SWUPDATE_IMAGES:append:mp2 = " ${IMAGE_BASENAME}-${MACHINE}-bootfs.vfat.zst"
 
 # swupdate image
 inherit swupdate-image
@@ -108,6 +108,9 @@ do_sdimage() {
         --outputpath ${IMGDEPLOYDIR}
 
     gzip -k -9 ${IMGDEPLOYDIR}/*.img
+
+    zstd -T0 -19 -f ${IMGDEPLOYDIR}/${IMAGE_BASENAME}-${MACHINE}-bootfs.vfat \
+        -o ${IMGDEPLOYDIR}/${IMAGE_BASENAME}-${MACHINE}-bootfs.vfat.zst
 
     cp ${WORKDIR}/sdcard_genimage-${IMAGE_BASENAME}-${MACHINE}.cfg ${IMGDEPLOYDIR}
 }

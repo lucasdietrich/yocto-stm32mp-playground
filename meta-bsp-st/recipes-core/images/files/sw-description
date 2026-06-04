@@ -26,10 +26,11 @@ software =
                 sha256 = "$swupdate_get_sha256(fip-@@MACHINE@@.bin)";
             },
             {
-                filename = "@@IMAGE_BASENAME@@-@@MACHINE@@-bootfs.vfat";
+                filename = "@@IMAGE_BASENAME@@-@@MACHINE@@-bootfs.vfat.zst";
                 type = "raw";
                 device = "/dev/disk/by-partlabel/bootfs";
-                sha256 = "$swupdate_get_sha256(@@IMAGE_BASENAME@@-@@MACHINE@@-bootfs.vfat)";
+                compressed = "zstd";
+                sha256 = "$swupdate_get_sha256(@@IMAGE_BASENAME@@-@@MACHINE@@-bootfs.vfat.zst)";
             }
         );
         scripts: (
