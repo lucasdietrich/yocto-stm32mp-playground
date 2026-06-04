@@ -1,8 +1,18 @@
 # MP2
 
+[ ] swupdate
+    [ ] A/B tfa
+    [ ] A/B fip
+    [ ] bootfs
+    [ ] A/B rootfs
+    [ ] optimize performances zstd streamed to partition
+
+[ ] usb device
+    [ ] ethernet
+
 [x] allow to persistent ethernet MAC address
-    [ ] u-boot
-    [ ] indus area
+    [x] u-boot
+    [ ] TODO indus area
 [x] fix userfs
     [x] mount /var/volatile as tmpfs
 
@@ -98,3 +108,4 @@ Going further:
 [ ] SCMI (u-boot/OP-TEE)
 [ ] boot kernel from network with u-boot
 [ ] custom rust toolchain
+[ ] test ST version of openocd (does it fix stepping with dk2 ?)
