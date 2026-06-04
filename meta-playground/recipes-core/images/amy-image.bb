@@ -1,3 +1,5 @@
+# Fall back to meta-bsp-st for shared files (update-script.sh)
+#
 # is there an alternative for this trick ?
 # the other solution is to copy all the files 
 # from meta-bsp-st/recipes-core/images/files 

@@ -1,14 +1,20 @@
 # MP2
 
-[ ] swupdate
+[x] swupdate
+    [x] tfa
+    [x] fip
+    [x] bootfs
     [ ] A/B tfa
     [ ] A/B fip
-    [ ] bootfs
-    [ ] A/B rootfs
-    [ ] optimize performances zstd streamed to partition
+    [x] bootfs
+    [x] A/B rootfs
+    [x] optimize performances zstd streamed to partition
 
 [ ] usb device
     [ ] ethernet
+
+[x] usb host
+    [ ] usb ssd storage ?
 
 [x] allow to persistent ethernet MAC address
     [x] u-boot
