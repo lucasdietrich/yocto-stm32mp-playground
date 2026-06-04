@@ -23,6 +23,26 @@ TOOLCHAIN_HOST_TASK += "\
 EXTRA_IMAGEDEPENDS += "virtual/tf-a"
 
 IMAGE_FSTYPES = "ext4"
+IMAGE_FSTYPES += "ext4.zst"
+
+#########################
+# SWUpdate image        #
+#########################
+
+python() {
+  d.setVarFlag("SWUPDATE_IMAGES_FSTYPES", d.getVar("IMAGE_BASENAME"), ".ext4.zst")
+}
+
+# do not include all SRC_URI files in the swupdate image
+SWUPDATE_SRC_URI_EXCLUDE += "${SDIMAGE_CONF}"
+
+# swupdate image
+inherit swupdate-image
+
+SRC_URI += "\
+    file://sw-description \
+    file://update-script.sh \
+"
 
 #########################
 # Create a sdcard image #

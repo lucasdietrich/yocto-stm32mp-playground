@@ -41,10 +41,15 @@ image @IMAGE@-@MACHINE@-sdcard.img {
         size = 32M
     }
 
-    partition rootfs {
+    partition rootfs-a {
         image = "@IMAGE_ROOTFS@"
         # generated with uuidgen
         partition-uuid = "6fd65744-f376-48ad-bffc-cda83df4d37e"
+        size = 512M
+    }
+
+    partition rootfs-b {
+        partition-uuid = "836a91dd-66c9-40a2-840c-c35428b09a91"
         size = 512M
     }
 }

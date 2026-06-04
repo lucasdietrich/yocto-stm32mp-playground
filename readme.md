@@ -72,6 +72,7 @@ BBLAYERS ?= " \
   /home/lucas/yocto/yocto-ld-mp1/meta-openembedded/meta-networking \
   /home/lucas/yocto/yocto-ld-mp1/meta-arm/meta-arm-toolchain \
   /home/lucas/yocto/yocto-ld-mp1/meta-lts-mixins \
+  /home/lucas/yocto/yocto-ld-mp1/meta-swupdate \
   /home/lucas/yocto/yocto-ld-mp1/meta-bsp-st \
   /home/lucas/yocto/yocto-ld-mp1/meta-playground \
   "

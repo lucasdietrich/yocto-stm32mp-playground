@@ -1,0 +1,24 @@
+software =
+{
+	version = "0.1.0";
+	hardware-compatibility: [ "1.0" ];
+
+	/* todo @@MACHINE@@ */
+	@@MACHINE@@ = {
+		images: (
+			{
+				filename = "@@IMAGE_BASENAME@@-@@MACHINE@@.rootfs.ext4.zst";
+				type = "raw";
+				device = "/dev/swu/other-rootfs";
+				compressed = "zstd";
+				sha256 = "$swupdate_get_sha256(@@IMAGE_BASENAME@@-@@MACHINE@@.rootfs.ext4.zst)";
+			}
+		);
+		scripts: (
+			{
+				filename = "update-script.sh";
+				type = "shellscript";
+			}
+		);
+	}
+}

@@ -3,10 +3,10 @@ LICENSE = "CLOSED"
 
 inherit packagegroup
 
-# populate here
 RDEPENDS:${PN} = "\
     userfs \
     os-release \
+    udev \
 "
 
 # u-boot-fw-utils add the fw_printenv fw_setenv utilities
@@ -16,6 +16,15 @@ RDEPENDS:${PN} += "\
     u-boot-env \
 "
 
+# mount /boot at boot time
 RDEPENDS:${PN} += "\
     mount-bootfs \
+"
+
+# swupdate dependencies
+RDEPENDS:${PN} += "\
+    fwupdate \
+    swupdate \
+    swupdate-www \
+    swupdate-tools \
 "

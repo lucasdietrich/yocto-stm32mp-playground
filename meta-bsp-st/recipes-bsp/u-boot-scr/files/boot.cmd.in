@@ -1,16 +1,39 @@
 echo Boot script for @@MACHINE@@ from bootfs partition
 
-if part number mmc ${bootdev} rootfs rootfs_part; then
-    echo rootfs partition found at index ${rootfs_part}
-else
-    echo Unable to locate rootfs partition
-    exit
+# create bootdev if not set
+if test -z "${bootdev}"; then
+    setenv bootdev 0
 fi
 
-part uuid mmc ${bootdev}:${rootfs_part} rootfs_partuuid
-echo rootfs PARTUUID=${rootfs_partuuid}
+# create ustate if not set
+if test -z "${ustate}"; then
+    setenv ustate 0
+fi
+
+# create bootcounter variable if not set
+if test -z "${bootcounter}"; then
+    setenv bootcounter 0
+fi
+
+# find the rootfs to boot from, either from environment variable or by looking for rootfs-a partition
+if test -n "${rootfs_partuuid}"; then
+    echo Using rootfs PARTUUID from environment: ${rootfs_partuuid}
+else
+    echo rootfs PARTUUID not set in environment, attempting to find rootfs-a partition
+    if part number mmc ${bootdev} rootfs-a rootfs_a_part; then
+        echo Found rootfs-a partition at ${rootfs_a_part}
+    else
+        echo Unable to locate rootfs-a partition
+        exit
+    fi
+
+    part uuid mmc ${bootdev}:${rootfs_a_part} rootfs_partuuid
+    echo rootfs-a PARTUUID=${rootfs_partuuid}
+fi
 
 setenv bootargs "console=ttySTM0,115200 earlycon root=PARTUUID=${rootfs_partuuid} rootfstype=ext4 rw rootwait"
+
+if test ! -e mmc 0:1 uboot.env; then saveenv; fi;
 
 fatload mmc ${bootdev}:${bootfs_part} ${kernel_addr_r} @@KERNEL_IMAGE@@
 fatload mmc ${bootdev}:${bootfs_part} ${fdt_addr_r} @@KERNEL_DEVICETREE_NAME@@.dtb
