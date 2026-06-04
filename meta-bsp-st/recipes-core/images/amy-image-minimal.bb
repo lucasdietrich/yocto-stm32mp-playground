@@ -91,7 +91,7 @@ do_sdimage() {
         -e "s|@TFA_DEVICETREE@|${TFA_DEVICETREE}|g" \
         -e "s|@IMAGE_ROOTFS@|${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.ext4|g" \
         -e "s|@KERNEL_DEVICETREE_NAME@|${KERNEL_DEVICETREE_NAME}|g" \
-        ${FILE_DIRNAME}/files/${SDIMAGE_CONF} > ${WORKDIR}/sdcard_genimage-${IMAGE_BASENAME}-${MACHINE}.cfg
+        ${WORKDIR}/${SDIMAGE_CONF} > ${WORKDIR}/sdcard_genimage-${IMAGE_BASENAME}-${MACHINE}.cfg
 
     mkdir -p ${WORKDIR}/genimage/tmp ${WORKDIR}/genimage/root
 
