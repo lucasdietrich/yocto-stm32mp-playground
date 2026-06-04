@@ -36,6 +36,11 @@ python() {
 # do not include all SRC_URI files in the swupdate image
 SWUPDATE_SRC_URI_EXCLUDE += "${SDIMAGE_CONF}"
 
+# include bootloader artifacts in the SWU for MP2 (A-slot only)
+SWUPDATE_IMAGES:append:mp2 = " tf-a/tf-a-${TFA_DEVICETREE}.stm32"
+SWUPDATE_IMAGES:append:mp2 = " fip/fip-${MACHINE}.bin"
+SWUPDATE_IMAGES:append:mp2 = " ${IMAGE_BASENAME}-${MACHINE}-bootfs.vfat"
+
 # swupdate image
 inherit swupdate-image
 
