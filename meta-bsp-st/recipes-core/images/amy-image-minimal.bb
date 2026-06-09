@@ -18,7 +18,8 @@ TOOLCHAIN_HOST_TASK += "\
     nativesdk-genimage \
     nativesdk-gcc-arm-none-eabi \
     nativesdk-dtc \
-    "
+    nativesdk-tf-a-tools \
+"
 
 EXTRA_IMAGEDEPENDS += "virtual/tf-a"
 
@@ -33,19 +34,21 @@ python() {
   d.setVarFlag("SWUPDATE_IMAGES_FSTYPES", d.getVar("IMAGE_BASENAME"), ".ext4.zst")
 }
 
+SDIMAGE_CONF ??= "sdcard_genimage.cfg.in"
+
 # do not include all SRC_URI files in the swupdate image
 SWUPDATE_SRC_URI_EXCLUDE += "${SDIMAGE_CONF}"
 
 # include bootloader artifacts in the SWU for MP2 (A-slot only)
-SWUPDATE_IMAGES:append:mp2 = " tf-a/tf-a-${TFA_DEVICETREE}.stm32"
+SWUPDATE_IMAGES:append = " tf-a/tf-a-${TFA_DEVICETREE}.stm32"
+SWUPDATE_IMAGES:append = " ${IMAGE_BASENAME}-${MACHINE}-bootfs.vfat.zst"
 SWUPDATE_IMAGES:append:mp2 = " fip/fip-${MACHINE}.bin"
-SWUPDATE_IMAGES:append:mp2 = " ${IMAGE_BASENAME}-${MACHINE}-bootfs.vfat.zst"
+SWUPDATE_IMAGES:append:mp1 = " u-boot/u-boot.bin"
+SWUPDATE_IMAGES:append:mp1 = " optee-os/tee-header_v2.bin optee-os/tee-pager_v2.bin optee-os/tee-pageable_v2.bin"
 
 # swupdate image
 inherit swupdate-image
-
 SRC_URI += "\
-    file://sw-description \
     file://update-script.sh \
 "
 
@@ -68,10 +71,6 @@ DEPENDS:append:mp1 = " virtual/optee-os "
 DEPENDS:append:mp1 = " virtual/u-boot "
 DEPENDS:append:mp1 = " virtual/kernel "
 DEPENDS:append:mp2 = "fip"
-
-TOOLCHAIN_HOST_TASK += "\
-    nativesdk-tf-a-tools \
-"
 
 SDIMAGE_DEPENDS := "\
     virtual/tf-a:do_deploy \

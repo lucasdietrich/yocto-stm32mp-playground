@@ -55,6 +55,7 @@ image @IMAGE@-@MACHINE@-sdcard.img {
     }
 
     partition rootfs-b {
+        partition-uuid = "836a91dd-66c9-40a2-840c-c35428b09a91"
         size = 512M
     }
 }

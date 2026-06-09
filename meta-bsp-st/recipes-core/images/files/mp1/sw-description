@@ -1,0 +1,67 @@
+software =
+{
+    version = "0.1.0";
+    hardware-compatibility: [ "1.0" ];
+
+    /* todo @@MACHINE@@ */
+    @@MACHINE@@ = {
+        images: (
+            {
+                filename = "@@IMAGE_BASENAME@@-@@MACHINE@@.rootfs.ext4.zst";
+                type = "raw";
+                device = "/dev/swu/other-rootfs";
+                compressed = "zstd";
+                sha256 = "$swupdate_get_sha256(@@IMAGE_BASENAME@@-@@MACHINE@@.rootfs.ext4.zst)";
+            },
+            {
+                filename = "tf-a-@@TFA_DEVICETREE@@.stm32";
+                type = "raw";
+                device = "/dev/disk/by-partlabel/fsbl1";
+                sha256 = "$swupdate_get_sha256(tf-a-@@TFA_DEVICETREE@@.stm32)";
+            },
+            {
+                filename = "tf-a-@@TFA_DEVICETREE@@.stm32";
+                type = "raw";
+                device = "/dev/disk/by-partlabel/fsbl2";
+                sha256 = "$swupdate_get_sha256(tf-a-@@TFA_DEVICETREE@@.stm32)";
+            },
+            {
+                filename = "tee-header_v2.bin";
+                type = "raw";
+                device = "/dev/disk/by-partlabel/tee-header";
+                sha256 = "$swupdate_get_sha256(tee-header_v2.bin)";
+            },
+            {
+                filename = "tee-pager_v2.bin";
+                type = "raw";
+                device = "/dev/disk/by-partlabel/tee-pager";
+                sha256 = "$swupdate_get_sha256(tee-pager_v2.bin)";
+            },
+            {
+                filename = "tee-pageable_v2.bin";
+                type = "raw";
+                device = "/dev/disk/by-partlabel/tee-pageable";
+                sha256 = "$swupdate_get_sha256(tee-pageable_v2.bin)";
+            },
+            {
+                filename = "u-boot.bin";
+                type = "raw";
+                device = "/dev/disk/by-partlabel/u-boot";
+                sha256 = "$swupdate_get_sha256(u-boot.bin)";
+            },
+            {
+                filename = "@@IMAGE_BASENAME@@-@@MACHINE@@-bootfs.vfat.zst";
+                type = "raw";
+                device = "/dev/disk/by-partlabel/bootfs";
+                compressed = "zstd";
+                sha256 = "$swupdate_get_sha256(@@IMAGE_BASENAME@@-@@MACHINE@@-bootfs.vfat.zst)";
+            }
+        );
+        scripts: (
+            {
+                filename = "update-script.sh";
+                type = "shellscript";
+            }
+        );
+    }
+}

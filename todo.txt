@@ -29,6 +29,8 @@
     [x] u-boot
     [x] kernel
 
+[ ] syslog
+
 [ ] OP-TEE FS
 
 - [x] fix finding of bootfs (among /dev/mmcblkX) in fstab 

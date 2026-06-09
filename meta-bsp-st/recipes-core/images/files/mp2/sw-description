@@ -20,9 +20,21 @@ software =
                 sha256 = "$swupdate_get_sha256(tf-a-@@TFA_DEVICETREE@@.stm32)";
             },
             {
+                filename = "tf-a-@@TFA_DEVICETREE@@.stm32";
+                type = "raw";
+                device = "/dev/disk/by-partlabel/fsbla2";
+                sha256 = "$swupdate_get_sha256(tf-a-@@TFA_DEVICETREE@@.stm32)";
+            },
+            {
                 filename = "fip-@@MACHINE@@.bin";
                 type = "raw";
                 device = "/dev/disk/by-partlabel/fip-a";
+                sha256 = "$swupdate_get_sha256(fip-@@MACHINE@@.bin)";
+            },
+            {
+                filename = "fip-@@MACHINE@@.bin";
+                type = "raw";
+                device = "/dev/disk/by-partlabel/fip-b";
                 sha256 = "$swupdate_get_sha256(fip-@@MACHINE@@.bin)";
             },
             {
