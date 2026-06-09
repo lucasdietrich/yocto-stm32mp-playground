@@ -1,0 +1,43 @@
+root@dk2:~# iperf3 -s
+warning: this system does not seem to support IPv6 - trying IPv4
+-----------------------------------------------------------
+Server listening on 5201 (test #1)
+-----------------------------------------------------------
+Accepted connection from 192.168.7.1, port 42156
+[  5] local 192.168.7.2 port 5201 connected to 192.168.7.1 port 42158
+[ ID] Interval           Transfer     Bitrate
+[  5]   0.00-1.01   sec  30.9 MBytes   256 Mbits/sec
+[  5]   1.01-2.00   sec  31.6 MBytes   268 Mbits/sec
+[  5]   2.00-3.00   sec  33.0 MBytes   277 Mbits/sec
+[  5]   3.00-4.00   sec  30.1 MBytes   253 Mbits/sec
+[  5]   4.00-5.00   sec  20.0 MBytes   168 Mbits/sec
+[  5]   5.00-6.00   sec  33.0 MBytes   277 Mbits/sec
+[  5]   6.00-7.00   sec  27.2 MBytes   229 Mbits/sec
+[  5]   7.00-8.00   sec  33.8 MBytes   283 Mbits/sec
+[  5]   8.00-9.00   sec  21.1 MBytes   177 Mbits/sec
+[  5]   9.00-10.00  sec  31.5 MBytes   264 Mbits/sec
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate
+[  5]   0.00-10.02  sec   332 MBytes   278 Mbits/sec                  receiver
+-----------------------------------------------------------
+Server listening on 5201 (test #2)
+-----------------------------------------------------------
+Accepted connection from 192.168.7.1, port 47476
+[  5] local 192.168.7.2 port 5201 connected to 192.168.7.1 port 47482
+[ ID] Interval           Transfer     Bitrate         Retr  Cwnd
+[  5]   0.00-1.00   sec  26.4 MBytes   221 Mbits/sec    0    177 KBytes
+[  5]   1.00-2.00   sec  26.1 MBytes   219 Mbits/sec    0    187 KBytes
+[  5]   2.00-3.00   sec  25.9 MBytes   217 Mbits/sec    0    187 KBytes
+[  5]   3.00-4.00   sec  26.1 MBytes   219 Mbits/sec    0    187 KBytes
+[  5]   4.00-5.00   sec  26.1 MBytes   219 Mbits/sec    0    187 KBytes
+[  5]   5.00-6.00   sec  26.0 MBytes   218 Mbits/sec    0    187 KBytes
+[  5]   6.00-7.00   sec  25.9 MBytes   217 Mbits/sec    0    187 KBytes
+[  5]   7.00-8.00   sec  26.1 MBytes   219 Mbits/sec    0    187 KBytes
+[  5]   8.00-9.00   sec  26.1 MBytes   219 Mbits/sec    0    187 KBytes
+[  5]   9.00-10.00  sec  26.1 MBytes   219 Mbits/sec    0    187 KBytes
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Retr
+[  5]   0.00-10.00  sec   261 MBytes   219 Mbits/sec    0            sender
+-----------------------------------------------------------
+Server listening on 5201 (test #3)
+-----------------------------------------------------------

@@ -4,6 +4,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files/7.0:"
 
 SRC_URI += " \
         file://0001-Add-custom-amy-devicetree.patch \
+        file://0002-feat-Add-USB-OTG-HS-support.patch \
 "
 
 SRC_URI:append:mp1 = " file://amy-stm32mp1_defconfig "
