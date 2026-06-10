@@ -1,0 +1,23 @@
+From f277a4cf2e4ad07625997f0d439a443eeac7f12d Mon Sep 17 00:00:00 2001
+From: Lucas Dietrich <ld.adecy@gmail.com>
+Date: Fri, 25 Apr 2025 18:20:40 +0200
+Subject: [PATCH] USB-DFU: Change MAX_CTRL_BUFFER_LENGTH from 4KB to 32KB
+Upstream-Status: Pending
+
+---
+ libusb/os/linux_usbfs.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libusb/os/linux_usbfs.h b/libusb/os/linux_usbfs.h
+index 1238ffa..9f0635f 100644
+--- a/libusb/os/linux_usbfs.h
++++ b/libusb/os/linux_usbfs.h
+@@ -71,7 +71,7 @@ struct usbfs_iso_packet_desc {
+ };
+ 
+ #define MAX_BULK_BUFFER_LENGTH		16384
+-#define MAX_CTRL_BUFFER_LENGTH		4096
++#define MAX_CTRL_BUFFER_LENGTH		32768
+ 
+ #define MAX_ISO_PACKETS_PER_URB		128
+ 

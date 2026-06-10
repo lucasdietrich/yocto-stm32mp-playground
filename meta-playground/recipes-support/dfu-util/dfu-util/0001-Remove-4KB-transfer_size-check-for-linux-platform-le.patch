@@ -1,0 +1,30 @@
+From ae791ad8e9b6d8ad26ddc34dbc780ff4b9cd4d7d Mon Sep 17 00:00:00 2001
+From: Lucas Dietrich <ld.adecy@gmail.com>
+Date: Fri, 25 Apr 2025 18:22:51 +0200
+Subject: [PATCH] Remove 4KB transfer_size check for linux platform (let
+ libusb1 call fails if we exceed the actual limit)
+Upstream-Status: Pending
+
+---
+ src/main.c | 8 --------
+ 1 file changed, 8 deletions(-)
+
+diff --git a/src/main.c b/src/main.c
+index 962c2a1..fee13c3 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -699,14 +699,6 @@ status_again:
+ 			errx(EX_USAGE, "Transfer size must be specified");
+ 	}
+ 
+-#ifdef __linux__
+-	/* limited to 4k in libusb Linux backend */
+-	if ((int)transfer_size > 4096) {
+-		transfer_size = 4096;
+-		printf("Limited transfer size to %i\n", transfer_size);
+-	}
+-#endif /* __linux__ */
+-
+ 	if (transfer_size < dfu_root->bMaxPacketSize0) {
+ 		transfer_size = dfu_root->bMaxPacketSize0;
+ 		printf("Adjusted transfer size to %i\n", transfer_size);

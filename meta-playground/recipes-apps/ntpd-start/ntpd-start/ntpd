@@ -1,0 +1,45 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:          ntpd
+# Required-Start:    $syslog $network $remote_fs
+# Required-Stop:     $syslog $network $remote_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Network Time Protocol client Daemon
+# Description:       ntpd, a Network Time Protocol client Daemon.
+### END INIT INFO
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+DAEMON=/usr/sbin/ntpd
+NAME=ntpd
+DESC="Network Time Protocol client Daemon"
+OPTS="-N -p fr.pool.ntp.org"
+PIDFILE=/var/run/ntpd.pid
+
+case "$1" in
+  start)
+	  echo -n "Starting $DESC: "
+	  start-stop-daemon --start --make-pidfile --pidfile $PIDFILE --exec $DAEMON -- $OPTS
+	  echo "$NAME."
+	;;
+  stop)
+	  echo -n "Stopping $DESC: "
+	  start-stop-daemon --stop --pidfile $PIDFILE
+	  echo "$NAME."
+	;;
+  restart)
+	  echo -n "Restarting $DESC: "
+	  start-stop-daemon --stop --pidfile $PIDFILE
+	  sleep 1
+	  start-stop-daemon --start --exec "$DAEMON" -- $OPTS
+	  echo "$NAME."
+	;;
+  *)
+	  N=/etc/init.d/$NAME
+	  echo "Usage: $N {start|stop|restart}" >&2
+	  exit 1
+	;;
+esac
+
+exit 0

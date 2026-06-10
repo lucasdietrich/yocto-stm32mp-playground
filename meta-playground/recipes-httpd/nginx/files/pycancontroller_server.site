@@ -1,0 +1,19 @@
+# redirect to pycancontroller server
+server {
+    listen 80;
+    # listen 443 ssl;
+    # server_name iot.example.com;  # TODO replace with your actual domain
+
+    location / {
+        proxy_pass http://localhost:8080;
+    }
+
+    # ssl_certificate     /etc/nginx/certs/serv.cert.pem;
+    # ssl_certificate_key /etc/nginx/certs/serv.key.pem;
+
+    # ssl_client_certificate /etc/nginx/certs/clients-ca.cert.pem;
+    # ssl_verify_client optional;
+
+    # ssl_protocols       TLSv1.2 TLSv1.3;
+    # ssl_ciphers         HIGH:!aNULL:!MD5;
+}

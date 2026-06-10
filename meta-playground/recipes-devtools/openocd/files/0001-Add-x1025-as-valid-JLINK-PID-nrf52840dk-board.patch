@@ -1,0 +1,21 @@
+From 44fcd3e1336763f93a338dc11572c0e8a8a46801 Mon Sep 17 00:00:00 2001
+From: Lucas Dietrich <lucas.dietrich.git@proton.me>
+Date: Wed, 3 Sep 2025 18:36:53 +0200
+Subject: [PATCH] Add x1025 as valid JLINK PID (nrf52840dk board)
+
+---
+ libjaylink/discovery_usb.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/libjaylink/discovery_usb.c b/libjaylink/discovery_usb.c
+index 03fcb8e..5d33e99 100644
+--- a/libjaylink/discovery_usb.c
++++ b/libjaylink/discovery_usb.c
+@@ -70,6 +70,7 @@ static const struct {
+ 	{0x1059, JAYLINK_USB_ADDRESS_0},
+ 	{0x1060, JAYLINK_USB_ADDRESS_0},
+ 	{0x1061, JAYLINK_USB_ADDRESS_0},
++	{0x1025, JAYLINK_USB_ADDRESS_0},
+ };
+ 
+ /** Maximum length of the USB string descriptor for the serial number. */

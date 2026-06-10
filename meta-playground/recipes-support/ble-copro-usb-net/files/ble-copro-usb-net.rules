@@ -1,0 +1,2 @@
+# mac address should be lower case
+SUBSYSTEM=="net", ACTION=="add", ATTRS{idVendor}=="2fe3", ATTRS{idProduct}=="0100", ATTR{address}=="00:00:5e:00:53:01", NAME="copro-eth0", RUN+="/etc/udev/scripts/configure-iface"

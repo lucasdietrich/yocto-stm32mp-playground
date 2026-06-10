@@ -1,0 +1,13 @@
+/var/log/caniot-controller.log {
+    daily
+    size 10M
+    rotate 14
+    missingok
+    notifempty
+    compress
+    postrotate
+        /etc/init.d/syslog reload 2>/dev/null || true
+    endscript
+    dateext
+    dateformat -%Y-%m-%d-%H-%M-%S
+}
