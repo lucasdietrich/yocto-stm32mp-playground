@@ -1,0 +1,107 @@
+#!/bin/sh
+set -eu
+
+G=/sys/kernel/config/usb_gadget/g_ncm
+
+if [ -z "${UDC_NAME:-}" ]; then
+    UDC_NAME=$(ls /sys/class/udc/ 2>/dev/null | head -n1)
+    if [ -z "$UDC_NAME" ]; then
+        echo "No UDC found in /sys/class/udc/" >&2
+        exit 1
+    fi
+fi
+
+DEV_MAC="${DEV_MAC:-02:00:00:00:00:01}"
+HOST_MAC="${HOST_MAC:-02:00:00:00:00:02}"
+
+VID="${VID:-0x1d6b}"
+PID="${PID:-0x0104}"
+SERIAL="${SERIAL:-stm32mp1-0001}"
+MANUFACTURER="${MANUFACTURER:-Amy}"
+PRODUCT="${PRODUCT:-STM32MP1 USB NCM Ethernet}"
+
+start_gadget() {
+    mount -t configfs none /sys/kernel/config 2>/dev/null || true
+
+    if [ ! -d "/sys/class/udc/${UDC_NAME}" ]; then
+        echo "UDC ${UDC_NAME} not found" >&2
+        exit 1
+    fi
+
+    mkdir -p "$G"
+    cd "$G"
+
+    # Unbind if already bound.
+    if [ -f UDC ] && [ "$(cat UDC 2>/dev/null || true)" ]; then
+        echo "" > UDC
+    fi
+
+    echo "$VID" > idVendor
+    echo "$PID" > idProduct
+    echo 0x0100 > bcdDevice
+    echo 0x0200 > bcdUSB
+
+    mkdir -p strings/0x409
+    echo "$SERIAL" > strings/0x409/serialnumber
+    echo "$MANUFACTURER" > strings/0x409/manufacturer
+    echo "$PRODUCT" > strings/0x409/product
+
+    mkdir -p configs/c.1/strings/0x409
+    echo "NCM Ethernet" > configs/c.1/strings/0x409/configuration
+    echo 120 > configs/c.1/MaxPower
+
+    mkdir -p functions/ncm.usb0
+
+    echo "$DEV_MAC" > functions/ncm.usb0/dev_addr
+    echo "$HOST_MAC" > functions/ncm.usb0/host_addr
+
+    # Windows NCM compatibility hint.
+    # This is useful on Windows for automatic NCM driver binding.
+    if [ -d functions/ncm.usb0/os_desc/interface.ncm ]; then
+        echo 1 > os_desc/use
+        echo 0xbc > os_desc/b_vendor_code
+        echo MSFT100 > os_desc/qw_sign
+        echo WINNCM > functions/ncm.usb0/os_desc/interface.ncm/compatible_id
+        ln -s configs/c.1 os_desc 2>/dev/null || true
+    fi
+
+    ln -s functions/ncm.usb0 configs/c.1/ 2>/dev/null || true
+
+    echo "$UDC_NAME" > UDC
+}
+
+stop_gadget() {
+    [ -d "$G" ] || exit 0
+
+    cd "$G"
+
+    echo "" > UDC 2>/dev/null || true
+
+    rm -f configs/c.1/ncm.usb0
+    rm -f os_desc/c.1
+
+    rmdir functions/ncm.usb0 2>/dev/null || true
+    rmdir configs/c.1/strings/0x409 2>/dev/null || true
+    rmdir configs/c.1 2>/dev/null || true
+    rmdir strings/0x409 2>/dev/null || true
+
+    cd /
+    rmdir "$G" 2>/dev/null || true
+}
+
+case "${1:-start}" in
+    start)
+        start_gadget
+        ;;
+    stop)
+        stop_gadget
+        ;;
+    restart)
+        stop_gadget
+        start_gadget
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart}" >&2
+        exit 2
+        ;;
+esac

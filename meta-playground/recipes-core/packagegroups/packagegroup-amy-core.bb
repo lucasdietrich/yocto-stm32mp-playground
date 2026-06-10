@@ -6,4 +6,13 @@ inherit packagegroup
 # populate here
 RDEPENDS:${PN} = "\
     ca-certificates \
+    usb-gadget-ncm \
+    tzdata \
+    ntpd-start \
+    dnsmasq \
+    syslog-ng \
+    logrotate \
 "
+# nginx
+# syslog-ng
+# logrotate

@@ -1,3 +1,35 @@
+# Common
+
+- [ ] BLE zephyr integration
+- [ ] nginx
+- [ ] configuration server
+- [ ] syslog-ng
+
+- [x] usb gadget
+    [x] ncm
+        [ ] mac from uboot env (e.g. usbaddr)
+        [x] linux host
+        [x] windows host
+    [x] mp1
+    [ ] mp2
+
+- [ ] container system
+    [ ] crun
+    [ ] networking
+        [ ] virtual ethernet devices
+        [ ] bridge
+        [ ] dnat / masquerade / forwarding
+        [ ] MTU
+
+- [ ] fix support for iotop: requires: CONFIG_TASKSTATS, CONFIG_TASK_DELAY_ACCT, CONFIG_TASK_IO_ACCOUNTING
+    ```
+    root@dk2:~# iotop
+    Error in stat: No such file or directory
+    Could not run iotop as some of the requirements are not met:
+    - Linux >= 2.6.20 with
+    - I/O accounting support (CONFIG_TASKSTATS, CONFIG_TASK_DELAY_ACCT, CONFIG_TASK_IO_ACCOUNTING)
+    ```
+
 # MP2
 
 [x] swupdate
@@ -9,9 +41,6 @@
     [x] bootfs
     [x] A/B rootfs
     [x] optimize performances zstd streamed to partition
-
-[ ] usb device
-    [ ] ethernet
 
 [x] usb host
     [ ] usb ssd storage ?
@@ -28,8 +57,6 @@
     [x] bl31
     [x] u-boot
     [x] kernel
-
-[ ] syslog
 
 [ ] OP-TEE FS
 
@@ -93,14 +120,6 @@
 
 [ ] create meta-lw-container layer
     [ ] orchestration application: lway
-
-[ ] container system
-    [ ] crun
-    [ ] networking
-        [ ] virtual ethernet devices
-        [ ] bridge
-        [ ] dnat / masquerade / forwarding
-        [ ] MTU
 
 [ ] networking
     [ ] udev auto DHCP when ethernet cable is plugged
