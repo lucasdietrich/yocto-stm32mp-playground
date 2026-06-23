@@ -20,8 +20,8 @@ do_configure:prepend:mp2() {
     cp ${WORKDIR}/amy-stm32mp2_defconfig defconfig
 }
 
-PV = "7.0.10"
-SRC_URI[sha256sum] = "573690074720e5703db81074ac4c0102d8e135252af59ee4511c59b20c3c2a46"
+PV = "7.0.13"
+SRC_URI[sha256sum] = "88b6905bc743e63a967ca81ed6b301318a4ed6aba8b417bdc32f1dc469e686e0"
 
 # "transitional" keyword introduced in kernel 6.18 is not yet supported 
 # by python3-kconfiglib maintained by the Zephyr project. 
