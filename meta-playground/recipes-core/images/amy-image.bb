@@ -34,6 +34,7 @@ IMAGE_INSTALL:append = "${@bb.utils.contains('AMY_DEBUG_UTILS', '1',' \
     gdbserver \
     htop \
     iotop \
+    bmon \
     lsof \
     strace \
     socat \
