@@ -12,7 +12,7 @@ RDEPENDS:${PN} = "\
     dnsmasq \
     syslog-ng \
     logrotate \
+    cronie \
+    nginx \
 "
 # nginx
-# syslog-ng
-# logrotate

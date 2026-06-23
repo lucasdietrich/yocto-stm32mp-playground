@@ -2,7 +2,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 SRC_URI += "file://caniot-logrotate"
 
-RDEPENDS:${PN} += "logrotate"
+RDEPENDS:${PN} += "logrotate cronie"
 
 do_install:append() {
     # Install logrotate configuration for caniot controller logs
