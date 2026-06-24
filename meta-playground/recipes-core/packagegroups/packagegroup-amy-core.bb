@@ -14,5 +14,6 @@ RDEPENDS:${PN} = "\
     logrotate \
     cronie \
     nginx \
+    sqlite3 \
 "
 # nginx
