@@ -1,5 +1,7 @@
 require linux-amy.inc
 
+COMPATIBLE_MACHINE = "^(mp1)$"
+
 FILESEXTRAPATHS:prepend := "${THISDIR}/files/6.18:"
 
 SRC_URI += " \

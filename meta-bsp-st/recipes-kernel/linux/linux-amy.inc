@@ -1,4 +1,5 @@
 SUMMARY = "Kernel for STM32MP157"
+HOMEPAGE = "https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git"
 
 inherit kernel
 require recipes-kernel/linux/linux-yocto.inc
