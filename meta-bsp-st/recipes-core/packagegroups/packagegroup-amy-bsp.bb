@@ -28,3 +28,8 @@ RDEPENDS:${PN} += "\
     swupdate-www \
     swupdate-tools \
 "
+
+# swupdate dependencies
+RDEPENDS:${PN} += "\
+    stm32mp2-cm33-fw \
+"

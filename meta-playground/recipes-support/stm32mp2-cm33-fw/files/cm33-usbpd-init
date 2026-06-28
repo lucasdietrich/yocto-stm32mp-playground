@@ -1,0 +1,39 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          cm33-usbpd
+# Required-Start:    $local_fs
+# Required-Stop:     $local_fs
+# Default-Start:     S
+# Default-Stop:      0 6
+# Short-Description: Load STM32MP2 CM33 USBPD firmware via remoteproc
+### END INIT INFO
+
+case "$1" in
+    start)
+        echo "Starting CM33 USBPD remoteproc..."
+        /sbin/cm33-usbpd-load.sh start
+        ;;
+    stop)
+        echo "Stopping CM33 USBPD remoteproc..."
+        /sbin/cm33-usbpd-load.sh stop
+        ;;
+    restart|reload)
+        /sbin/cm33-usbpd-load.sh stop
+        /sbin/cm33-usbpd-load.sh start
+        ;;
+    status)
+        RPROC_DIR="/sys/class/remoteproc"
+        for dev in "${RPROC_DIR}"/remoteproc*; do
+            [ -f "${dev}/name" ] || continue
+            [ "$(cat "${dev}/name")" = "m33" ] || continue
+            echo "CM33 state: $(cat "${dev}/state")"
+            exit 0
+        done
+        echo "CM33 remoteproc not found"
+        exit 1
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart|status}"
+        exit 1
+        ;;
+esac
