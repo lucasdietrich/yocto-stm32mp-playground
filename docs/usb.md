@@ -1,5 +1,3 @@
-# Documentation
-
 ## USB
 
 Connect USB user to host, it will create an USB NCM Ethernet interface:
