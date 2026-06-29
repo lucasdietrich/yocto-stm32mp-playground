@@ -1,9 +1,12 @@
 # Common
 
+- [ ] swap
 - [ ] BLE zephyr integration
-- [ ] nginx
+- [x] nginx
 - [ ] configuration server
-- [ ] syslog-ng
+- [x] syslog-ng
+
+- [ ] FIT Image instead of vfat
 
 - [x] usb gadget
     [x] ncm
