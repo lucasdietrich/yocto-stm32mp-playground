@@ -8,6 +8,9 @@ SRC_URI = "git://github.com/lucasdietrich/userfs.git;protocol=https;branch=featu
            "
 SRCREV = "727dbad4ff7dcdea42fecd06ad5b0bc3725bf7b6"
 
+PACKAGECONFIG ??= "swap"
+PACKAGECONFIG[swap] = ",,,swapfile"
+
 DEPENDS += "util-linux"
 RDEPENDS:${PN} += "util-linux-libfdisk libubootenv btrfs-tools parted"
 

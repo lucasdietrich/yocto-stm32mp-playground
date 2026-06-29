@@ -5,6 +5,7 @@ inherit packagegroup
 
 RDEPENDS:${PN} = "\
     userfs \
+    swapfile \
     os-release \
     udev \
 "

@@ -27,6 +27,12 @@ start() {
     # TODO FIXME
     # remount /var/volatile with correct options
     mount -o remount /var/volatile
+
+    # mount swap
+    if command -v swapfile > /dev/null 2>&1; then
+        swapfile /mnt/userfs/swapfile 256
+        swapon /mnt/userfs/swapfile
+    fi
 }
 
 stop() {
