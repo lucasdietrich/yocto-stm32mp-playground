@@ -8,6 +8,8 @@ RDEPENDS:${PN} = "\
     swapfile \
     os-release \
     udev \
+    lvm2 \
+    cryptsetup \
 "
 
 # u-boot-fw-utils add the fw_printenv fw_setenv utilities
@@ -34,3 +36,11 @@ RDEPENDS:${PN} += "\
 RDEPENDS:${PN} += "\
     stm32mp2-cm33-fw \
 "
+
+RDEPENDS:${PN} += "${@bb.utils.contains('AMY_DEBUG', '1', '\
+    fsbench \
+    partclone \
+    zstd \
+', '', d)}"
+
+# fsbackup
