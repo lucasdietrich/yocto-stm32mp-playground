@@ -16,11 +16,13 @@ SRC_URI = "\
         file://features/veth.scc file://features/veth.cfg \
         file://features/fs.scc file://features/fs.cfg \
         file://features/usb.scc file://features/usb.cfg \
-        "
+        file://features/dm.scc file://features/dm.cfg \
+"
 
 KERNEL_FEATURES += "veth.scc"
 KERNEL_FEATURES += "fs.scc"
 KERNEL_FEATURES += "usb.scc"
+KERNEL_FEATURES += "dm.scc"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
