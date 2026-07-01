@@ -26,6 +26,14 @@ EXTRA_IMAGEDEPENDS += "virtual/tf-a"
 IMAGE_FSTYPES = "ext4"
 IMAGE_FSTYPES += "ext4.zst"
 
+# sysctl
+SRC_URI += "file://sysctl.conf"
+
+sysctl() {
+    install -m 0442 ${WORKDIR}/sysctl.conf ${IMAGE_ROOTFS}${sysconfdir}/sysctl.conf
+}
+ROOTFS_POSTPROCESS_COMMAND += "sysctl;"
+
 #########################
 # SWUpdate image        #
 #########################
