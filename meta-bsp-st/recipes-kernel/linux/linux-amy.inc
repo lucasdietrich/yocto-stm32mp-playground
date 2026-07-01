@@ -18,6 +18,7 @@ SRC_URI = "\
         file://features/usb.scc file://features/usb.cfg \
         file://features/dm.scc file://features/dm.cfg \
         file://features/crypto.scc file://features/crypto.cfg \
+        file://features/zram.cfg \
 "
 
 KERNEL_FEATURES += "veth.scc"

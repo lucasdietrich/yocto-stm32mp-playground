@@ -28,10 +28,19 @@ start() {
     # remount /var/volatile with correct options
     mount -o remount /var/volatile
 
-    # mount swap
+    # swapfile
     if command -v swapfile > /dev/null 2>&1; then
         swapfile /mnt/userfs/swapfile 256
         swapon /mnt/userfs/swapfile
+    fi
+
+    # zswa
+    if [ -b /dev/zram0 ]; then
+        echo 1 > /sys/block/zram0/reset
+        echo 256M > /sys/block/zram0/disksize
+        echo 128M > /sys/block/zram0/mem_limit
+        mkswap /dev/zram0
+        swapon /dev/zram0
     fi
 }
 
