@@ -45,7 +45,7 @@ python() {
 SDIMAGE_CONF ??= "sdcard_genimage.cfg.in"
 
 # do not include all SRC_URI files in the swupdate image
-SWUPDATE_SRC_URI_EXCLUDE += "${SDIMAGE_CONF}"
+SWUPDATE_SRC_URI_EXCLUDE += "${SDIMAGE_CONF} sysctl.conf"
 
 # include bootloader artifacts in the SWU for MP2 (A-slot only)
 SWUPDATE_IMAGES:append = " tf-a/tf-a-${TFA_DEVICETREE}.stm32"
