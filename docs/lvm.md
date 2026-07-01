@@ -1,4 +1,4 @@
-# LVM + partclone + zstd on /dev/mmcblk1 — Session Notes
+# LVM + partclone + zstd on /dev/mmcblk1 — AI Session Notes
 
 **Host:** `root@mp2` (stm32mp257f-dk)
 **Device:** `/dev/mmcblk1` — 7.3G eMMC
