@@ -1,0 +1,10 @@
+amy:x:100:
+sshd:x:101:
+dhcpcd:x:102:
+bind:x:103:
+crontab:x:104:
+www:x:105:
+ptest:x:106:
+messagebus:x:107:
+mosquitto:x:110:
+postgres:x:28:

@@ -1,0 +1,10 @@
+amy:x:100:100::/home/amy:/sbin/nologin
+sshd:x:101:101::/home/sshd:/sbin/nologin
+dhcpcd:x:102:102::/home/dhcpcd:/sbin/nologin
+bind:x:103:103::/home/bind:/sbin/nologin
+crontab:x:104:104::/home/crontab:/sbin/nologin
+www:x:105:105::/home/www:/sbin/nologin
+ptest:x:106:106::/home/ptest:/sbin/nologin
+messagebus:x:107:107::/home/messagebus:/sbin/nologin
+mosquitto:x:110:110::/home/mosquitto:/sbin/nologin
+postgres:x:28:28::/home/postgres:/sbin/nologin
