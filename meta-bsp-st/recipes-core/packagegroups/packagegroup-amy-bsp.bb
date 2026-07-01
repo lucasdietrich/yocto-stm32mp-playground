@@ -24,6 +24,11 @@ RDEPENDS:${PN} += "\
     mount-bootfs \
 "
 
+# optee related
+RDEPENDS:${PN} += "\
+    optee-client \
+"
+
 # swupdate dependencies
 RDEPENDS:${PN} += "\
     fwupdate \

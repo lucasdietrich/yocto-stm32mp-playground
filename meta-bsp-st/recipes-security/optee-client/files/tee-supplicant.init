@@ -1,0 +1,23 @@
+#!/bin/sh
+
+#!/bin/sh
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+
+NAME=tee-supplicant
+DAEMON=/usr/sbin/tee-supplicant
+
+ARGS="/dev/teepriv0"
+
+case "$1" in
+    start)
+        start-stop-daemon --start --name "$NAME" --background --exec "$DAEMON" -- $ARGS
+        ;;
+    stop)
+        start-stop-daemon --stop --name "$NAME"
+        ;;
+    *)
+        echo "Usage: $0 {start|stop}"
+        exit 1
+        ;;
+esac

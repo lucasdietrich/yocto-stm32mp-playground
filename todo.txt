@@ -5,6 +5,11 @@
 - [x] nginx
 - [ ] configuration server
 - [x] syslog-ng
+- [ ] optee-client
+    - [x] 4.10.0 integration
+    - [ ] optee-examples
+    - [ ] udev rule to start tee-supplicant when /dev/teepriv[0-9]* is detected
+    - [ ] demo ta
 
 - [ ] FIT Image instead of vfat
 
