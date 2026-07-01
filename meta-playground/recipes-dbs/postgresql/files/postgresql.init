@@ -1,0 +1,37 @@
+#!/bin/sh
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+
+NAME=postgres
+DAEMON=/usr/bin/postgres
+USER="postgres"
+
+DESC="PostgreSQL Database Server"
+ARGS="-D /var/lib/postgresql/data -c config_file=/etc/postgresql/postgresql.conf"
+
+case "$1" in
+  start)
+	  echo -n "Starting $DESC: "
+	  start-stop-daemon --start --chuid $USER --background --exec "$DAEMON" -- $ARGS
+	  echo "$NAME."
+	;;
+  stop)
+	  echo -n "Stopping $DESC: "
+	  start-stop-daemon --stop --name "$NAME"
+	  echo "$NAME."
+	;;
+  restart)
+	  echo -n "Restarting $DESC: "
+	  start-stop-daemon --stop --name "$NAME"
+	  sleep 1
+	  start-stop-daemon --start --chuid $USER --background --exec "$DAEMON" -- $ARGS
+	  echo "$NAME."
+	;;
+  *)
+	  N=/etc/init.d/$NAME
+	  echo "Usage: $N {start|stop|restart}" >&2
+	  exit 1
+	;;
+esac
+
+exit 0
