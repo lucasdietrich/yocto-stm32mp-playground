@@ -21,6 +21,11 @@ IMAGE_INSTALL:append = " \
 
 # utils
 IMAGE_INSTALL:append = "${@bb.utils.contains('AMY_DEBUG_UTILS', '1',' \
+    amy-utilities \
+', '', d)}"
+
+# utils
+IMAGE_INSTALL:append = "${@bb.utils.contains('AMY_DEBUG_UTILS', '1',' \
     util-linux \
     e2fsprogs-resize2fs \
     e2fsprogs-e2fsck \
