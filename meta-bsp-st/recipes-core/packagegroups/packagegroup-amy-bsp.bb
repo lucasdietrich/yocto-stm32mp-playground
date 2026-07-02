@@ -46,6 +46,7 @@ RDEPENDS:${PN} += "${@bb.utils.contains('AMY_DEBUG', '1', '\
     fsbench \
     partclone \
     zstd \
+    mmc-utils \
 ', '', d)}"
 
 # fsbackup
