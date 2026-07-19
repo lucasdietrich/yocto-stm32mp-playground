@@ -38,7 +38,7 @@ RDEPENDS:${PN} += "\
 "
 
 # swupdate dependencies
-RDEPENDS:${PN} += "\
+RDEPENDS:${PN}:append:mp2 = "\
     stm32mp2-cm33-fw \
 "
 
