@@ -24,6 +24,11 @@ EXTRA_OECMAKE += " \
 INITSCRIPT_NAME = "tee-supplicant"
 INITSCRIPT_PARAMS = "start 10 S . stop 90 0 6 ."
 
+inherit useradd
+
+USERADD_PACKAGES = "${PN}"
+GROUPADD_PARAM:${PN} = "--system tee; --system teepriv"
+
 do_install:append() {
     # TODO
     rm -rf ${D}/${libdir}/systemd
