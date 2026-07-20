@@ -42,6 +42,10 @@ image @IMAGE@-@MACHINE@-sdcard.img {
         size = 128K
     }
 
+    partition tee-fs {
+        size = 64M
+    }
+
     partition bootfs {
         image = "@IMAGE@-@MACHINE@-bootfs.vfat"
         size = 16M

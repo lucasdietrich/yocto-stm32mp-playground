@@ -8,9 +8,12 @@ SRC_BRANCH ??= "master"
 SRC_URI = "git://github.com/OP-TEE/optee_os.git;protocol=https;branch=${SRC_BRANCH}"
 
 S = "${WORKDIR}/git"
+B = "${WORKDIR}/build"
 
 PROVIDES += "virtual/optee-os"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
+
+PACKAGES =+ "${PN}-ta-devkit"
 
 DEPENDS = "dtc-native python3-cryptography-native python3-pyelftools-native"
 DEPENDS:append:armv7ve  = " gcc-arm-none-eabi-native"
@@ -31,6 +34,8 @@ EXTRA_OEMAKE = ""
 
 EXTRA_OEMAKE:append:armv7ve  = " CROSS_COMPILE=arm-none-eabi-"
 EXTRA_OEMAKE:append:aarch64 = " CROSS_COMPILE64=aarch64-none-elf-"
+
+EXTRA_OEMAKE += "O=${B}"
 
 EXTRA_OEMAKE += "PLATFORM=${OPTEE_PLATFORM}"
 EXTRA_OEMAKE += "CFG_EMBED_DTB_SOURCE_FILE=${OPTEE_DEVICETREE}.dts"
@@ -65,32 +70,59 @@ EXTRA_OEMAKE += "${@bb.utils.contains('OPTEE_DEBUG', '1', '\
 
 EXTRA_OEMAKE += "${PACKAGECONFIG_CONFARGS}"
 
-do_compile:prepend() {
+do_compile() {
     # Fixes issue: unrecognized option '-Wl,-O1'
     unset LDFLAGS
     unset CFLAGS
     unset CPPFLAGS
+
+    oe_runmake -C ${S} O=${B} ${EXTRA_OEMAKE}
 }
+
+OPTEE_ARCH:mp1 = "arm32"
+OPTEE_ARCH:mp2 = "arm64"
 
 export_binaries() {
     local dest="${1}"
-    plat="${@d.getVar('OPTEE_PLATFORM').split('-')[0]}"
 
     install -d ${dest}
-    install -m 0644 ${S}/out/arm-plat-${plat}/core/tee-header_v2.bin ${dest}/
-    install -m 0644 ${S}/out/arm-plat-${plat}/core/tee-pager_v2.bin ${dest}/
-    install -m 0644 ${S}/out/arm-plat-${plat}/core/tee-pageable_v2.bin ${dest}/
-    install -m 0644 ${S}/out/arm-plat-${plat}/conf.mk ${dest}/
+    install -m 0644 ${B}/core/tee-header_v2.bin ${dest}/
+    install -m 0644 ${B}/core/tee-pager_v2.bin ${dest}/
+    install -m 0644 ${B}/core/tee-pageable_v2.bin ${dest}/
+    install -m 0644 ${B}/conf.mk ${dest}/
 
     # TODO copy all TAs
     mkdir -p ${dest}/ta
 }
 
+export_tadevkit() {
+    local dest="${1}"
+
+    install -d ${dest}
+    for f in ${B}/export-ta_${OPTEE_ARCH}/* ; do
+        cp -aR $f ${dest}/
+    done
+}
+
+# install tadevkit
+do_install:append() {
+    export_tadevkit ${D}${includedir}/optee/export-user_ta/
+}
+
+FILES:${PN}-ta-devkit = " \
+    ${includedir}/optee/export-user_ta \
+"
+
+INSANE_SKIP:${PN}-ta-devkit += "staticdev buildpaths"
+
+RDEPENDS:${PN}-dev += "${PN}-ta-devkit"
+
 optee_sysroot_populate() {
-  export_binaries ${SYSROOT_DESTDIR}${FIP_DIR_OPTEE_BASE}
+  export_binaries ${SYSROOT_DESTDIR}${SYSROOT_OPTEE_DIR_BASE}
+  export_tadevkit ${SYSROOT_DESTDIR}${SYSROOT_OPTEE_DIR_BASE}/export-user_ta
 }
 SYSROOT_PREPROCESS_FUNCS =+ "optee_sysroot_populate"
-SYSROOT_DIRS:append = " ${FIP_DIR_OPTEE_BASE}"
+SYSROOT_DIRS:append = " ${SYSROOT_OPTEE_DIR_BASE}"
 
 inherit deploy
 do_deploy() {

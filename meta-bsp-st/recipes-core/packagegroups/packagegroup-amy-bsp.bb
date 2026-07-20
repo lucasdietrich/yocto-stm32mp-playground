@@ -27,6 +27,7 @@ RDEPENDS:${PN} += "\
 # optee related
 RDEPENDS:${PN} += "\
     optee-client \
+    optee-examples \
 "
 
 # swupdate dependencies

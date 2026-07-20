@@ -19,6 +19,7 @@ SRC_URI += "file://tee-supplicant.init"
 
 EXTRA_OECMAKE += " \
     -DBUILD_SHARED_LIBS=ON \
+    -DCFG_TEE_FS_PARENT_PATH='/mnt/tee-fs' \
     "
 
 INITSCRIPT_NAME = "tee-supplicant"

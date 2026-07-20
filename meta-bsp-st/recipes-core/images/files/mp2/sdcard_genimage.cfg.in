@@ -41,6 +41,10 @@ image @IMAGE@-@MACHINE@-sdcard.img {
         size = 32M
     }
 
+    partition tee-fs {
+        size = 64M
+    }
+
     partition rootfs-a {
         image = "@IMAGE_ROOTFS@"
         # generated with uuidgen
