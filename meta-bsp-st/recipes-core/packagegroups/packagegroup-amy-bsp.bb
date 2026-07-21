@@ -43,11 +43,12 @@ RDEPENDS:${PN}:append:mp2 = "\
     stm32mp2-cm33-fw \
 "
 
-RDEPENDS:${PN} += "${@bb.utils.contains('AMY_DEBUG', '1', '\
+RDEPENDS:${PN} += "${@bb.utils.contains('AMY_DEBUG_UTILS', '1', '\
     fsbench \
     partclone \
     zstd \
     mmc-utils \
+    iptables \
 ', '', d)}"
 
 # fsbackup
