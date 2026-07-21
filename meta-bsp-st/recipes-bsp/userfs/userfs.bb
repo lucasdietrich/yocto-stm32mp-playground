@@ -2,17 +2,19 @@ SUMMARY = "userfs is a tool to create/manage user partitions and filesystems"
 HOMEPAGE = "https://github.com/lucasdietrich/userfs"
 LICENSE = "CLOSED"
 
-SRC_URI = "git://github.com/lucasdietrich/userfs.git;protocol=https;branch=feature/gpt \
+SRC_BRANCH ?= "mpx"
+SRC_URI = "git://github.com/lucasdietrich/userfs.git;protocol=https;branch=${SRC_BRANCH} \
            file://init-user-fs.sh \
            file://factory_reset.sh \
            "
-SRCREV = "727dbad4ff7dcdea42fecd06ad5b0bc3725bf7b6"
+SRCREV = "5f629d154df08bf4f5f7bb4411e859d91bc068d4"
 
 PACKAGECONFIG ??= "swap"
 PACKAGECONFIG[swap] = ",,,swapfile"
 
-DEPENDS += "util-linux"
-RDEPENDS:${PN} += "util-linux-libfdisk libubootenv btrfs-tools parted"
+# TODO use e2fsprogs
+DEPENDS += "util-linux libdevmapper"
+RDEPENDS:${PN} += "util-linux-libfdisk btrfs-tools parted libubootenv libdevmapper"
 
 inherit meson pkgconfig update-rc.d
 
@@ -20,6 +22,8 @@ inherit meson pkgconfig update-rc.d
 EXTRA_OEMESON += "-Dpartition_table=gpt"
 EXTRA_OEMESON += "-Doverlay_opt=true"
 EXTRA_OEMESON += "-Ddefault_block_device_name=/dev/mmcblk0"
+EXTRA_OEMESON += "-Dteefs=true"
+EXTRA_OEMESON += "-Dmanufacturer_partition=true"
 
 S = "${WORKDIR}/git"
 
