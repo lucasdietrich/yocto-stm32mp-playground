@@ -41,6 +41,10 @@ image @IMAGE@-@MACHINE@-sdcard.img {
         size = 32M
     }
 
+    partition manufacturer-data {
+        size = 4M
+    }
+
     partition tee-fs {
         size = 64M
     }
