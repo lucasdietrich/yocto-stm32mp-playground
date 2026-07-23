@@ -44,7 +44,6 @@ RDEPENDS:${PN}:append:mp2 = "\
 "
 
 RDEPENDS:${PN} += "${@bb.utils.contains('AMY_DEBUG_UTILS', '1', '\
-    fsbench \
     partclone \
     zstd \
     mmc-utils \
@@ -52,3 +51,4 @@ RDEPENDS:${PN} += "${@bb.utils.contains('AMY_DEBUG_UTILS', '1', '\
 ', '', d)}"
 
 # fsbackup
+# fsbench
