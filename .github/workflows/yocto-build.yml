@@ -1,0 +1,176 @@
+# Builds the amy-image for both STM32MP1 (dk2) and STM32MP2 (mp2) machines.
+name: Yocto build (amy-image)
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_sdk:
+        description: "Also build the SDK (bitbake -c populate_sdk)"
+        type: boolean
+        default: false
+  push:
+    branches: [main, feature/ci]
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
+      - "todo.txt"
+
+concurrency:
+  group: yocto-build-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DL_DIR: ${{ github.workspace }}/../yocto-cache/downloads
+  SSTATE_DIR: ${{ github.workspace }}/../yocto-cache/sstate-cache
+
+jobs:
+  build:
+    name: build (${{ matrix.name }})
+    runs-on: 'self-hosted'
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: mp1
+            machine: dk2
+            build_dir: build
+            amy_debug: "0"
+          - name: mp2
+            machine: mp2
+            build_dir: build-mp2
+            amy_debug: "1"
+    env:
+      LANG: en_US.UTF-8
+      LC_ALL: en_US.UTF-8
+    steps:
+      - name: Checkout (with submodules)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 1
+
+      - name: Free disk space
+        run: |
+          echo "Disk space before cleanup:"
+          df -h
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc \
+            /opt/hostedtoolcache/CodeQL "${AGENT_TOOLSDIRECTORY:-}" || true
+          sudo docker image prune --all --force || true
+          sudo apt-get clean
+          echo "Disk space after cleanup:"
+          df -h
+
+      - name: Install host dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            gawk wget git diffstat unzip texinfo gcc build-essential \
+            chrpath socat cpio python3 python3-pip python3-pexpect \
+            xz-utils debianutils iputils-ping python3-git python3-jinja2 \
+            python3-subunit zstd liblz4-tool file locales libacl1 \
+            ca-certificates
+          sudo locale-gen en_US.UTF-8
+
+      - name: Cache downloads (DL_DIR)
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.DL_DIR }}
+          key: yocto-downloads-${{ github.run_id }}
+          restore-keys: |
+            yocto-downloads-
+
+      - name: Cache sstate-cache (SSTATE_DIR)
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.SSTATE_DIR }}-${{ matrix.machine }}
+          key: yocto-sstate-${{ matrix.machine }}-${{ github.run_id }}
+          restore-keys: |
+            yocto-sstate-${{ matrix.machine }}-
+
+      - name: Generate build/conf files
+        run: |
+          conf_dir="${{ matrix.build_dir }}/conf"
+          mkdir -p "$conf_dir"
+
+          cat > "$conf_dir/bblayers.conf" <<'EOF'
+          POKY_BBLAYERS_CONF_VERSION = "2"
+
+          BBPATH = "${TOPDIR}"
+          BBFILES ?= ""
+
+          BBLAYERS ?= " \
+            ${{ github.workspace }}/poky/meta \
+            ${{ github.workspace }}/poky/meta-poky \
+            ${{ github.workspace }}/poky/meta-yocto-bsp \
+            ${{ github.workspace }}/meta-openembedded/meta-oe \
+            ${{ github.workspace }}/meta-openembedded/meta-python \
+            ${{ github.workspace }}/meta-openembedded/meta-networking \
+            ${{ github.workspace }}/meta-openembedded/meta-webserver \
+            ${{ github.workspace }}/meta-arm/meta-arm-toolchain \
+            ${{ github.workspace }}/meta-lts-mixins \
+            ${{ github.workspace }}/meta-swupdate \
+            ${{ github.workspace }}/meta-bsp-st \
+            ${{ github.workspace }}/meta-playground \
+            "
+          EOF
+
+          cat > "$conf_dir/local.conf" <<'EOF'
+          MACHINE = "${{ matrix.machine }}"
+          DL_DIR ?= "${{ env.DL_DIR }}"
+          SSTATE_DIR ?= "${{ env.SSTATE_DIR }}-${{ matrix.machine }}"
+          INHERIT += "rm_work"
+          AMY_DEBUG = "${{ matrix.amy_debug }}"
+          EOF
+
+      - name: Build amy-image
+        shell: bash
+        run: |
+          source poky/oe-init-build-env "${{ matrix.build_dir }}"
+          bitbake amy-image
+
+      - name: Build SDK
+        if: ${{ github.event.inputs.build_sdk == 'true' }}
+        shell: bash
+        run: |
+          source poky/oe-init-build-env "${{ matrix.build_dir }}"
+          bitbake amy-image -c populate_sdk
+
+      - name: Upload images
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: amy-image-${{ matrix.name }}
+          if-no-files-found: warn
+          retention-days: 5
+          path: |
+            ${{ matrix.build_dir }}/tmp/deploy/images/${{ matrix.machine }}/kernel/**
+            ${{ matrix.build_dir }}/tmp/deploy/images/${{ matrix.machine }}/optee-os/**
+            ${{ matrix.build_dir }}/tmp/deploy/images/${{ matrix.machine }}/tf-a/**
+            ${{ matrix.build_dir }}/tmp/deploy/images/${{ matrix.machine }}/u-boot/**
+            ${{ matrix.build_dir }}/tmp/deploy/images/${{ matrix.machine }}/u-boot-scr/**
+            ${{ matrix.build_dir }}/tmp/deploy/images/${{ matrix.machine }}/fip/**
+            ${{ matrix.build_dir }}/tmp/deploy/images/${{ matrix.machine }}/*-sdcard.img
+            ${{ matrix.build_dir }}/tmp/deploy/images/${{ matrix.machine }}/*.manifest
+            ${{ matrix.build_dir }}/tmp/deploy/images/${{ matrix.machine }}/*.swu
+            ${{ matrix.build_dir }}/tmp/deploy/images/${{ matrix.machine }}/*.cfg
+
+      - name: Upload SDK
+        if: ${{ github.event.inputs.build_sdk == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: amy-image-sdk-${{ matrix.name }}
+          if-no-files-found: warn
+          retention-days: 5
+          path: ${{ matrix.build_dir }}/tmp/deploy/sdk/*.sh
+
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: amy-image-${{ matrix.name }}-logs
+          if-no-files-found: ignore
+          retention-days: 5
+          path: |
+            ${{ matrix.build_dir }}/conf/*.conf
+            ${{ matrix.build_dir }}/tmp/log/**
