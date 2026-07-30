@@ -84,3 +84,4 @@ TOOLCHAIN_HOST_TASK += "packagegroup-rust-cross-canadian-${MACHINE} \
                         nativesdk-erofs-utils \
                         nativesdk-systemtap \
                         "
+TOOLCHAIN_TARGET_TASK:append = " libnl-dev"
