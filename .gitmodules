@@ -1,18 +1,18 @@
 [submodule "poky"]
 	path = poky
-	url = git://git.yoctoproject.org/poky
+	url = https://git.yoctoproject.org/poky
 [submodule "meta-openembedded"]
 	path = meta-openembedded
-	url = git://git.openembedded.org/meta-openembedded
+	url = https://git.openembedded.org/meta-openembedded
 [submodule "meta-arm"]
 	path = meta-arm
-	url = git://git.yoctoproject.org/meta-arm
+	url = https://git.yoctoproject.org/meta-arm
 [submodule "meta-lts-mixins"]
 	path = meta-lts-mixins
-	url = git://git.yoctoproject.org/meta-lts-mixins
+	url = https://git.yoctoproject.org/meta-lts-mixins
 [submodule "meta-virtualization"]
 	path = meta-virtualization
-	url = git://git.yoctoproject.org/meta-virtualization
+	url = https://git.yoctoproject.org/meta-virtualization
 [submodule "meta-swupdate"]
 	path = meta-swupdate
 	url = https://github.com/sbabic/meta-swupdate.git
