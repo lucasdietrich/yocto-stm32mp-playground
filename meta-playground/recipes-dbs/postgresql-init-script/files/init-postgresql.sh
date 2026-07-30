@@ -3,9 +3,6 @@
 
 set -e
 
-# Source function library.
-. /etc/init.d/functions
-
 PGDIR=/var/lib/postgresql
 PGHBA=$PGDIR/data/pg_hba.conf
 PGCONF=$PGDIR/data/postgresql.conf
@@ -55,14 +52,21 @@ do_init_postgresql() {
 
 start() {
    do_init_postgresql
-   $PGEXE start
+   if [ -x "$PGEXE" ]; then
+      $PGEXE start
+   fi
+   return 0
 }
 
 reset() {
-   $PGEXE stop
+   if [ -x "$PGEXE" ]; then
+      $PGEXE stop
+   fi
    rm $STAMP_CFG
    start
-   $PGEXE start
+   if [ -x "$PGEXE" ]; then
+      $PGEXE start
+   fi
 }
 
 case "$1" in 

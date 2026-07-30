@@ -1,0 +1,14 @@
+[Unit]
+Description=Create/manage userfs partitions, swapfile and zram
+DefaultDependencies=no
+After=local-fs.target
+Before=sysinit.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/lib/userfs/userfs.sh start
+ExecStop=/usr/lib/userfs/userfs.sh stop
+
+[Install]
+WantedBy=sysinit.target

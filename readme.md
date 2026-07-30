@@ -21,6 +21,32 @@
 | linux   | amy 7.0.10   | OK  | NOK         |                                                                            |
 | linux   | st 6.6.116   | ?   | OK          | ST adaptation of linux LTS, next will be 6.18                              |
 
+## systemd/sysvinit dual-init support (amy-image packages)
+
+The following `meta-bsp-st`/`meta-playground` packages (pulled in by `amy-image`/`amy-image-minimal`
+via `packagegroup-amy-bsp`, `packagegroup-amy-core`, `packagegroup-amy-examples`) previously only
+shipped a sysvinit `/etc/init.d` script. Each now also ships an equivalent systemd unit
+(`inherit systemd` + `SYSTEMD_SERVICE:${PN}`), so the packages work whether
+`INIT_MANAGER`/`DISTRO_FEATURES` selects `sysvinit` or `systemd`.
+
+Note: `systemd.bbclass` deletes `${sysconfdir}/init.d` from a package on pure-systemd builds
+(`systemd` in `DISTRO_FEATURES` without `sysvinit`, this distro's case) once a systemd unit is
+also shipped. So each systemd unit's `ExecStart`/`ExecStop` calls a second copy of the same
+script installed outside `/etc/init.d` (`${libdir}/<pkgname>/<script>`) instead of the
+`/etc/init.d` path directly. Verified packaged file layout via `oe-pkgdata-util`; not yet
+boot-tested on hardware.
+
+| package                | unit                        | mp1 | mp2 | comment                                            |
+| ---------------------- | --------------------------- | --- | --- | --------------------------------------------------- |
+| userfs                 | userfs.service               | ?   | ?   |                                                     |
+| fwupdate               | fwupdate.service             | ?   | ?   |                                                     |
+| mount-bootfs           | mount-bootfs.service         | ?   | ?   |                                                     |
+| optee-client (4.10)    | tee-supplicant.service       | ?   | ?   | replaces upstream-removed `rm -rf .../systemd` unit |
+| ntpd-start             | ntpd.service                 | ?   | ?   |                                                     |
+| usb-gadget-ncm         | usb-gadget-ncm.service       | ?   | ?   |                                                     |
+| postgresql-init-script | postgresql-init.service      | ?   | ?   | must run before upstream `postgresql.service`       |
+| stm32mp2-cm33-fw       | cm33-usbpd.service           |     | ?   | mp2 only                                            |
+
 - note from ST about maintenance of the ST fork of linux: <https://community.st.com/t5/stm32-mpus-embedded-software-and/kernel-version-for-openstlinux-on-stm32mp25-series/td-p/855852>
 - notes about linux LTS: <https://www.kernel.org/category/releases.html>
 

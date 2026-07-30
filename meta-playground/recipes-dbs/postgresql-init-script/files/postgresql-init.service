@@ -1,0 +1,12 @@
+[Unit]
+Description=Initialize PostgreSQL data directory before postgresql.service starts
+After=local-fs.target
+Before=postgresql.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/lib/postgresql-init-script/postgresql-init start
+
+[Install]
+WantedBy=multi-user.target

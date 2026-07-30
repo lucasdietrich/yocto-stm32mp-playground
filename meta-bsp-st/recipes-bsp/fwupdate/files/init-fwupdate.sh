@@ -2,8 +2,6 @@
 
 # set -e
 
-# Source function library.
-. /etc/init.d/functions
 . /usr/lib/fwupdate/detect-booted-rootfs.sh
 
 create_ab_symlinks() {

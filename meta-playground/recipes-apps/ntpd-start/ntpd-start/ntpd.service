@@ -1,0 +1,14 @@
+[Unit]
+Description=Network Time Protocol client Daemon (ntpd)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=forking
+PIDFile=/var/run/ntpd.pid
+ExecStart=/usr/lib/ntpd-start/ntpd-init start
+ExecStop=/usr/lib/ntpd-start/ntpd-init stop
+ExecReload=/usr/lib/ntpd-start/ntpd-init restart
+
+[Install]
+WantedBy=multi-user.target

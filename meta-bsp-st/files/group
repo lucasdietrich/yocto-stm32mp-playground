@@ -1,2 +1,8 @@
 tee:x:400:
 teepriv:x:401:
+systemd-bus-proxy:x:501:
+systemd-network:x:502:
+systemd-resolve:x:503:
+systemd-timesync:x:504:
+systemd-journal:x:507:
+render:x:527:

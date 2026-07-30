@@ -1,0 +1,11 @@
+[Unit]
+Description=OP-TEE tee-supplicant daemon
+After=local-fs.target
+
+[Service]
+Type=forking
+ExecStart=/usr/lib/optee-client/tee-supplicant-init start
+ExecStop=/usr/lib/optee-client/tee-supplicant-init stop
+
+[Install]
+WantedBy=multi-user.target

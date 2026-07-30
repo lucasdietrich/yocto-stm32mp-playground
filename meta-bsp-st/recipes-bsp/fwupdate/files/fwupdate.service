@@ -1,0 +1,14 @@
+[Unit]
+Description=Detect booted rootfs slot and handle pending swupdate state
+DefaultDependencies=no
+After=local-fs.target userfs.service
+Before=sysinit.target swupdate.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/lib/fwupdate/fwupdate-init.sh start
+ExecStop=/usr/lib/fwupdate/fwupdate-init.sh stop
+
+[Install]
+WantedBy=sysinit.target

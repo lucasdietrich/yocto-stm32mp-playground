@@ -1,0 +1,13 @@
+[Unit]
+Description=Load and start the STM32MP2 CM33 USBPD firmware via remoteproc
+After=local-fs.target
+Before=multi-user.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/lib/stm32mp2-cm33-fw/cm33-usbpd-init start
+ExecStop=/usr/lib/stm32mp2-cm33-fw/cm33-usbpd-init stop
+
+[Install]
+WantedBy=multi-user.target

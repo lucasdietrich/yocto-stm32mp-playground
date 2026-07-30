@@ -10,6 +10,7 @@ SRC_URI = " \
     git://github.com/STMicroelectronics/STM32CubeMP2.git;protocol=https;nobranch=1 \
     file://cm33-usbpd-load.sh \
     file://cm33-usbpd-init \
+    file://cm33-usbpd.service \
 "
 # v1.3.1 - same revision used by meta-st-stm32mp
 SRCREV = "2f7258aa45e916777ffb4f6e1b5590f65304378d"
@@ -23,10 +24,12 @@ USBPD_FW_NAME    = "USBPD_DRP_UCSI_CM33_NonSecure_stripped.elf"
 
 DEPENDS = "cmake-native gcc-arm-none-eabi-native"
 
-inherit update-rc.d
+inherit update-rc.d systemd
 
 INITSCRIPT_NAME = "cm33-usbpd"
 INITSCRIPT_PARAMS = "start 70 S . stop 30 0 6 ."
+
+SYSTEMD_SERVICE:${PN} = "cm33-usbpd.service"
 
 do_configure() {
     cmake \
@@ -56,7 +59,18 @@ do_install() {
     install -d ${D}${sysconfdir}/init.d
     install -m 0755 ${WORKDIR}/cm33-usbpd-init \
         ${D}${sysconfdir}/init.d/cm33-usbpd
+
+    install -d ${D}${systemd_system_unitdir}
+    install -m 0644 ${WORKDIR}/cm33-usbpd.service ${D}${systemd_system_unitdir}/cm33-usbpd.service
+
+    # the systemd bbclass deletes ${sysconfdir}/init.d on pure-systemd builds
+    # (DISTRO_FEATURES has systemd but not sysvinit), so keep a second copy of
+    # the same script outside init.d for cm33-usbpd.service to call
+    install -d ${D}${libdir}/stm32mp2-cm33-fw
+    install -m 0755 ${WORKDIR}/cm33-usbpd-init ${D}${libdir}/stm32mp2-cm33-fw/cm33-usbpd-init
 }
+
+FILES:${PN} += "${libdir}/stm32mp2-cm33-fw/cm33-usbpd-init"
 
 FILES:${PN} = " \
     ${nonarch_base_libdir}/firmware/${USBPD_FW_NAME} \

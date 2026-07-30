@@ -19,6 +19,7 @@ SRC_URI = "\
         file://features/dm.scc file://features/dm.cfg \
         file://features/crypto.scc file://features/crypto.cfg \
         file://features/zram.cfg \
+        file://features/net.cfg \
 "
 
 KERNEL_FEATURES += "veth.scc"

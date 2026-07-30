@@ -2,9 +2,6 @@
 
 # set -e
 
-# Source function library.
-. /etc/init.d/functions
-
 start() {
     flags=""
 

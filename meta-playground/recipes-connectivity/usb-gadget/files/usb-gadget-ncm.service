@@ -1,0 +1,14 @@
+[Unit]
+Description=USB CDC-NCM gadget setup
+DefaultDependencies=no
+After=local-fs.target sys-kernel-config.mount
+Before=sysinit.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/lib/usb-gadget-ncm/usb-gadget-ncm-init start
+ExecStop=/usr/lib/usb-gadget-ncm/usb-gadget-ncm-init stop
+
+[Install]
+WantedBy=sysinit.target
