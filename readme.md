@@ -45,6 +45,18 @@ This repository contains the steps to build a custom BSP layer for the STM32MP15
 2. [STM32CubeMP1](https://github.com/STMicroelectronics/STM32CubeMP1)
     - [STM32MP1 Tips & Tricks - 04 How to debug M4 in production mode with STM32CubeIDE](https://www.youtube.com/watch?v=YIhzzgJmop0)
 
+## Prerequisites
+
+Debian/Ubuntu
+```
+sudo apt-get install build-essential chrpath cpio debianutils diffstat file gawk gcc git iputils-ping libacl1 libcrypt-dev locales python3 python3-git python3-jinja2 python3-pexpect python3-pip python3-subunit socat texinfo unzip wget xz-utils zstd
+```
+
+Arch/CachyOS
+```
+sudo pacman -Syu --needed base-devel chrpath cpio diffstat file gawk git iputils acl libxcrypt python python-gitpython python-jinja python-pexpect python-pip python-subunit socat texinfo unzip wget xz zstd rpcsvc-proto
+```
+
 ## Setup build
 
 Source the `.env` file.
@@ -58,24 +70,26 @@ MACHINE = "dk2"
 INHERIT += "rm_work"
 RM_WORK_EXCLUDE += ""
 AMY_DEBUG = "0"
+# BB_NUMBER_THREADS = "16"
+PARALLEL_MAKE = "-j16"
 ```
 
 Configure the `bblayers.conf`:
 
 ```bash
 BBLAYERS ?= " \
-  /home/lucas/yocto/yocto-ld-mp1/poky/meta \
-  /home/lucas/yocto/yocto-ld-mp1/poky/meta-poky \
-  /home/lucas/yocto/yocto-ld-mp1/poky/meta-yocto-bsp \
-  /home/lucas/yocto/yocto-ld-mp1/meta-openembedded/meta-oe \
-  /home/lucas/yocto/yocto-ld-mp1/meta-openembedded/meta-python \
-  /home/lucas/yocto/yocto-ld-mp1/meta-openembedded/meta-networking \
-  /home/lucas/yocto/yocto-ld-mp1/meta-openembedded/meta-webserver \
-  /home/lucas/yocto/yocto-ld-mp1/meta-arm/meta-arm-toolchain \
-  /home/lucas/yocto/yocto-ld-mp1/meta-lts-mixins \
-  /home/lucas/yocto/yocto-ld-mp1/meta-swupdate \
-  /home/lucas/yocto/yocto-ld-mp1/meta-bsp-st \
-  /home/lucas/yocto/yocto-ld-mp1/meta-playground \
+  ${TOPDIR}/../poky/meta \
+  ${TOPDIR}/../poky/meta-poky \
+  ${TOPDIR}/../poky/meta-yocto-bsp \
+  ${TOPDIR}/../meta-openembedded/meta-oe \
+  ${TOPDIR}/../meta-openembedded/meta-python \
+  ${TOPDIR}/../meta-openembedded/meta-networking \
+  ${TOPDIR}/../meta-openembedded/meta-webserver \
+  ${TOPDIR}/../meta-arm/meta-arm-toolchain \
+  ${TOPDIR}/../meta-lts-mixins \
+  ${TOPDIR}/../meta-swupdate \
+  ${TOPDIR}/../meta-bsp-st \
+  ${TOPDIR}/../meta-playground \
   "
 ```
 
