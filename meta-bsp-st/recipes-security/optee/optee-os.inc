@@ -15,6 +15,8 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 PACKAGES =+ "${PN}-ta-devkit"
 
+inherit python3native
+
 DEPENDS = "dtc-native python3-cryptography-native python3-pyelftools-native"
 DEPENDS:append:armv7ve  = " gcc-arm-none-eabi-native"
 DEPENDS:append:aarch64 = " gcc-aarch64-none-elf-native"
@@ -50,7 +52,6 @@ EXTRA_OEMAKE:append:mp1 = " CFG_CORE_RESERVED_SHM=y "
 EXTRA_OEMAKE:append:mp1 = " CFG_CORE_DYN_SHM=y "
 EXTRA_OEMAKE:append:mp1 = " CFG_STM32MP_REMOTEPROC=y "
 
-
 # u-boot requires BSEC PTA to be present
 # EXTRA_OEMAKE += "CFG_STM32_BSEC_PTA=y"
 # EXTRA_OEMAKE:append:mp1 = " CFG_STM32_BSEC=y "
@@ -75,6 +76,9 @@ do_compile() {
     unset LDFLAGS
     unset CFLAGS
     unset CPPFLAGS
+
+    # OpenSSL 3.0 legacy provider unavailable in native sysroot; not needed for TA signing
+    export CRYPTOGRAPHY_OPENSSL_NO_LEGACY=1
 
     oe_runmake -C ${S} O=${B} ${EXTRA_OEMAKE}
 }
