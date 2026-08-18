@@ -7,5 +7,5 @@ RDEPENDS:${PN} += "logrotate cronie"
 do_install:append() {
     # Install logrotate configuration for caniot controller logs
     install -d ${D}${sysconfdir}/logrotate.d
-    install -m 0644 ${WORKDIR}/caniot-logrotate ${D}${sysconfdir}/logrotate.d/caniot-controller
+    install -m 0644 ${UNPACKDIR}/caniot-logrotate ${D}${sysconfdir}/logrotate.d/caniot-controller
 }

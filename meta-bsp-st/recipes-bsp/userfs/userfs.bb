@@ -25,8 +25,6 @@ EXTRA_OEMESON += "-Ddefault_block_device_name=/dev/mmcblk0"
 EXTRA_OEMESON += "-Dteefs=true"
 EXTRA_OEMESON += "-Dmanufacturer_partition=true"
 
-S = "${WORKDIR}/git"
-
 # the filesystems must be created after the `mountall.sh` script,
 # before any application want to store data
 INITSCRIPT_PARAMS = "start 04 S ."
@@ -34,7 +32,7 @@ INITSCRIPT_NAME = "${PN}.sh"
 
 do_install:append() {
     install -d ${D}${sysconfdir}/init.d
-    install -m 0755 ${WORKDIR}/init-user-fs.sh ${D}${sysconfdir}/init.d/${INITSCRIPT_NAME}
+    install -m 0755 ${UNPACKDIR}/init-user-fs.sh ${D}${sysconfdir}/init.d/${INITSCRIPT_NAME}
 
-    install -m 0755 ${WORKDIR}/factory_reset.sh ${D}${bindir}/factory_reset
+    install -m 0755 ${UNPACKDIR}/factory_reset.sh ${D}${bindir}/factory_reset
 }

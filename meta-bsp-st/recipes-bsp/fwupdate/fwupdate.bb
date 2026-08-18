@@ -6,6 +6,8 @@ SRC_URI = "file://init-fwupdate.sh \
            file://detect-booted-rootfs.sh \
            "
 
+S = "${UNPACKDIR}"
+
 inherit update-rc.d
 
 RDEPENDS:${PN} = "\
@@ -19,13 +21,13 @@ INITSCRIPT_NAME = "${PN}.sh"
 
 do_install:append() {
     install -d ${D}${sysconfdir}/init.d
-    install -m 0755 ${WORKDIR}/init-fwupdate.sh ${D}${sysconfdir}/init.d/${INITSCRIPT_NAME}
+    install -m 0755 ${UNPACKDIR}/init-fwupdate.sh ${D}${sysconfdir}/init.d/${INITSCRIPT_NAME}
 
     install -d ${D}${bindir}
-    install -m 0755 ${WORKDIR}/fwupdate.sh ${D}${bindir}/fwupdate
+    install -m 0755 ${UNPACKDIR}/fwupdate.sh ${D}${bindir}/fwupdate
 
     install -d ${D}${libdir}/fwupdate
-    install -m 0644 ${WORKDIR}/detect-booted-rootfs.sh ${D}${libdir}/fwupdate/detect-booted-rootfs.sh
+    install -m 0644 ${UNPACKDIR}/detect-booted-rootfs.sh ${D}${libdir}/fwupdate/detect-booted-rootfs.sh
 }
 
 FILES:${PN} += "${bindir}/fwupdate ${libdir}/fwupdate/detect-booted-rootfs.sh"

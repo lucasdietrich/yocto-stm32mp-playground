@@ -4,6 +4,8 @@ HOMEPAGE = "https://github.com/u-boot/u-boot.git"
 LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://Licenses/README;md5=2ca5f2c35c8cc335f0a19756634782f1"
 
+inherit pkgconfig
+
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 # if non-empty, this variable should point to a file in the recipe's files directory containing the u-boot defconfig to use
@@ -23,7 +25,6 @@ SRC_URI = " \
 # mp2 does not support CONFIG_DEBUG_UART
 SRC_URI:append:mp1 = " ${@bb.utils.contains('AMY_DEBUG', '1', 'file://debug.cfg', '', d)}"
 
-S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
 
 PROVIDES += "virtual/u-boot"
@@ -34,32 +35,32 @@ EXTRA_OEMAKE += 'HOSTCC="${BUILD_CC} ${BUILD_CFLAGS} ${BUILD_LDFLAGS}"'
 EXTRA_OEMAKE += 'STAGING_INCDIR=${STAGING_INCDIR_NATIVE} STAGING_LIBDIR=${STAGING_LIBDIR_NATIVE}'
 EXTRA_OEMAKE += "${PACKAGECONFIG_CONFARGS}"
 
-DEPENDS = "bison-native swig-native"
+DEPENDS = "bison-native swig-native bc-native dtc-native gnutls-native python3-pyelftools-native"
 DEPENDS:append:armv7ve = " gcc-arm-none-eabi-native"
 DEPENDS:append:aarch64 = " gcc-aarch64-none-elf-native"
 
 do_configure() {
     # copy the same .env for both supported platforms
-    cp ${WORKDIR}/amy.env ${S}/board/st/stm32mp1/amy.env
-    cp ${WORKDIR}/amy.env ${S}/board/st/stm32mp2/amy.env
+    cp ${UNPACKDIR}/amy.env ${S}/board/st/stm32mp1/amy.env
+    cp ${UNPACKDIR}/amy.env ${S}/board/st/stm32mp2/amy.env
 
     # configuration
     base_config="${S}/configs/${UBOOT_CONFIG}"
     configs_to_merge="${base_config}"
 
     if [ -n "${UBOOT_CONFIG_SRC_URI}" ]; then
-        cp ${WORKDIR}/${UBOOT_CONFIG_SRC_URI} ${base_config}
+        cp ${UNPACKDIR}/${UBOOT_CONFIG_SRC_URI} ${base_config}
     fi
 
     # Avoid stale state from previous configure runs.
     rm -f ${B}/.config
 
     # Merge fragments in precedence order: base -> debug (optional) -> amy-env
-    if [ -f ${WORKDIR}/debug.cfg ]; then
-        configs_to_merge="${configs_to_merge} ${WORKDIR}/debug.cfg"
+    if [ -f ${UNPACKDIR}/debug.cfg ]; then
+        configs_to_merge="${configs_to_merge} ${UNPACKDIR}/debug.cfg"
     fi
 
-    configs_to_merge="${configs_to_merge} ${WORKDIR}/amy-env.cfg"
+    configs_to_merge="${configs_to_merge} ${UNPACKDIR}/amy-env.cfg"
 
     ${S}/scripts/kconfig/merge_config.sh -m -O ${B} ${configs_to_merge}
 
@@ -81,7 +82,7 @@ do_compile() {
 
 do_install() {
     install -d ${D}${sysconfdir}
-    install -m 0644 ${WORKDIR}/fw_env.config ${D}${sysconfdir}/fw_env.config
+    install -m 0644 ${UNPACKDIR}/fw_env.config ${D}${sysconfdir}/fw_env.config
     install -m 0644 ${B}/u-boot-initial-env ${D}${sysconfdir}/u-boot-initial-env
 }
 

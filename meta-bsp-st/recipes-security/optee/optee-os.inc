@@ -7,7 +7,6 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=c1f21c4f72f372ef38a5a4aee55ec173"
 SRC_BRANCH ??= "master"
 SRC_URI = "git://github.com/OP-TEE/optee_os.git;protocol=https;branch=${SRC_BRANCH}"
 
-S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
 
 PROVIDES += "virtual/optee-os"

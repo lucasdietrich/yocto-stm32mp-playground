@@ -29,6 +29,14 @@ IMAGE_FSTYPES += "ext4.zst"
 # sysctl
 SRC_URI += "file://sysctl.conf"
 
+# swupdate-common.bbclass (pulled in below via "inherit swupdate-image") sets
+# S = "${UNPACKDIR}", and image.bbclass's do_rootfs[cleandirs] wipes ${S}
+# before ROOTFS_POSTPROCESS_COMMAND runs, so keep a copy of ${UNPACKDIR} files outside of it.
+do_unpack[postfuncs] += "copy_src_files"
+copy_src_files() {
+    cp ${UNPACKDIR}/* ${WORKDIR}
+}
+
 sysctl() {
     install -m 0442 ${WORKDIR}/sysctl.conf ${IMAGE_ROOTFS}${sysconfdir}/sysctl.conf
 }

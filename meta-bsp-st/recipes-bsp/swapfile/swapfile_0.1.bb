@@ -3,8 +3,10 @@ LICENSE = "CLOSED"
 
 SRC_URI = "file://swapfile.c"
 
+S = "${UNPACKDIR}"
+
 do_compile() {
-    ${CC} ${CFLAGS} ${LDFLAGS} -o ${WORKDIR}/swapfile ${WORKDIR}/swapfile.c
+    ${CC} ${CFLAGS} ${LDFLAGS} -o ${WORKDIR}/swapfile ${S}/swapfile.c
 }
 
 do_install() {

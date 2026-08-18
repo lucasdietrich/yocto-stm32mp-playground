@@ -3,6 +3,8 @@ From: Lucas Dietrich <lucas.dietrich.git@proton.me>
 Date: Tue, 9 Jun 2026 18:48:02 +0200
 Subject: [PATCH 2/2] feat: Add USB OTG HS support
 
+Upstream-Status: Pending
+
 ---
  arch/arm/boot/dts/st/stm32mp157f-dk2-amy.dts | 14 +++-----------
  1 file changed, 3 insertions(+), 11 deletions(-)

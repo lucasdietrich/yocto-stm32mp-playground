@@ -5,10 +5,10 @@ inherit cargo
 inherit cargo-update-recipe-crates
 
 LICENSE = "MIT | Apache-2.0"
-LIC_FILES_CHKSUM="file://COPYRIGHT;md5=e6b2207ac3740d2d01141c49208c2147"
+LIC_FILES_CHKSUM = "file://COPYRIGHT;md5=e6b2207ac3740d2d01141c49208c2147"
 
 SRC_URI = "git://github.com/lucasdietrich/rust-hello-world.git;protocol=https;branch=dependency-workspace"
-SRCREV="d94157957be474a9e0b2243ed9bda77aaffe632f"
+SRCREV = "d94157957be474a9e0b2243ed9bda77aaffe632f"
 
 # ws-hello and ws-world dependencies
 SRC_URI += "git://github.com/lucasdietrich/rust-hello-world-workspace.git;protocol=https;nobranch=1;name=rust-hello-world-workspace;destsuffix=rust-hello-world-workspace;workspace=ws-hello:ws-hello,ws-world:ws-world\
@@ -17,8 +17,6 @@ SRCREV_FORMAT .= "_rust-hello-world-workspace"
 SRCREV_rust-hello-world-workspace = "a63ad47f5a7714d8a1259812bf2e44b821d3cb27"        
 
 require rust-example-crates.inc
-
-S = "${WORKDIR}/git"
 
 BBCLASSEXTEND = "native"
 
@@ -35,7 +33,7 @@ python cargo_common_do_patch_paths() {
         return
 
     patches = dict()
-    workdir = d.getVar('WORKDIR')
+    workdir = d.getVar('UNPACKDIR')
     fetcher = bb.fetch2.Fetch(src_uri, d)
     for url in fetcher.urls:
         ud = fetcher.ud[url]

@@ -23,11 +23,11 @@ PACKAGECONFIG[gateway] = ""
 do_install:append() {
     if [ "${@bb.utils.contains('PACKAGECONFIG', 'gateway', '1', '0', d)}" = "1" ]; then
         # install gateway site
-        install -Dm 0644 ${WORKDIR}/gateway.site ${D}${sysconfdir}/nginx/sites-available/gateway
+        install -Dm 0644 ${UNPACKDIR}/gateway.site ${D}${sysconfdir}/nginx/sites-available/gateway
         ln -s ../sites-available/gateway ${D}${sysconfdir}/nginx/sites-enabled/
     fi
 
-    install -Dm 0644 ${WORKDIR}/mqtt.conf ${D}${sysconfdir}/nginx/conf.d/mqtt.conf
+    install -Dm 0644 ${UNPACKDIR}/mqtt.conf ${D}${sysconfdir}/nginx/conf.d/mqtt.conf
 
-    install -Dm 0644 ${WORKDIR}/index.html ${D}/var/www/localhost/html/index.html
+    install -Dm 0644 ${UNPACKDIR}/index.html ${D}/var/www/localhost/html/index.html
 }

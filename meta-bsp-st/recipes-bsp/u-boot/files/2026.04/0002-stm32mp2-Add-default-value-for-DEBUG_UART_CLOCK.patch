@@ -2,6 +2,7 @@ From 34108b508496e8ff63fec713700457c95c95b91d Mon Sep 17 00:00:00 2001
 From: Lucas Dietrich <lucas.dietrich.git@proton.me>
 Date: Wed, 27 May 2026 19:45:02 +0200
 Subject: [PATCH] stm32mp2: Add default value for DEBUG_UART_CLOCK
+Upstream-Status: Pending
 
 ---
  arch/arm/mach-stm32mp/Kconfig.25x | 3 +++

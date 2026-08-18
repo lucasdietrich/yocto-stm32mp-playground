@@ -13,6 +13,8 @@ SRC_URI = " \
     file://boot.cmd.in \
 "
 
+S = "${UNPACKDIR}"
+
 UBOOTSCR_KERNEL_IMAGE ??= "${KERNEL_IMAGETYPE}"
 UBOOTSCR_BOOT_CMD ??= "${@'bootz' if 'zImage' in (d.getVar('KERNEL_IMAGETYPE') or '').split() else ('bootm' if 'uImage' in (d.getVar('KERNEL_IMAGETYPE') or '').split() else 'booti')}"
 
@@ -23,7 +25,7 @@ do_compile() {
         -e 's|@@KERNEL_IMAGE@@|${UBOOTSCR_KERNEL_IMAGE}|' \
         -e 's|@@KERNEL_DEVICETREE_NAME@@|${KERNEL_DEVICETREE_NAME}|' \
         -e 's|@@BOOT_CMD@@|${UBOOTSCR_BOOT_CMD}|' \
-        ${WORKDIR}/boot.cmd.in > ${WORKDIR}/boot.cmd
+        ${UNPACKDIR}/boot.cmd.in > ${WORKDIR}/boot.cmd
 
     mkimage -A ${UBOOT_ARCH} -T script -C none -n "Amy ${MACHINE} boot script" \
         -d ${WORKDIR}/boot.cmd ${WORKDIR}/boot.scr

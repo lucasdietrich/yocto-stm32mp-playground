@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-dev=/dev/sdd
+dev=/dev/sdc
 machine=${1-"mp2"}
 image=${2:-"amy-image"}
 

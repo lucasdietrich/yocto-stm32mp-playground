@@ -8,8 +8,6 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 SRC_URI = "git://github.com/Thomas-Tsai/partclone.git;protocol=https;branch=master"
 SRCREV = "198be487eecf816caac138587c68989c9aac8ac4"
 
-S = "${WORKDIR}/git"
-
 DEPENDS = "e2fsprogs xxhash zstd"
 
 inherit autotools pkgconfig gettext

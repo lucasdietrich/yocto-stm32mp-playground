@@ -102,9 +102,9 @@ jobs:
           BBFILES ?= ""
 
           BBLAYERS ?= " \
-            ${{ github.workspace }}/poky/meta \
-            ${{ github.workspace }}/poky/meta-poky \
-            ${{ github.workspace }}/poky/meta-yocto-bsp \
+            ${{ github.workspace }}/openembedded-core/meta \
+            ${{ github.workspace }}/meta-yocto/meta-poky \
+            ${{ github.workspace }}/meta-yocto/meta-yocto-bsp \
             ${{ github.workspace }}/meta-openembedded/meta-oe \
             ${{ github.workspace }}/meta-openembedded/meta-python \
             ${{ github.workspace }}/meta-openembedded/meta-networking \
@@ -121,6 +121,7 @@ jobs:
           MACHINE = "${{ matrix.machine }}"
           DL_DIR ?= "${{ env.DL_DIR }}"
           SSTATE_DIR ?= "${{ env.SSTATE_DIR }}-${{ matrix.machine }}"
+          BB_HASHSERVE_DB_DIR = "${SSTATE_DIR}"
           INHERIT += "rm_work"
           AMY_DEBUG = "${{ matrix.amy_debug }}"
           EOF
@@ -128,14 +129,14 @@ jobs:
       - name: Build amy-image
         shell: bash
         run: |
-          source poky/oe-init-build-env "${{ matrix.build_dir }}"
+          source openembedded-core/oe-init-build-env "${{ matrix.build_dir }}"
           bitbake amy-image
 
       - name: Build SDK
         if: ${{ github.event.inputs.build_sdk == 'true' }}
         shell: bash
         run: |
-          source poky/oe-init-build-env "${{ matrix.build_dir }}"
+          source openembedded-core/oe-init-build-env "${{ matrix.build_dir }}"
           bitbake amy-image -c populate_sdk
 
       - name: Upload images

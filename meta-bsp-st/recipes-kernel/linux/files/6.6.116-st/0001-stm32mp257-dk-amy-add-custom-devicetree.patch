@@ -2,6 +2,7 @@ From 372925fa3e19ea9290e2b9c97877933f9fd644d8 Mon Sep 17 00:00:00 2001
 From: Lucas Dietrich <lucas.dietrich.git@proton.me>
 Date: Wed, 3 Jun 2026 19:38:50 +0200
 Subject: [PATCH] stm32mp257-dk-amy: add custom devicetree
+Upstream-Status: Pending
 
 ---
  arch/arm64/boot/dts/st/Makefile               |  1 +

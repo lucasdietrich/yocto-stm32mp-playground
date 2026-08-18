@@ -58,8 +58,10 @@ CONFIG_LUAPKG="lua"
 #
 CONFIG_CROSS_COMPILE=""
 CONFIG_SYSROOT=""
-CONFIG_EXTRA_CFLAGS=""
-CONFIG_EXTRA_LDFLAGS=""
+# CONFIG_EXTRA_CFLAGS and CONFIG_EXTRA_LDFLAGS intentionally omitted: swupdate.inc's
+# do_configure() writes them from ${CFLAGS}/${LDFLAGS} (incl. buildpaths prefix-map
+# flags) *before* appending this defconfig; a duplicate empty assignment here would
+# win and strip those flags, leaking TMPDIR into the installed binary (QA buildpaths).
 CONFIG_EXTRA_LDLIBS=""
 # end of Build Options
 

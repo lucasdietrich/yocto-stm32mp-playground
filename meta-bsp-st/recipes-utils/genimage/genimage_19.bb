@@ -7,8 +7,6 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=570a9b3749dd0463a1778803b12a6dce"
 SRC_URI = "git://github.com/pengutronix/genimage.git;protocol=https;branch=master"
 SRCREV = "67a399476add05f29ef1ad722856728fb7639ba9"
 
-S = "${WORKDIR}/git"
-
 inherit autotools pkgconfig
 
 DEPENDS = "libconfuse"

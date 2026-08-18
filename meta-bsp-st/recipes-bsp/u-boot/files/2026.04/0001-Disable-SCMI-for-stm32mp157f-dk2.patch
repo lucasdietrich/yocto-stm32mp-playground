@@ -3,6 +3,8 @@ From: Lucas Dietrich <lucas.dietrich.git@proton.me>
 Date: Sat, 23 May 2026 11:11:24 +0200
 Subject: [PATCH] Disable SCMI for stm32mp157f-dk2
 
+Upstream-Status: Pending
+
 ---
  dts/upstream/src/arm/st/stm32mp157f-dk2.dts | 20 +++++++++++---------
  1 file changed, 11 insertions(+), 9 deletions(-)

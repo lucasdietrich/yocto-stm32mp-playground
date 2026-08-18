@@ -4,6 +4,8 @@ LICENSE = "CLOSED"
 
 SRC_URI = "file://ntpd"
 
+S = "${UNPACKDIR}"
+
 inherit update-rc.d
 
 # should be run just after dhcp has been resolved
@@ -12,5 +14,5 @@ INITSCRIPT_NAME = "ntpd"
 
 do_install() {
     install -d ${D}${sysconfdir}/init.d
-    install -m 0755 ${WORKDIR}/ntpd ${D}${sysconfdir}/init.d/ntpd
+    install -m 0755 ${UNPACKDIR}/ntpd ${D}${sysconfdir}/init.d/ntpd
 }

@@ -16,8 +16,6 @@ SRC_URI = "gitsm://git.gitlab.arm.com/firmware/SCP-firmware.git;protocol=https;b
 # v2.14.0 tag (3267f296) lacks product/optee/stm32mp2; use post-2.16.0 main
 SRCREV = "f76402dfefc7557b97aac6226c0b1302e2dc5e12"
 
-S = "${WORKDIR}/git"
-
 SCP_FIRMWARE_SYSROOT_DIR ??= "/usr/src/scp-firmware"
 
 # No compilation — we only provide the source tree

@@ -13,11 +13,11 @@ SRC_URI:append:mp1 = " file://amy-stm32mp1_defconfig "
 SRC_URI:append:mp2 = " file://amy-stm32mp2_defconfig "
 
 do_configure:prepend:mp1() {
-    cp ${WORKDIR}/amy-stm32mp1_defconfig defconfig
+    cp ${UNPACKDIR}/amy-stm32mp1_defconfig defconfig
 }
 
 do_configure:prepend:mp2() {
-    cp ${WORKDIR}/amy-stm32mp2_defconfig defconfig
+    cp ${UNPACKDIR}/amy-stm32mp2_defconfig defconfig
 }
 
 PV = "7.0.13"

@@ -11,10 +11,12 @@ SRCREV = "934c7edb74a26e90f68024cf441073528444177f"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
 
-DEPENDS = "virtual/optee-os optee-client"
+inherit python3native
+
+DEPENDS = "virtual/optee-os optee-client python3-cryptography-native "
+
 
 TA_DEV_KIT_DIR = "${RECIPE_SYSROOT}${SYSROOT_OPTEE_DIR_BASE}/export-user_ta"
 

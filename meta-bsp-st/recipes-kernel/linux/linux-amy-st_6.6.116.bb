@@ -17,8 +17,15 @@ SRC_URI[0001-v6.6-stm32mp-r3.patch.sha256sum] = "a726aa312d11866f5242961c97ac9fd
 
 
 do_configure:prepend() {
-    cp ${WORKDIR}/amy-stm32mp2_defconfig defconfig
+    cp ${UNPACKDIR}/amy-stm32mp2_defconfig defconfig
 }
+
+# scripts/conmakehash (drivers/tty/vt/consolemap_deftbl.c) embeds the absolute
+# path of its .uni input (under tmp/work-shared/${MACHINE}/kernel-source) in a
+# comment; that path isn't covered by the default S/B prefix-map remapping, so
+# it trips the buildpaths QA check on the -src package. It's just a generated
+# comment, not functional code, so skip the check for this package.
+INSANE_SKIP:${PN}-src += "buildpaths"
 
 # "transitional" keyword introduced in kernel 6.18 is not yet supported 
 # by python3-kconfiglib maintained by the Zephyr project. 

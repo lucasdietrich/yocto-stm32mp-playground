@@ -35,7 +35,7 @@
     ```
 
 
-# stm32mp15 from scratch with yocto
+# stm32mp15 from scratch with yocto (scarthgap)
 
 This repository contains the steps to build a custom BSP layer for the STM32MP15 series.
 
@@ -69,7 +69,7 @@ SSTATE_DIR ?= "/home/lucas/yocto/sstate-cache"
 MACHINE = "dk2"
 INHERIT += "rm_work"
 RM_WORK_EXCLUDE += ""
-AMY_DEBUG = "0"
+AMY_DEBUG = "1"
 # BB_NUMBER_THREADS = "16"
 PARALLEL_MAKE = "-j16"
 ```
@@ -78,9 +78,9 @@ Configure the `bblayers.conf`:
 
 ```bash
 BBLAYERS ?= " \
-  ${TOPDIR}/../poky/meta \
-  ${TOPDIR}/../poky/meta-poky \
-  ${TOPDIR}/../poky/meta-yocto-bsp \
+  ${TOPDIR}/../openembedded-core/meta  \
+  ${TOPDIR}/../meta-yocto/meta-poky \
+  ${TOPDIR}/../meta-yocto/meta-yocto-bsp \
   ${TOPDIR}/../meta-openembedded/meta-oe \
   ${TOPDIR}/../meta-openembedded/meta-python \
   ${TOPDIR}/../meta-openembedded/meta-networking \
@@ -92,6 +92,55 @@ BBLAYERS ?= " \
   ${TOPDIR}/../meta-playground \
   "
 ```
+
+# Yocto (wrynose)
+
+Resources:
+
+- [10 Setting Up the Poky Reference Distro Manually](https://docs.yoctoproject.org/dev-manual/poky-manual-setup.html)
+- [Migration notes for 6.0 (wrynose)](https://docs.yoctoproject.org/dev/migration-guides/migration-6.0.html)
+    - https://docs.yoctoproject.org/dev/migration-guides/migration-5.1.html
+    - https://docs.yoctoproject.org/dev/migration-guides/migration-5.2.html
+    - https://docs.yoctoproject.org/dev/migration-guides/migration-5.3.html
+
+local.conf:
+
+```bash
+DL_DIR ?= "/home/lucas/yocto/downloads"
+SSTATE_DIR ?= "/home/lucas/yocto/sstate-cache"
+BB_HASHSERVE_DB_DIR = "${SSTATE_DIR}"
+MACHINE = "dk2"
+INHERIT += "rm_work"
+RM_WORK_EXCLUDE += ""
+AMY_DEBUG = "1"
+# BB_NUMBER_THREADS = "16"
+PARALLEL_MAKE = "-j16"
+```
+
+bblayers.conf:
+
+```bash
+BBLAYERS ?= " \
+  ${TOPDIR}/../openembedded-core/meta  \
+  ${TOPDIR}/../meta-yocto/meta-poky \
+  ${TOPDIR}/../meta-yocto/meta-yocto-bsp \
+  ${TOPDIR}/../meta-openembedded/meta-oe \
+  ${TOPDIR}/../meta-openembedded/meta-python \
+  ${TOPDIR}/../meta-openembedded/meta-networking \
+  ${TOPDIR}/../meta-openembedded/meta-webserver \
+  ${TOPDIR}/../meta-arm/meta-arm-toolchain \
+  ${TOPDIR}/../meta-lts-mixins \
+  ${TOPDIR}/../meta-swupdate \
+  ${TOPDIR}/../meta-bsp-st \
+  ${TOPDIR}/../meta-playground \
+  "
+```
+
+Source bitbake:
+
+`source openembedded-core/oe-init-build-env build-wrynose`
+
+# Result
 
 ## Expected console output
 
@@ -143,3 +192,42 @@ struct optee_image {
         uint32_t size; // size of image in bytes: OP-TEE OS size 0x00012510, pager size 0x00065000
 };
 ```
+
+## Container build
+
+The `Dockerfile` only provides the OS-level build host packages; bitbake,
+openembedded-core and the meta-* layers come from this checkout and are
+bind-mounted at run time (see `entrypoint.sh`).
+
+Build the image once (rebuild after changing `Dockerfile`/`entrypoint.sh`):
+
+```bash
+just yocto-builder
+```
+
+Build an image (defaults to `build-wrynose` / `amy-image`):
+
+```bash
+just bitbake
+just bitbake build_dir=build-mp1-wrynose image=core-image-minimal
+```
+
+Or use the wrapper scripts directly, which can also be aliased to shadow the
+real tools on your host by sourcing `scripts/aliases.sh` from your shell rc
+(works under bash and zsh):
+
+```bash
+source scripts/aliases.sh
+export DL_DIR="./downloads"
+export SSTATE_DIR="./sstate-cache"
+export BUILD_DIR="./build-wrynose"
+```
+
+```bash
+bitbake.sh amy-image -k
+devtool.sh status
+oe-pkgdata-util.sh list-pkgs
+```
+
+`downloads/` and `sstate-cache/` may be plain directories or symlinks to a
+shared cache elsewhere on the host; both are handled transparently.

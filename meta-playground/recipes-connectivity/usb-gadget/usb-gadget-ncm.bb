@@ -11,7 +11,7 @@ SRC_URI = " \
     file://init-usb-gadget-ncm \
 "
 
-S = "${WORKDIR}"
+S = "${UNPACKDIR}"
 
 RDEPENDS:${PN} += " \
     iproute2 \
@@ -23,23 +23,23 @@ INITSCRIPT_PARAMS = "start 40 S . stop 40 0 6 ."
 
 do_install() {
     install -d ${D}${sbindir}
-    install -m 0755 ${WORKDIR}/usb-gadget-ncm ${D}${sbindir}/usb-gadget-ncm
-    install -m 0755 ${WORKDIR}/usb-ncm-iface ${D}${sbindir}/usb-ncm-iface
+    install -m 0755 ${UNPACKDIR}/usb-gadget-ncm ${D}${sbindir}/usb-gadget-ncm
+    install -m 0755 ${UNPACKDIR}/usb-ncm-iface ${D}${sbindir}/usb-ncm-iface
 
     install -d ${D}${sysconfdir}/udev/rules.d
-    install -m 0644 ${WORKDIR}/90-usb-ncm.rules ${D}${sysconfdir}/udev/rules.d/90-usb-ncm.rules
+    install -m 0644 ${UNPACKDIR}/90-usb-ncm.rules ${D}${sysconfdir}/udev/rules.d/90-usb-ncm.rules
 }
 
 do_install() {
     install -d ${D}${sbindir}
-    install -m 0755 ${WORKDIR}/usb-gadget-ncm ${D}${sbindir}/usb-gadget-ncm
-    install -m 0755 ${WORKDIR}/usb-ncm-iface ${D}${sbindir}/usb-ncm-iface
+    install -m 0755 ${UNPACKDIR}/usb-gadget-ncm ${D}${sbindir}/usb-gadget-ncm
+    install -m 0755 ${UNPACKDIR}/usb-ncm-iface ${D}${sbindir}/usb-ncm-iface
 
     install -d ${D}${sysconfdir}/udev/rules.d
-    install -m 0644 ${WORKDIR}/90-usb-ncm.rules ${D}${sysconfdir}/udev/rules.d/90-usb-ncm.rules
+    install -m 0644 ${UNPACKDIR}/90-usb-ncm.rules ${D}${sysconfdir}/udev/rules.d/90-usb-ncm.rules
 
     install -d ${D}${sysconfdir}/init.d
-    install -m 0755 ${WORKDIR}/init-usb-gadget-ncm ${D}${sysconfdir}/init.d/usb-gadget-ncm
+    install -m 0755 ${UNPACKDIR}/init-usb-gadget-ncm ${D}${sysconfdir}/init.d/usb-gadget-ncm
 }
 
 FILES:${PN} += " \

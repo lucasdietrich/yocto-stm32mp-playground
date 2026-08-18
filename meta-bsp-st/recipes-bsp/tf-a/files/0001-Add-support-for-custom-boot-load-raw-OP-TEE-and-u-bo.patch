@@ -4,6 +4,8 @@ Date: Sat, 13 Dec 2025 19:39:55 +0100
 Subject: [PATCH] Add support for custom boot: load raw OP-TEE and u-boot
  binaries from MMC partitions.
 
+Upstream-Status: Pending
+
 ---
  common/bl_common.c                            |    4 +-
  drivers/amy/io_amy.c                          |  220 ++++

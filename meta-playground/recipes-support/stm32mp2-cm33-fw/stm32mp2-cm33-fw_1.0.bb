@@ -16,8 +16,6 @@ SRCREV = "2f7258aa45e916777ffb4f6e1b5590f65304378d"
 
 PV = "1.3.1"
 
-S = "${WORKDIR}/git"
-
 USBPD_PROJECT_DIR = "${S}/Projects/STM32MP257F-DK/Demonstrations/USBPD_DRP_UCSI"
 USBPD_FW_NAME    = "USBPD_DRP_UCSI_CM33_NonSecure_stripped.elf"
 
@@ -37,6 +35,19 @@ do_configure() {
 }
 
 do_compile() {
+    # fixes:
+    # 
+    # | CMake Error at CMakeLists.txt:1 (cmake_minimum_required):
+    # |   Compatibility with CMake < 3.5 has been removed from CMake.
+    # |
+    # |   Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+    # |   to tell CMake that the project requires at least <min> but has been updated
+    # |   to work with policies introduced by <max> or earlier.
+    # |
+    # |   Or, add -DCMAKE_POLICY_VERSION_MINIMUM=3.5 to try configuring anyway
+    #
+    export CMAKE_POLICY_VERSION_MINIMUM=3.5
+
     make -C ${USBPD_PROJECT_DIR}/build all
     # Strip debug info to produce the _stripped variant expected by remoteproc
     arm-none-eabi-strip \
@@ -51,10 +62,10 @@ do_install() {
         ${D}${nonarch_base_libdir}/firmware/
 
     install -d ${D}${base_sbindir}
-    install -m 0755 ${WORKDIR}/cm33-usbpd-load.sh ${D}${base_sbindir}/
+    install -m 0755 ${UNPACKDIR}/cm33-usbpd-load.sh ${D}${base_sbindir}/
 
     install -d ${D}${sysconfdir}/init.d
-    install -m 0755 ${WORKDIR}/cm33-usbpd-init \
+    install -m 0755 ${UNPACKDIR}/cm33-usbpd-init \
         ${D}${sysconfdir}/init.d/cm33-usbpd
 }
 

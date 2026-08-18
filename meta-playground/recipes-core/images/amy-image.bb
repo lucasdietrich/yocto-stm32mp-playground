@@ -69,12 +69,8 @@ IMAGE_INSTALL:append = "${@bb.utils.contains('AMY_DEBUG_UTILS', '1',' \
     dtc \
 ', '', d)}"
 
-EXTRA_IMAGE_FEATURES = "\
-    allow-root-login \
-"
-
 EXTRA_IMAGE_FEATURES += "${@bb.utils.contains('AMY_DEBUG_SSH', '1',' \
-    debug-tweaks \
+    allow-root-login \
     empty-root-password \
     allow-empty-password \
     post-install-logging \

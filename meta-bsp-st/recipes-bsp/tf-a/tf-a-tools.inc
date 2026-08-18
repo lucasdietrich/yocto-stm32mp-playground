@@ -2,11 +2,13 @@ SUMMARY = "Trusted Firmware A Tools"
 
 require tf-a-common.inc
 
-DEPENDS = "dtc"
+DEPENDS = "dtc openssl-native"
+RDEPENDS:${PN} = "libcrypto"
 
 do_compile() {
-    # TODO target stm32mp2 for now
-    oe_runmake -C ${S} PLAT=stm32mp2 fiptool
+    # fiptool's Makefile hardcodes OPENSSL_DIR=/usr, so point it at our sysroot.
+    # ${prefix} is already the full staging path for native/nativesdk recipes.
+    oe_runmake -C ${S} PLAT=stm32mp2 OPENSSL_DIR=${prefix} fiptool
 }
 
 do_install() {

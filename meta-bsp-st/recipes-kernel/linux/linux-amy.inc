@@ -34,7 +34,7 @@ LINUX_VERSION_EXTENSION:append = "-amy"
 
 KERNEL_DEPLOYSUBDIR = "kernel"
 
-S="${WORKDIR}/linux-${LINUX_VERSION}"
+S = "${UNPACKDIR}/linux-${LINUX_VERSION}"
 
 COMPATIBLE_MACHINE = "^(mp1|mp2)$"
 KCONFIG_MODE = "alldefconfig"
