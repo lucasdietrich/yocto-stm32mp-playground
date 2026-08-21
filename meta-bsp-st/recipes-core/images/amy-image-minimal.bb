@@ -26,9 +26,6 @@ EXTRA_IMAGEDEPENDS += "virtual/tf-a"
 IMAGE_FSTYPES = "ext4"
 IMAGE_FSTYPES += "ext4.zst"
 
-# sysctl
-SRC_URI += "file://sysctl.conf"
-
 # swupdate-common.bbclass (pulled in below via "inherit swupdate-image") sets
 # S = "${UNPACKDIR}", and image.bbclass's do_rootfs[cleandirs] wipes ${S}
 # before ROOTFS_POSTPROCESS_COMMAND runs, so keep a copy of ${UNPACKDIR} files outside of it.
@@ -37,8 +34,12 @@ copy_src_files() {
     cp ${UNPACKDIR}/* ${WORKDIR}
 }
 
+# content generated inline (not via SRC_URI/do_unpack/THISDIR) since those all
+# break once this recipe is require'd from another layer (e.g. amy-image.bb)
+# or once do_unpack gets skipped by an sstate-restored do_populate_sysroot.
 sysctl() {
-    install -m 0442 ${WORKDIR}/sysctl.conf ${IMAGE_ROOTFS}${sysconfdir}/sysctl.conf
+    echo "vm.swappiness = 60" > ${IMAGE_ROOTFS}${sysconfdir}/sysctl.conf
+    chmod 0442 ${IMAGE_ROOTFS}${sysconfdir}/sysctl.conf
 }
 ROOTFS_POSTPROCESS_COMMAND += "sysctl;"
 
@@ -53,7 +54,7 @@ python() {
 SDIMAGE_CONF ??= "sdcard_genimage.cfg.in"
 
 # do not include all SRC_URI files in the swupdate image
-SWUPDATE_SRC_URI_EXCLUDE += "${SDIMAGE_CONF} sysctl.conf"
+SWUPDATE_SRC_URI_EXCLUDE += "${SDIMAGE_CONF}"
 
 # include bootloader artifacts in the SWU for MP2 (A-slot only)
 SWUPDATE_IMAGES:append = " tf-a/tf-a-${TFA_DEVICETREE}.stm32"
