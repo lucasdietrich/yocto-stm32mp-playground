@@ -49,6 +49,9 @@ IMAGE_INSTALL:append = "${@bb.utils.contains('AMY_DEBUG_UTILS', '1',' \
     usbutils \
     iperf3 \
     perf \
+    ethtool \
+    iproute2 \
+    iproute2-tc \
 ', '', d)}"
 
 # benchmark
