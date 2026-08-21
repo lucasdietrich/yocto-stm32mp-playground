@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# set -e
+set -e
 
 # Source function library.
 . /etc/init.d/functions
@@ -22,7 +22,7 @@ start() {
     fi
 
     # create userfs partition (btrfs)
-    /usr/bin/userfs -v $flags > /run/userfs.log 2>&1
+    /usr/bin/userfs -v $flags 2>&1 | tee /run/userfs.log
 
     # TODO FIXME
     # remount /var/volatile with correct options
@@ -34,7 +34,7 @@ start() {
         swapon /mnt/userfs/swapfile
     fi
 
-    # zswa
+    # zswap
     if [ -b /dev/zram0 ]; then
         echo 1 > /sys/block/zram0/reset
         echo 256M > /sys/block/zram0/disksize

@@ -7,7 +7,7 @@ SRC_URI = "git://github.com/lucasdietrich/userfs.git;protocol=https;branch=${SRC
            file://init-user-fs.sh \
            file://factory_reset.sh \
            "
-SRCREV = "2fd863904559da870b4d1fab1c77ecf8116a922c"
+SRCREV = "74d35c5d11a6f68fd49cf652f3a5fc7ae55fb5fb"
 
 PACKAGECONFIG ??= "swap"
 PACKAGECONFIG[swap] = ",,,swapfile"
