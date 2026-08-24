@@ -12,3 +12,8 @@ bitbake build_dir="build-wrynose" image="amy-image":
     -v "$(readlink -f $PWD/sstate-cache):/sstate-cache:Z" \
     -e BUILD_DIR={{build_dir}} \
     yocto-builder bitbake {{image}} -k
+
+# do_menuconfig/do_devshell need a terminal; runs bitbake in a tmux
+# session inside the container so it opens as a pane in this terminal.
+menuconfig recipe build_dir="build-wrynose":
+    BUILD_DIR={{build_dir}} ./scripts/menuconfig.sh -c menuconfig {{recipe}}
