@@ -1,6 +1,7 @@
 {
     "search.exclude": {
         "build/**": true,
+        "build-*/**": true,
         "./build/conf/**": false,
     },
     "files.associations": {
