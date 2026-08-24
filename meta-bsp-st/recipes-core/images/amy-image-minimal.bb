@@ -26,14 +26,6 @@ EXTRA_IMAGEDEPENDS += "virtual/tf-a"
 IMAGE_FSTYPES = "ext4"
 IMAGE_FSTYPES += "ext4.zst"
 
-# swupdate-common.bbclass (pulled in below via "inherit swupdate-image") sets
-# S = "${UNPACKDIR}", and image.bbclass's do_rootfs[cleandirs] wipes ${S}
-# before ROOTFS_POSTPROCESS_COMMAND runs, so keep a copy of ${UNPACKDIR} files outside of it.
-do_unpack[postfuncs] += "copy_src_files"
-copy_src_files() {
-    cp ${UNPACKDIR}/* ${WORKDIR}
-}
-
 # content generated inline (not via SRC_URI/do_unpack/THISDIR) since those all
 # break once this recipe is require'd from another layer (e.g. amy-image.bb)
 # or once do_unpack gets skipped by an sstate-restored do_populate_sysroot.
@@ -53,9 +45,6 @@ python() {
 
 SDIMAGE_CONF ??= "sdcard_genimage.cfg.in"
 
-# do not include all SRC_URI files in the swupdate image
-SWUPDATE_SRC_URI_EXCLUDE += "${SDIMAGE_CONF}"
-
 # include bootloader artifacts in the SWU for MP2 (A-slot only)
 SWUPDATE_IMAGES:append = " tf-a/tf-a-${TFA_DEVICETREE}.stm32"
 SWUPDATE_IMAGES:append = " ${IMAGE_BASENAME}-${MACHINE}-bootfs.vfat.zst"
@@ -72,14 +61,10 @@ SRC_URI += "\
 #########################
 # Create a sdcard image #
 #########################
-# This is required because of https://stackoverflow.com/a/55570545
-python () {
-    # Ensure we run these usually noexec tasks
-    d.delVarFlag("do_fetch", "noexec")
-    d.delVarFlag("do_unpack", "noexec")
-}
-
-SRC_URI += "file://${SDIMAGE_CONF}"
+# Reference the template directly instead of via SRC_URI/do_unpack: THISDIR must be
+# captured immediately (":=") here so it stays this recipe's own directory even when
+# this file is require'd from another layer (e.g. amy-image.bb).
+SDIMAGE_CONF_PATH := "${THISDIR}/files/${MACHINE}/${SDIMAGE_CONF}"
 
 DEPENDS += "dosfstools-native mtools-native genimage-native"
 DEPENDS += "virtual/tf-a"
@@ -112,7 +97,7 @@ do_sdimage() {
         -e "s|@TFA_DEVICETREE@|${TFA_DEVICETREE}|g" \
         -e "s|@IMAGE_ROOTFS@|${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.ext4|g" \
         -e "s|@KERNEL_DEVICETREE_NAME@|${KERNEL_DEVICETREE_NAME}|g" \
-        ${WORKDIR}/${SDIMAGE_CONF} > ${WORKDIR}/sdcard_genimage-${IMAGE_BASENAME}-${MACHINE}.cfg
+        ${SDIMAGE_CONF_PATH} > ${WORKDIR}/sdcard_genimage-${IMAGE_BASENAME}-${MACHINE}.cfg
 
     mkdir -p ${WORKDIR}/genimage/tmp ${WORKDIR}/genimage/root
 
