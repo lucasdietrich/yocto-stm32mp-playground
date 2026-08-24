@@ -1,6 +1,6 @@
 # Common
 
-- [ ] swap
+- [x] swap
 - [ ] BLE zephyr integration
 - [x] nginx
 - [ ] configuration server
@@ -11,6 +11,12 @@
     - [ ] udev rule to start tee-supplicant when /dev/teepriv[0-9]* is detected
     - [ ] demo ta
 
+
+[ ] networking
+    [x] udev auto DHCP when ethernet cable is plugged -> net-dhcp-hotplug
+    [x] kea ? -> removed, was an accidental packagegroup-core-base-utils RDEPENDS for non-systemd, duplicating dnsmasq's DHCP server on usb0
+    [ ] hostname change
+
 - [ ] FIT Image instead of vfat
 
 - [x] usb gadget
@@ -19,7 +25,7 @@
         [x] linux host
         [x] windows host
     [x] mp1
-    [ ] mp2
+    [x] mp2
 
 - [ ] container system
     [ ] crun
@@ -29,7 +35,7 @@
         [ ] dnat / masquerade / forwarding
         [ ] MTU
 
-- [ ] fix support for iotop: requires: CONFIG_TASKSTATS, CONFIG_TASK_DELAY_ACCT, CONFIG_TASK_IO_ACCOUNTING
+- [x] fix support for iotop: requires: CONFIG_TASKSTATS, CONFIG_TASK_DELAY_ACCT, CONFIG_TASK_IO_ACCOUNTING
     ```
     root@dk2:~# iotop
     Error in stat: No such file or directory
@@ -39,6 +45,14 @@
     ```
 
 # MP2
+
+[ ] AI:
+    - [ ] https://wiki.st.com/stm32mpu/wiki/How_to_use_hardware_acceleration_with_TensorFlow_Lite_and_ONNX_Runtime_frameworks
+
+[ ] TSN:
+
+[ ] TSN + AI: closed loop predictive control with AI inference
+    [ ] inverted pendulum ?
 
 [x] swupdate
     [x] tfa
@@ -128,9 +142,6 @@
 
 [ ] create meta-lw-container layer
     [ ] orchestration application: lway
-
-[ ] networking
-    [ ] udev auto DHCP when ethernet cable is plugged
 
 [ ] distribution
     [x] port userfs
