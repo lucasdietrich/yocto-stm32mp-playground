@@ -10,6 +10,13 @@
 - Avoid hardcoded host paths in recipes/configs.
 - Keep machine-specific behavior behind variables or overrides.
 
+## Build
+- Source the env for the target machine: `source .env-mp2`
+- Then build with: `bitbake <target>`
+
+## Code Style
+- Use only ASCII characters in code, comments, and documentation.
+
 ## Documentation
 - For build/boot-impacting changes, update `readme.md` with tested target and status: `OK`, `NOK`, or `?`.
 
