@@ -35,6 +35,13 @@ sysctl() {
 }
 ROOTFS_POSTPROCESS_COMMAND += "sysctl;"
 
+# cgroups
+rootfs_fstab_cgroup2() {
+    # Patch /etc/fstab and add cgroup2 mount
+    echo "cgroup               /sys/fs/cgroup       cgroup2    defaults              0  0" >> ${IMAGE_ROOTFS}/etc/fstab
+}
+ROOTFS_POSTPROCESS_COMMAND += "rootfs_fstab_cgroup2; "
+
 #########################
 # SWUpdate image        #
 #########################
