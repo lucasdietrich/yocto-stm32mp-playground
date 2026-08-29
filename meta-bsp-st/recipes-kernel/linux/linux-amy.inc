@@ -1,4 +1,4 @@
-SUMMARY = "Kernel for STM32MP157"
+SUMMARY = "Kernel for STM32MP"
 HOMEPAGE = "https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git"
 
 inherit kernel
@@ -18,6 +18,7 @@ SRC_URI = "\
         file://features/usb.scc file://features/usb.cfg \
         file://features/dm.scc file://features/dm.cfg \
         file://features/crypto.scc file://features/crypto.cfg \
+        file://features/virt.scc file://features/virt.cfg \
         file://features/zram.cfg \
 "
 
@@ -26,6 +27,7 @@ KERNEL_FEATURES += "fs.scc"
 KERNEL_FEATURES += "usb.scc"
 KERNEL_FEATURES += "dm.scc"
 KERNEL_FEATURES += "crypto.scc"
+KERNEL_FEATURES += "virt.scc"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
