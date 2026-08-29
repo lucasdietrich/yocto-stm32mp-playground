@@ -31,16 +31,16 @@ start() {
     # swapfile
     if command -v swapfile > /dev/null 2>&1; then
         swapfile /mnt/userfs/swapfile 256
-        swapon /mnt/userfs/swapfile
+        swapon /mnt/userfs/swapfile -p 1
     fi
 
-    # zswap
+    # zswap (higher prio)
     if [ -b /dev/zram0 ]; then
         echo 1 > /sys/block/zram0/reset
         echo 256M > /sys/block/zram0/disksize
         echo 128M > /sys/block/zram0/mem_limit
         mkswap /dev/zram0
-        swapon /dev/zram0
+        swapon /dev/zram0 -p 10
     fi
 }
 
