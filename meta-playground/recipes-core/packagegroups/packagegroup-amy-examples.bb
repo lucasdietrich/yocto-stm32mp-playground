@@ -6,4 +6,5 @@ inherit packagegroup
 # populate here
 RDEPENDS:${PN} = "\
     rust-example \
+    container-example \
 "

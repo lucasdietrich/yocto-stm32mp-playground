@@ -15,5 +15,8 @@ RDEPENDS:${PN} = "\
     cronie \
     nginx \
     sqlite3 \
+    openssl \
+    libcap \
+    libcgroup \
 "
 # nginx

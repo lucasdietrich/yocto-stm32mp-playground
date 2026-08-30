@@ -85,8 +85,10 @@ BBLAYERS ?= " \
   ${TOPDIR}/../meta-openembedded/meta-python \
   ${TOPDIR}/../meta-openembedded/meta-networking \
   ${TOPDIR}/../meta-openembedded/meta-webserver \
+  ${TOPDIR}/../meta-openembedded/meta-filesystems \
   ${TOPDIR}/../meta-arm/meta-arm-toolchain \
   ${TOPDIR}/../meta-lts-mixins \
+  ${TOPDIR}/../meta-virtualization \
   ${TOPDIR}/../meta-swupdate \
   ${TOPDIR}/../meta-bsp-st \
   ${TOPDIR}/../meta-playground \
@@ -128,8 +130,10 @@ BBLAYERS ?= " \
   ${TOPDIR}/../meta-openembedded/meta-python \
   ${TOPDIR}/../meta-openembedded/meta-networking \
   ${TOPDIR}/../meta-openembedded/meta-webserver \
+  ${TOPDIR}/../meta-openembedded/meta-filesystems \
   ${TOPDIR}/../meta-arm/meta-arm-toolchain \
   ${TOPDIR}/../meta-lts-mixins \
+  ${TOPDIR}/../meta-virtualization \
   ${TOPDIR}/../meta-swupdate \
   ${TOPDIR}/../meta-bsp-st \
   ${TOPDIR}/../meta-playground \

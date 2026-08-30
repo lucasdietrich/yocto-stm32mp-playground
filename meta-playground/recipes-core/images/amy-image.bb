@@ -52,6 +52,7 @@ IMAGE_INSTALL:append = "${@bb.utils.contains('AMY_DEBUG_UTILS', '1',' \
     ethtool \
     iproute2 \
     iproute2-tc \
+    uftrace \
 ', '', d)}"
 
 # benchmark
@@ -70,6 +71,7 @@ IMAGE_INSTALL:append = "${@bb.utils.contains('AMY_DEBUG_UTILS', '1',' \
     minicom \
     mosquitto-clients \
     dtc \
+    jq \
 ', '', d)}"
 
 EXTRA_IMAGE_FEATURES += "${@bb.utils.contains('AMY_DEBUG_SSH', '1',' \
@@ -82,5 +84,10 @@ EXTRA_IMAGE_FEATURES += "${@bb.utils.contains('AMY_DEBUG_SSH', '1',' \
 TOOLCHAIN_HOST_TASK += "packagegroup-rust-cross-canadian-${MACHINE} \
                         nativesdk-erofs-utils \
                         nativesdk-systemtap \
+                        "
+
+TOOLCHAIN_HOST_TASK += "nativesdk-umoci \
+                        nativesdk-skopeo \
+                        nativesdk-erofs-utils \
                         "
 TOOLCHAIN_TARGET_TASK:append = " libnl-dev"
