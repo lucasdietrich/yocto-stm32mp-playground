@@ -91,3 +91,4 @@ TOOLCHAIN_HOST_TASK += "nativesdk-umoci \
                         nativesdk-erofs-utils \
                         "
 TOOLCHAIN_TARGET_TASK:append = " libnl-dev"
+TOOLCHAIN_TARGET_TASK:append = " libstd-rs"
