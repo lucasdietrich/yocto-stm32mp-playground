@@ -1,3 +1,15 @@
+# AI
+
+- [ ] current
+    - [ ] doc: /home/lucas/Documents/knowledge/docs/linux/stm32mp2/openstlinux-ai.md
+    - [ ] claude ai TFL getting started: <https://claude.ai/share/e80ef4ca-38bb-4080-9a80-ac5cd936119e>
+    - [ ] yocto st-linux-ai:
+        - /home/lucas/yocto/yocto-st-ai
+        - doc: /home/lucas/Documents/knowledge/docs/linux/stm32mp2/openstlinux-ai.md
+    - [ ] evaluate:
+        - [ ] <https://github.com/NobuoTsukamoto/meta-tensorflow-lite>
+        - [ ] <https://github.com/NobuoTsukamoto/meta-onnxruntime>
+
 # Common
 
 - [x] swap
