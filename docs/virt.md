@@ -12,6 +12,45 @@ Run:
 crun --root=. --rootless=1 --log-level=debug run -b /containers/oci-bundle cnt1
 ```
 
+Get state
+
+```bash
+crun --root=/containers/oci-bundle --rootless=1 --log-level=debug state cnt1
+```
+
+Result:
+
+```bash
+root@mp2:~/rt# crun --root=/containers/oci-bundle --rootless=1 --log-level=debug state cnt1
+2018-03-09T17:04:04.637203Z: Using debug verbosity
+2018-03-09T17:04:04.637820Z: Loading container from config file: `/containers/oci-bundle/cnt1/config.json`
+{
+    "ociVersion": "1.0.0",
+    "id": "cnt1",
+    "pid": 677,
+    "status": "running",
+    "bundle": "/containers/oci-bundle",
+    "rootfs": "rootfs",
+    "created": "2018-03-09T15:43:27.469256Z",
+    "systemd-scope": "",
+    "owner": "root",
+    "annotations": {
+        "org.opencontainers.image.architecture": "arm64",
+        "org.opencontainers.image.author": "oe.patch@oe",
+        "org.opencontainers.image.created": "2026-08-30T09:06:22Z",
+        "org.opencontainers.image.os": "linux",
+        "org.opencontainers.image.ref.name": "wrynose",
+        "org.opencontainers.image.revision": "4f9ae75"
+    }
+}
+```
+
+kill the container:
+
+```bash
+crun --root=/containers/oci-bundle --rootless=1 --log-level=debug kill cnt1 SIGKILL
+```
+
 ---
 
 ## Legacy
