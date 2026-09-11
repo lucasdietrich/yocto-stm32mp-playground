@@ -7,4 +7,5 @@ inherit packagegroup
 RDEPENDS:${PN} = "\
     rust-example \
     container-example \
+    example-led-button \
 "
