@@ -1,15 +1,15 @@
 #!/bin/sh
-# Load and start the CM33 USBPD firmware via Linux remoteproc.
-# Finds the m33 remoteproc device by name, not by index.
+# Load and start the CM0 firmware via Linux remoteproc.
+# Finds the m0 remoteproc device by name, not by index.
 
 RPROC_DIR="/sys/class/remoteproc"
-FW_NAME="USBPD_DRP_UCSI_CM33_NonSecure_stripped.elf"
+FW_NAME="CM0PLUS_DEMO_NonSecure_stripped.elf"
 
 find_m33_rproc() {
     for dev in "${RPROC_DIR}"/remoteproc*; do
         [ -f "${dev}/name" ] || continue
         name=$(cat "${dev}/name")
-        if [ "${name}" = "m33" ]; then
+        if [ "${name}" = "m0" ]; then
             echo "${dev}"
             return 0
         fi
@@ -21,7 +21,7 @@ ACTION="${1:-start}"
 RPROC=$(find_m33_rproc)
 
 if [ -z "${RPROC}" ]; then
-    echo "ERROR: no remoteproc device named 'm33' found" >&2
+    echo "ERROR: no remoteproc device named 'm0' found" >&2
     exit 1
 fi
 
@@ -29,12 +29,12 @@ case "${ACTION}" in
     start)
         state=$(cat "${RPROC}/state")
         if [ "${state}" = "running" ]; then
-            echo "CM33 already running, stopping first..."
+            echo "CM0 already running, stopping first..."
             echo stop > "${RPROC}/state"
         fi
 
         if [ "$(cat "${RPROC}/fw_format")" = "TEE" ]; then
-            echo "CM33 firmware format is TEE"
+            echo "CM0 firmware format is TEE"
             exit 1
         fi
 
@@ -45,15 +45,15 @@ case "${ACTION}" in
 
         echo "${FW_NAME}" > "${RPROC}/firmware"
         echo start > "${RPROC}/state"
-        echo "CM33 started with ${FW_NAME}"
+        echo "CM0 started with ${FW_NAME}"
         ;;
     stop)
         state=$(cat "${RPROC}/state")
         if [ "${state}" = "offline" ]; then
-            echo "CM33 already offline"
+            echo "CM0 already offline"
         else
             echo stop > "${RPROC}/state"
-            echo "CM33 stopped"
+            echo "CM0 stopped"
         fi
         ;;
     *)

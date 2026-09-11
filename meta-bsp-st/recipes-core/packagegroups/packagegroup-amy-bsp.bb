@@ -40,7 +40,8 @@ RDEPENDS:${PN} += "\
 
 # swupdate dependencies
 RDEPENDS:${PN}:append:mp2 = "\
-    stm32mp2-cm33-fw \
+    stm32mp2-copro-fw-cm33 \
+    stm32mp2-copro-fw-cm0plus \
 "
 
 RDEPENDS:${PN} += "${@bb.utils.contains('AMY_DEBUG_UTILS', '1', '\
