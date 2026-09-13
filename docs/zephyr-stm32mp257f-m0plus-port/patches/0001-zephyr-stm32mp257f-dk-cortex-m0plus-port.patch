@@ -1,0 +1,960 @@
+diff --git a/boards/st/stm32mp257f_dk/Kconfig.stm32mp257f_dk b/boards/st/stm32mp257f_dk/Kconfig.stm32mp257f_dk
+index 5cc7b02d10a..91d1de2d745 100644
+--- a/boards/st/stm32mp257f_dk/Kconfig.stm32mp257f_dk
++++ b/boards/st/stm32mp257f_dk/Kconfig.stm32mp257f_dk
+@@ -3,3 +3,4 @@
+ 
+ config BOARD_STM32MP257F_DK
+ 	select SOC_STM32MP257FXX_M33 if BOARD_STM32MP257F_DK_STM32MP257FXX_M33
++	select SOC_STM32MP257FXX_M0PLUS if BOARD_STM32MP257F_DK_STM32MP257FXX_M0PLUS
+diff --git a/boards/st/stm32mp257f_dk/board.cmake b/boards/st/stm32mp257f_dk/board.cmake
+index 1a979285e46..9f12c102c8f 100644
+--- a/boards/st/stm32mp257f_dk/board.cmake
++++ b/boards/st/stm32mp257f_dk/board.cmake
+@@ -7,4 +7,12 @@ if(CONFIG_BOARD_STM32MP257F_DK_STM32MP257FXX_M33)
+   board_runner_args(openocd "--gdb-init=target extended-remote :3334")
+ endif()
+ 
++if(CONFIG_BOARD_STM32MP257F_DK_STM32MP257FXX_M0PLUS)
++  board_runner_args(
++    openocd "--config=${BOARD_DIR}/support/openocd_stm32mp257f_dk_m0plus.cfg")
++  # Port 3335 is the "stm32mp25x.m0p" GDB port opened by target/st/stm32mp25x.cfg
++  # (3333 -> a35_0, 3334 -> m33, 3335 -> m0p); confirmed on hardware.
++  board_runner_args(openocd "--gdb-init=target extended-remote :3335")
++endif()
++
+ include(${ZEPHYR_BASE}/boards/common/openocd.board.cmake)
+diff --git a/boards/st/stm32mp257f_dk/stm32mp257f_dk_stm32mp257fxx_m0plus.dts b/boards/st/stm32mp257f_dk/stm32mp257f_dk_stm32mp257fxx_m0plus.dts
+new file mode 100644
+index 00000000000..6383f7c93a0
+--- /dev/null
++++ b/boards/st/stm32mp257f_dk/stm32mp257f_dk_stm32mp257fxx_m0plus.dts
+@@ -0,0 +1,46 @@
++/*
++ * Copyright (C) 2025 Savoir-faire Linux, Inc.
++ *
++ * SPDX-License-Identifier: Apache-2.0
++ */
++
++/dts-v1/;
++#include <st/mp2/stm32mp257_m0plus.dtsi>
++#include <st/mp2/stm32mp257faix-pinctrl.dtsi>
++
++/ {
++	model = "STMicroelectronics STM32MP257F-DK board";
++	compatible = "st,stm32mp257f-dk", "st,stm32mp25";
++
++	chosen {
++		zephyr,console = &lpuart1;
++		zephyr,shell-uart = &lpuart1;
++		zephyr,flash = &lpsram_code;
++		zephyr,sram = &lpsram_data;
++	};
++
++	/*
++	 * GPIOZ is the only GPIO bank reachable from the Cortex-M0+ core
++	 * (SmartRun domain). PZ0 is not wired to a board LED; used here as
++	 * a generic GPIO for the blinky sample.
++	 */
++	leds {
++		compatible = "gpio-leds";
++
++		blue_led_pz0: led_pz0 {
++			gpios = <&gpioz 0 GPIO_ACTIVE_HIGH>;
++			label = "PZ0";
++		};
++	};
++
++	aliases {
++		led0 = &blue_led_pz0;
++	};
++};
++
++&lpuart1 {
++	pinctrl-0 = <&lpuart1_tx_pz7 &lpuart1_rx_pz8>;
++	pinctrl-names = "default";
++	current-speed = <115200>;
++	status = "okay";
++};
+diff --git a/boards/st/stm32mp257f_dk/stm32mp257f_dk_stm32mp257fxx_m0plus.yaml b/boards/st/stm32mp257f_dk/stm32mp257f_dk_stm32mp257fxx_m0plus.yaml
+new file mode 100644
+index 00000000000..8c7074679c2
+--- /dev/null
++++ b/boards/st/stm32mp257f_dk/stm32mp257f_dk_stm32mp257fxx_m0plus.yaml
+@@ -0,0 +1,12 @@
++identifier: stm32mp257f_dk/stm32mp257fxx/m0plus
++name: STM32MP257F_DK
++type: mcu
++arch: arm
++toolchain:
++  - zephyr
++  - gccarmemb
++supported:
++  - gpio
++ram: 8
++flash: 16
++vendor: st
+diff --git a/boards/st/stm32mp257f_dk/stm32mp257f_dk_stm32mp257fxx_m0plus_defconfig b/boards/st/stm32mp257f_dk/stm32mp257f_dk_stm32mp257fxx_m0plus_defconfig
+new file mode 100644
+index 00000000000..f9ab1083663
+--- /dev/null
++++ b/boards/st/stm32mp257f_dk/stm32mp257f_dk_stm32mp257fxx_m0plus_defconfig
+@@ -0,0 +1,21 @@
++# Copyright (C) 2025 Savoir-faire Linux, Inc.
++# SPDX-License-Identifier: Apache-2.0
++
++# Fixed HSI clock (no RCC access from the M0+ core, see soc.h)
++CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC=64000000
++
++# No RCC access from the M0+ core: clocking is configured by the
++# Cortex-A35/M33 core(s) before the M0+ firmware is started, and there is no
++# "rcc" devicetree node for this variant.
++CONFIG_CLOCK_CONTROL_STM32_CUBE=n
++
++# Enable GPIO
++CONFIG_GPIO=y
++
++# Enable UART driver
++CONFIG_SERIAL=y
++CONFIG_UART_INTERRUPT_DRIVEN=y
++
++# UART console
++CONFIG_CONSOLE=y
++CONFIG_UART_CONSOLE=y
+diff --git a/boards/st/stm32mp257f_dk/support/openocd_stm32mp257f_dk_m0plus.cfg b/boards/st/stm32mp257f_dk/support/openocd_stm32mp257f_dk_m0plus.cfg
+new file mode 100644
+index 00000000000..de42074d0b4
+--- /dev/null
++++ b/boards/st/stm32mp257f_dk/support/openocd_stm32mp257f_dk_m0plus.cfg
+@@ -0,0 +1,20 @@
++# Only enable the Cortex-M0+ debugger
++set EN_CA35_0 	0
++set EN_CA35_1 	0
++set EN_CM33   	0
++set EN_CM0P 	1
++
++source [find board/stm32mp25x_dk.cfg]
++
++# Set active target to Cortex-M0+
++targets stm32mp25x.m0p
++
++# Arm vector_catch on m0p as soon as it is examined, so the core halts at
++# the very first instruction after any reset (including a Linux-side
++# remoteproc "echo start") without a manual "monitor cortex_m vector_catch
++# reset". It's sticky, so this only needs to fire once. Disable for a
++# session with "monitor cortex_m vector_catch none".
++stm32mp25x.m0p configure -event examine-end {
++    cortex_m vector_catch reset
++    echo "m0p: vector_catch armed automatically (examine-end)"
++}
+diff --git a/drivers/interrupt_controller/intc_exti_stm32_priv.h b/drivers/interrupt_controller/intc_exti_stm32_priv.h
+index 0fbe2e18438..8d8cfc16fcb 100644
+--- a/drivers/interrupt_controller/intc_exti_stm32_priv.h
++++ b/drivers/interrupt_controller/intc_exti_stm32_priv.h
+@@ -49,7 +49,8 @@ extern "C" {
+ #if (defined(CONFIG_SOC_SERIES_STM32H7X) && defined(CONFIG_CPU_CORTEX_M4)) || \
+ 	(defined(CONFIG_SOC_SERIES_STM32MP2X) && defined(CONFIG_CPU_CORTEX_M33))
+ #define CPU_NR	_C2
+-#elif defined(CONFIG_SOC_SERIES_STM32MP2X) && defined(CONFIG_CPU_CORTEX_M0)
++#elif defined(CONFIG_SOC_SERIES_STM32MP2X) && \
++	(defined(CONFIG_CPU_CORTEX_M0) || defined(CONFIG_CPU_CORTEX_M0PLUS))
+ #define CPU_NR	_C3
+ #else
+ /* NOTE: usually one CPU (e.g. C1) only is omitted and leaved empty */
+diff --git a/dts/arm/st/mp2/stm32mp257_m0plus.dtsi b/dts/arm/st/mp2/stm32mp257_m0plus.dtsi
+new file mode 100644
+index 00000000000..0cd7af6a3c7
+--- /dev/null
++++ b/dts/arm/st/mp2/stm32mp257_m0plus.dtsi
+@@ -0,0 +1,13 @@
++/*
++ * Copyright (C) 2025 Savoir-faire Linux, Inc.
++ *
++ * SPDX-License-Identifier: Apache-2.0
++ */
++
++#include <st/mp2/stm32mp2_m0plus.dtsi>
++
++/ {
++	soc {
++		compatible = "st,stm32mp257", "st,stm32mp2", "simple-bus";
++	};
++};
+diff --git a/dts/arm/st/mp2/stm32mp2_m0plus.dtsi b/dts/arm/st/mp2/stm32mp2_m0plus.dtsi
+new file mode 100644
+index 00000000000..11f20078619
+--- /dev/null
++++ b/dts/arm/st/mp2/stm32mp2_m0plus.dtsi
+@@ -0,0 +1,121 @@
++/*
++ * Copyright (C) 2025 Savoir-faire Linux, Inc.
++ *
++ * SPDX-License-Identifier: Apache-2.0
++ */
++
++#include <arm/armv6-m.dtsi>
++#include <freq.h>
++#include <mem.h>
++#include <zephyr/dt-bindings/gpio/gpio.h>
++#include <zephyr/dt-bindings/clock/stm32mp2_clock.h>
++#include <zephyr/dt-bindings/reset/stm32mp2_reset.h>
++
++/ {
++	cpus {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		cpu0: cpu@0 {
++			device_type = "cpu";
++			compatible = "arm,cortex-m0+";
++			reg = <0>;
++		};
++	};
++
++	/*
++	 * The Cortex-M0+ coprocessor can only access the LPSRAM1/2/3
++	 * memories (0x200c0000-0x200c7fff), loaded and started through
++	 * remoteproc by the Cortex-A35/Linux.
++	 */
++	lpsram_code: memory@200c0000 {
++		compatible = "zephyr,memory-region", "mmio-sram";
++		reg = <0x200c0000 DT_SIZE_K(16)>;
++		zephyr,memory-region = "LPSRAM_CODE";
++	};
++
++	lpsram_data: memory@200c4000 {
++		compatible = "zephyr,memory-region", "mmio-sram";
++		reg = <0x200c4000 DT_SIZE_K(8)>;
++		zephyr,memory-region = "LPSRAM_DATA";
++	};
++
++	lpsram_shm: memory@200c6000 {
++		compatible = "zephyr,memory-region", "mmio-sram";
++		reg = <0x200c6000 DT_SIZE_K(8)>;
++		zephyr,memory-region = "LPSRAM_SHM";
++	};
++
++	soc {
++		/*
++		 * The M0+ core has no RIF permission to access the real RCC
++		 * registers; peripherals it owns (e.g. LPUART1) are already
++		 * clocked by the A35 before this firmware starts. This node
++		 * (and its rctl child) is a no-op placeholder so the shared
++		 * uart_stm32.c driver, which unconditionally binds to the
++		 * devicetree node labeled "rcc", has something to attach to.
++		 */
++		rcc: rcc@44200000 {
++			compatible = "st,stm32mp2-rcc-m0stub";
++			#clock-cells = <2>;
++			reg = <0x44200000 DT_SIZE_K(64)>;
++
++			rctl: reset-controller {
++				compatible = "st,stm32-rcc-rctl-m0stub";
++				#reset-cells = <1>;
++			};
++		};
++
++		lpuart1: serial@46030000 {
++			compatible = "st,stm32-lpuart", "st,stm32-uart";
++			reg = <0x46030000 DT_SIZE_K(1)>;
++			clocks = <&rcc STM32_CLOCK(LPUART1, STM32_CLK)>;
++			resets = <&rctl STM32_RESET(LPUART1, STM32_RST)>;
++			interrupts = <11 0>;
++			status = "disabled";
++		};
++
++		/*
++		 * Only the two combined GPIO EXTI lines (0-7 and 8-15) are
++		 * routed to the Cortex-M0+ NVIC; the other EXTI2 lines are
++		 * not visible from this core.
++		 */
++		exti2: interrupt-controller@46230000 {
++			compatible = "st,stm32-exti";
++			interrupt-controller;
++			#interrupt-cells = <1>;
++			#address-cells = <0>;
++			reg = <0x46230000 DT_SIZE_K(1)>;
++			num-lines = <32>;
++			interrupts = <5 0>, <6 0>;
++			interrupt-names = "line0-7", "line8-15";
++			line-ranges = <0 8>, <8 8>;
++		};
++
++		/*
++		 * GPIOZ is physically a separate SmartRun-domain block, not
++		 * part of the main STM32MP2 pin-controller MMIO range (which
++		 * isn't reachable from M0+ at all) -- this wrapper only
++		 * exists so the vendor-generated pinctrl dtsi (which extends
++		 * "&pinctrl { ... }") has a node labeled "pinctrl" to attach
++		 * to.
++		 */
++		pinctrl: pin-controller@46200000 {
++			compatible = "st,stm32-pinctrl";
++			#address-cells = <1>;
++			#size-cells = <1>;
++			reg = <0x46200000 DT_SIZE_K(1)>;
++
++			gpioz: gpio@46200000 {
++				compatible = "st,stm32mp2-gpio";
++				gpio-controller;
++				#gpio-cells = <2>;
++				reg = <0x46200000 DT_SIZE_K(1)>;
++			};
++		};
++	};
++};
++
++&nvic {
++	arm,num-irq-priority-bits = <2>;
++};
+diff --git a/dts/bindings/clock/st,stm32mp2-rcc-m0stub.yaml b/dts/bindings/clock/st,stm32mp2-rcc-m0stub.yaml
+new file mode 100644
+index 00000000000..7363278eec2
+--- /dev/null
++++ b/dts/bindings/clock/st,stm32mp2-rcc-m0stub.yaml
+@@ -0,0 +1,27 @@
++# Copyright (C) 2025 Savoir-faire Linux, Inc.
++# SPDX-License-Identifier: Apache-2.0
++
++description: |
++  No-op clock-control node for the STM32MP2 Cortex-M0+ core.
++
++  The M0+ core has no RIF permission to access the real RCC registers;
++  clock gating for M0+-owned peripherals (e.g. LPUART1) is done by the
++  Cortex-A35 before the M0+ firmware is started via remoteproc. This node
++  only exists so drivers that unconditionally bind to the devicetree node
++  labeled "rcc" (e.g. STM32_CLOCK_CONTROL_NODE in uart_stm32.c) have a
++  device to attach to; the backing driver never touches hardware.
++
++compatible: "st,stm32mp2-rcc-m0stub"
++
++include: [clock-controller.yaml, base.yaml]
++
++properties:
++  reg:
++    required: true
++
++  "#clock-cells":
++    const: 2
++
++clock-cells:
++  - bus
++  - bits
+diff --git a/dts/bindings/reset/st,stm32-rcc-rctl-m0stub.yaml b/dts/bindings/reset/st,stm32-rcc-rctl-m0stub.yaml
+new file mode 100644
+index 00000000000..bb6d9c57cbf
+--- /dev/null
++++ b/dts/bindings/reset/st,stm32-rcc-rctl-m0stub.yaml
+@@ -0,0 +1,17 @@
++# Copyright (C) 2025 Savoir-faire Linux, Inc.
++# SPDX-License-Identifier: Apache-2.0
++
++description: |
++  No-op reset-controller node for the STM32MP2 Cortex-M0+ core.
++  See st,stm32mp2-rcc-m0stub.yaml for the rationale.
++
++compatible: "st,stm32-rcc-rctl-m0stub"
++
++include: [reset-controller.yaml, base.yaml]
++
++properties:
++  "#reset-cells":
++    const: 1
++
++reset-cells:
++  - id
+diff --git a/include/zephyr/dt-bindings/clock/stm32mp2_clock.h b/include/zephyr/dt-bindings/clock/stm32mp2_clock.h
+index 9048a828775..02132369e07 100644
+--- a/include/zephyr/dt-bindings/clock/stm32mp2_clock.h
++++ b/include/zephyr/dt-bindings/clock/stm32mp2_clock.h
+@@ -70,6 +70,9 @@
+ #define STM32_CLOCK_PERIPH_I2C7		0x7BC
+ #define STM32_CLOCK_PERIPH_I2C8		0x7C0
+ 
++/* LPUART Peripheral */
++#define STM32_CLOCK_PERIPH_LPUART1	0x7A0
++
+ /* FDCAN Peripheral */
+ #define STM32_CLOCK_PERIPH_FDCAN	0x7E0
+ 
+diff --git a/include/zephyr/dt-bindings/reset/stm32mp2_reset.h b/include/zephyr/dt-bindings/reset/stm32mp2_reset.h
+index b5863e0baab..689034b79cd 100644
+--- a/include/zephyr/dt-bindings/reset/stm32mp2_reset.h
++++ b/include/zephyr/dt-bindings/reset/stm32mp2_reset.h
+@@ -22,6 +22,9 @@
+ /* Reset reg */
+ #define STM32_RST	0U
+ 
++/* LPUART Peripheral */
++#define STM32_RESET_PERIPH_LPUART1	0x7A0
++
+ /* USART/UART Peripheral */
+ #define STM32_RESET_PERIPH_USART1	0x77C
+ #define STM32_RESET_PERIPH_USART2	0x780
+diff --git a/samples/basic/blinky_hello/CMakeLists.txt b/samples/basic/blinky_hello/CMakeLists.txt
+new file mode 100644
+index 00000000000..6973c595c23
+--- /dev/null
++++ b/samples/basic/blinky_hello/CMakeLists.txt
+@@ -0,0 +1,7 @@
++# SPDX-License-Identifier: Apache-2.0
++
++cmake_minimum_required(VERSION 3.20.0)
++find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
++project(blinky_hello)
++
++target_sources(app PRIVATE src/main.c)
+diff --git a/samples/basic/blinky_hello/README.rst b/samples/basic/blinky_hello/README.rst
+new file mode 100644
+index 00000000000..912cbfedae8
+--- /dev/null
++++ b/samples/basic/blinky_hello/README.rst
+@@ -0,0 +1,42 @@
++.. zephyr:code-sample:: blinky-hello
++   :name: Blinky + Hello World
++   :relevant-api: gpio_interface
++
++   Blink an LED and periodically print "hello, world" to the console.
++
++Overview
++********
++
++This sample combines the classic :zephyr:code-sample:`blinky` and
++:zephyr:code-sample:`hello_world` samples: it toggles an LED using the GPIO
++API and prints an incrementing "hello, world" message to the console on
++every toggle, once a second. It is useful as a quick smoke test that both
++GPIO output and the console UART are working together on a given board.
++
++Requirements
++************
++
++Your board must:
++
++1. Have an LED connected via a GPIO pin (these are called "User LEDs" on
++   many of Zephyr's :ref:`boards`).
++2. Have the LED configured using the ``led0`` devicetree alias.
++3. Have a working console/UART configured.
++
++Building and Running
++*********************
++
++Build and flash the sample as follows, changing ``<board>`` for your board:
++
++.. zephyr-app-commands::
++   :zephyr-app: samples/basic/blinky_hello
++   :board: <board>
++   :goals: build flash
++   :compact:
++
++After flashing, the LED starts to blink and a message is printed to the
++console every second::
++
++   hello, world 0
++   hello, world 1
++   hello, world 2
+diff --git a/samples/basic/blinky_hello/prj.conf b/samples/basic/blinky_hello/prj.conf
+new file mode 100644
+index 00000000000..dd803475908
+--- /dev/null
++++ b/samples/basic/blinky_hello/prj.conf
+@@ -0,0 +1,4 @@
++CONFIG_GPIO=y
++CONFIG_CONSOLE=y
++CONFIG_SERIAL=y
++CONFIG_UART_CONSOLE=y
+diff --git a/samples/basic/blinky_hello/sample.yaml b/samples/basic/blinky_hello/sample.yaml
+new file mode 100644
+index 00000000000..7cbce03fed9
+--- /dev/null
++++ b/samples/basic/blinky_hello/sample.yaml
+@@ -0,0 +1,17 @@
++sample:
++  name: Blinky + Hello World Sample
++tests:
++  sample.basic.blinky_hello:
++    tags:
++      - LED
++      - gpio
++      - uart
++    filter: dt_enabled_alias_with_parent_compat("led0", "gpio-leds")
++    depends_on:
++      - gpio
++      - serial
++    harness: console
++    harness_config:
++      type: multi_line
++      regex:
++        - "hello, world [0-9]+"
+diff --git a/samples/basic/blinky_hello/src/main.c b/samples/basic/blinky_hello/src/main.c
+new file mode 100644
+index 00000000000..5024067ded5
+--- /dev/null
++++ b/samples/basic/blinky_hello/src/main.c
+@@ -0,0 +1,47 @@
++/*
++ * Copyright (c) 2016 Intel Corporation
++ *
++ * SPDX-License-Identifier: Apache-2.0
++ */
++
++#include <stdio.h>
++#include <zephyr/kernel.h>
++#include <zephyr/drivers/gpio.h>
++
++/* 1000 msec = 1 sec */
++#define SLEEP_TIME_MS   1000
++
++/* The devicetree node identifier for the "led0" alias. */
++#define LED0_NODE DT_ALIAS(led0)
++
++/*
++ * A build error on this line means your board is unsupported.
++ * See the sample documentation for information on how to fix this.
++ */
++static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
++
++int main(void)
++{
++	int ret;
++	unsigned int count = 0;
++
++	if (!gpio_is_ready_dt(&led)) {
++		return 0;
++	}
++
++	ret = gpio_pin_configure_dt(&led, GPIO_OUTPUT_ACTIVE);
++	if (ret < 0) {
++		return 0;
++	}
++
++	while (1) {
++		ret = gpio_pin_toggle_dt(&led);
++		if (ret < 0) {
++			return 0;
++		}
++
++		printf("hello, world %u\n", count++);
++		k_msleep(SLEEP_TIME_MS);
++	}
++	return 0;
++}
+diff --git a/soc/st/stm32/common/gpioport_mgr.c b/soc/st/stm32/common/gpioport_mgr.c
+index d14f5f21376..7385c1f429e 100644
+--- a/soc/st/stm32/common/gpioport_mgr.c
++++ b/soc/st/stm32/common/gpioport_mgr.c
+@@ -227,6 +227,7 @@ int stm32_gpioport_configure_pin(
+ static int stm32_gpioport_pm_action(const struct device *dev,
+ 				    enum pm_device_action action)
+ {
++#if DT_NODE_EXISTS(DT_NODELABEL(rcc))
+ 	const struct device *const clk = DEVICE_DT_GET(STM32_CLOCK_CONTROL_NODE);
+ 	const struct gpio_stm32_config *cfg = dev->config;
+ 	clock_control_subsys_t subsys = (void *)&cfg->pclken;
+@@ -244,6 +245,24 @@ static int stm32_gpioport_pm_action(const struct device *dev,
+ 	}
+ 
+ 	return 0;
++#else
++	/*
++	 * No "rcc" clock controller node/device is available on this SoC
++	 * (e.g. Cortex-M0+ on STM32MP2x, where clocking is managed by another
++	 * core). There is nothing to do here.
++	 */
++	ARG_UNUSED(dev);
++
++	switch (action) {
++	case PM_DEVICE_ACTION_RESUME:
++	case PM_DEVICE_ACTION_SUSPEND:
++	case PM_DEVICE_ACTION_TURN_OFF:
++	case PM_DEVICE_ACTION_TURN_ON:
++		return 0;
++	default:
++		return -ENOTSUP;
++	}
++#endif /* DT_NODE_EXISTS(DT_NODELABEL(rcc)) */
+ }
+ 
+ __maybe_unused static int stm32_gpioport_init(const struct device *dev)
+diff --git a/soc/st/stm32/common/soc_config.c b/soc/st/stm32/common/soc_config.c
+index 579b5244cef..ebb5fb456a9 100644
+--- a/soc/st/stm32/common/soc_config.c
++++ b/soc/st/stm32/common/soc_config.c
+@@ -88,6 +88,8 @@ static int st_stm32_common_config(void)
+ 	LL_DBGMCU_EnableDBGStandbyMode();
+ #elif defined(CONFIG_SOC_SERIES_STM32MP13X)
+ 	LL_DBGMCU_EnableDebugInLowPowerMode();
++#elif defined(CONFIG_SOC_SERIES_STM32MP2X) && defined(CORE_CM0PLUS)
++	/* DBGMCU is not accessible from the Cortex-M0+ core */
+ #else /* all other parts */
+ 	LL_DBGMCU_EnableDBGStopMode();
+ #endif
+@@ -113,6 +115,8 @@ static int st_stm32_common_config(void)
+ 	LL_DBGMCU_DisableDBGStandbyMode();
+ #elif defined(CONFIG_SOC_SERIES_STM32MP13X)
+ 	LL_DBGMCU_DisableDebugInLowPowerMode();
++#elif defined(CONFIG_SOC_SERIES_STM32MP2X) && defined(CORE_CM0PLUS)
++	/* DBGMCU is not accessible from the Cortex-M0+ core */
+ #else /* all other parts */
+ 	LL_DBGMCU_DisableDBGStopMode();
+ #endif
+diff --git a/soc/st/stm32/common/stm32_backup_domain.c b/soc/st/stm32/common/stm32_backup_domain.c
+index 2e755ea1bd8..b27ad7c7adc 100644
+--- a/soc/st/stm32/common/stm32_backup_domain.c
++++ b/soc/st/stm32/common/stm32_backup_domain.c
+@@ -12,6 +12,24 @@
+ 
+ LOG_MODULE_REGISTER(stm32_backup_domain, CONFIG_SOC_LOG_LEVEL);
+ 
++#if defined(CORE_CM0PLUS)
++/*
++ * The backup domain / D3 write-protection registers are not accessible from
++ * the Cortex-M0+ core on STM32MP2x: access is granted/managed by the
++ * Cortex-A35/M33 core(s) before the M0+ firmware is started. Treat access as
++ * always enabled.
++ */
++
++void stm32_backup_domain_enable_access(void)
++{
++}
++
++void stm32_backup_domain_disable_access(void)
++{
++}
++
++#else /* !CORE_CM0PLUS */
++
+ #ifdef PWR_BDCR1_DBD3P
+ #define ENABLE_BKUP_ACCESS	LL_PWR_EnableBkUpD3Access
+ #define DISABLE_BKUP_ACCESS	LL_PWR_DisableBkUpD3Access
+@@ -58,3 +76,5 @@ void stm32_backup_domain_disable_access(void)
+ 
+ 	k_spin_unlock(&lock, key);
+ }
++
++#endif /* CORE_CM0PLUS */
+diff --git a/soc/st/stm32/soc.yml b/soc/st/stm32/soc.yml
+index c0d161f5291..13f1e22802b 100644
+--- a/soc/st/stm32/soc.yml
++++ b/soc/st/stm32/soc.yml
+@@ -222,6 +222,7 @@ family:
+     - name: stm32mp257fxx
+       cpuclusters:
+       - name: m33
++      - name: m0plus
+   - name: stm32n6x
+     socs:
+     - name: stm32n657xx
+diff --git a/soc/st/stm32/stm32mp2x/CMakeLists.txt b/soc/st/stm32/stm32mp2x/CMakeLists.txt
+index fdfdc3244a7..149b143f2d7 100644
+--- a/soc/st/stm32/stm32mp2x/CMakeLists.txt
++++ b/soc/st/stm32/stm32mp2x/CMakeLists.txt
+@@ -7,3 +7,7 @@ zephyr_include_directories(.)
+ if(CONFIG_CPU_CORTEX_M33)
+   add_subdirectory(m33)
+ endif()
++
++if(CONFIG_CPU_CORTEX_M0PLUS)
++  add_subdirectory(m0plus)
++endif()
+diff --git a/soc/st/stm32/stm32mp2x/Kconfig b/soc/st/stm32/stm32mp2x/Kconfig
+index e07d783a35f..6268d3576bc 100644
+--- a/soc/st/stm32/stm32mp2x/Kconfig
++++ b/soc/st/stm32/stm32mp2x/Kconfig
+@@ -5,7 +5,6 @@
+ 
+ config SOC_SERIES_STM32MP2X
+ 	select ARM
+-	select CPU_HAS_FPU
+ 	select HAS_STM32CUBE
+ 
+ config SOC_STM32MP2X_M33
+@@ -16,9 +15,19 @@ config SOC_STM32MP2X_M33
+ 	select CPU_CORTEX_M_HAS_DWT
+ 	select CPU_HAS_ARM_MPU
+ 	select CPU_HAS_ARM_SAU
++	select CPU_HAS_FPU
+ 
+ config SOC_STM32MP215FXX_M33
+ 	select SOC_STM32MP2X_M33
+ 
+ config SOC_STM32MP257FXX_M33
+ 	select SOC_STM32MP2X_M33
++
++config SOC_STM32MP2X_M0PLUS
++	select CPU_CORTEX_M0PLUS
++	select SOC_EARLY_INIT_HOOK
++	select CPU_HAS_ARM_MPU
++	select CPU_CORTEX_M_HAS_SYSTICK
++
++config SOC_STM32MP257FXX_M0PLUS
++	select SOC_STM32MP2X_M0PLUS
+diff --git a/soc/st/stm32/stm32mp2x/Kconfig.defconfig.stm32mp257fxx b/soc/st/stm32/stm32mp2x/Kconfig.defconfig.stm32mp257fxx
+index 994b7b79ece..1e4c28ea39f 100644
+--- a/soc/st/stm32/stm32mp2x/Kconfig.defconfig.stm32mp257fxx
++++ b/soc/st/stm32/stm32mp2x/Kconfig.defconfig.stm32mp257fxx
+@@ -9,3 +9,10 @@ config NUM_IRQS
+ 	default 311
+ 
+ endif # SOC_STM32MP257FXX_M33
++
++if SOC_STM32MP257FXX_M0PLUS
++
++config NUM_IRQS
++	default 32
++
++endif # SOC_STM32MP257FXX_M0PLUS
+diff --git a/soc/st/stm32/stm32mp2x/Kconfig.soc b/soc/st/stm32/stm32mp2x/Kconfig.soc
+index e0d6aaff88d..96723789ede 100644
+--- a/soc/st/stm32/stm32mp2x/Kconfig.soc
++++ b/soc/st/stm32/stm32mp2x/Kconfig.soc
+@@ -21,6 +21,14 @@ config SOC_STM32MP257FXX_M33
+ 	bool
+ 	select SOC_SERIES_STM32MP2X
+ 
++config SOC_STM32MP2X_M0PLUS
++	bool
++
++config SOC_STM32MP257FXX_M0PLUS
++	bool
++	select SOC_SERIES_STM32MP2X
++
+ config SOC
+ 	default "stm32mp215fxx" if SOC_STM32MP215FXX_M33
+ 	default "stm32mp257fxx" if SOC_STM32MP257FXX_M33
++	default "stm32mp257fxx" if SOC_STM32MP257FXX_M0PLUS
+diff --git a/soc/st/stm32/stm32mp2x/m0plus/CMakeLists.txt b/soc/st/stm32/stm32mp2x/m0plus/CMakeLists.txt
+new file mode 100644
+index 00000000000..247bcae462e
+--- /dev/null
++++ b/soc/st/stm32/stm32mp2x/m0plus/CMakeLists.txt
+@@ -0,0 +1,24 @@
++# Copyright (C) 2025 Savoir-faire Linux, Inc.
++#
++# SPDX-License-Identifier: Apache-2.0
++
++zephyr_include_directories(${ZEPHYR_BASE}/drivers)
++zephyr_sources(
++  soc.c
++  rcc_stub.c
++  reset_stub.c
++)
++
++# The M0+ core's CMSIS device header (stm32mp257fxx_cm0.h) only defines
++# LPUART1 (no USART1..UART9), since those peripherals are not accessible
++# to this core. The vendor STM32Cube LL USART header
++# (stm32mp2xx_ll_usart.h) guards its entire content -- including the
++# generic inline register-access helpers used by the Zephyr UART driver
++# for LPUART -- behind `#if defined(USART1) || ... || defined(UART9)`.
++# Define a dummy USART1 alias to LPUART1 so that guard is satisfied and
++# the shared LL_USART_* helpers become visible for LPUART1 use.
++zephyr_compile_definitions(USART1=LPUART1)
++
++zephyr_include_directories(.)
++
++set(SOC_LINKER_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/linker.ld CACHE INTERNAL "")
+diff --git a/soc/st/stm32/stm32mp2x/m0plus/linker.ld b/soc/st/stm32/stm32mp2x/m0plus/linker.ld
+new file mode 100644
+index 00000000000..1d324312c7b
+--- /dev/null
++++ b/soc/st/stm32/stm32mp2x/m0plus/linker.ld
+@@ -0,0 +1,21 @@
++/* linker.ld - Linker command/script file */
++
++/*
++ * Copyright (C) 2025 Savoir-faire Linux, Inc.
++ *
++ * SPDX-License-Identifier: Apache-2.0
++ */
++
++#define rom_start .isr_vectors
++
++#include <zephyr/arch/arm/cortex_m/scripts/linker.ld>
++
++SECTIONS
++{
++#ifdef CONFIG_OPENAMP_RSC_TABLE
++	SECTION_PROLOGUE(.resource_table,, SUBALIGN(4))
++	{
++		KEEP(*(.resource_table*))
++	} GROUP_LINK_IN(ROMABLE_REGION)
++#endif
++}
+diff --git a/soc/st/stm32/stm32mp2x/m0plus/rcc_stub.c b/soc/st/stm32/stm32mp2x/m0plus/rcc_stub.c
+new file mode 100644
+index 00000000000..59e13ab8f14
+--- /dev/null
++++ b/soc/st/stm32/stm32mp2x/m0plus/rcc_stub.c
+@@ -0,0 +1,64 @@
++/*
++ * Copyright (C) 2025 Savoir-faire Linux, Inc.
++ *
++ * SPDX-License-Identifier: Apache-2.0
++ */
++
++/*
++ * No-op clock-control driver for the M0+ core's "rcc" placeholder node.
++ * Real RCC access isn't possible from this core (see the compatible's
++ * devicetree binding); peripherals are already clocked by the A35 before
++ * this firmware starts, so on/off/get_status are pure formalities.
++ */
++
++#define DT_DRV_COMPAT st_stm32mp2_rcc_m0stub
++
++#include <zephyr/device.h>
++#include <zephyr/drivers/clock_control.h>
++
++static int rcc_m0stub_on_off(const struct device *dev, clock_control_subsys_t sys)
++{
++	ARG_UNUSED(dev);
++	ARG_UNUSED(sys);
++
++	return 0;
++}
++
++static enum clock_control_status rcc_m0stub_get_status(const struct device *dev,
++							 clock_control_subsys_t sys)
++{
++	ARG_UNUSED(dev);
++	ARG_UNUSED(sys);
++
++	return CLOCK_CONTROL_STATUS_ON;
++}
++
++/*
++ * ck_ker_lpuart1, as configured by the A35/Linux clock tree before this
++ * firmware starts (confirmed via `clk_summary` on target: 16 MHz). This is
++ * an independent clock mux, NOT tied to the M0+ core/HCLK frequency
++ * (CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC), since M0+ has no RCC access to
++ * read it back itself.
++ */
++#define LPUART1_KER_CLK_RATE 16000000
++
++static int rcc_m0stub_get_rate(const struct device *dev, clock_control_subsys_t sys,
++				uint32_t *rate)
++{
++	ARG_UNUSED(dev);
++	ARG_UNUSED(sys);
++
++	*rate = LPUART1_KER_CLK_RATE;
++
++	return 0;
++}
++
++static DEVICE_API(clock_control, rcc_m0stub_api) = {
++	.on = rcc_m0stub_on_off,
++	.off = rcc_m0stub_on_off,
++	.get_status = rcc_m0stub_get_status,
++	.get_rate = rcc_m0stub_get_rate,
++};
++
++DEVICE_DT_INST_DEFINE(0, NULL, NULL, NULL, NULL, PRE_KERNEL_1,
++		       CONFIG_CLOCK_CONTROL_INIT_PRIORITY, &rcc_m0stub_api);
+diff --git a/soc/st/stm32/stm32mp2x/m0plus/reset_stub.c b/soc/st/stm32/stm32mp2x/m0plus/reset_stub.c
+new file mode 100644
+index 00000000000..4491094e27f
+--- /dev/null
++++ b/soc/st/stm32/stm32mp2x/m0plus/reset_stub.c
+@@ -0,0 +1,43 @@
++/*
++ * Copyright (C) 2025 Savoir-faire Linux, Inc.
++ *
++ * SPDX-License-Identifier: Apache-2.0
++ */
++
++/*
++ * No-op reset-controller driver for the M0+ core's "rctl" placeholder node.
++ * See rcc_stub.c / the compatible's devicetree binding for the rationale.
++ */
++
++#define DT_DRV_COMPAT st_stm32_rcc_rctl_m0stub
++
++#include <zephyr/device.h>
++#include <zephyr/drivers/reset.h>
++
++static int rctl_m0stub_status(const struct device *dev, uint32_t id, uint8_t *status)
++{
++	ARG_UNUSED(dev);
++	ARG_UNUSED(id);
++
++	*status = 0;
++
++	return 0;
++}
++
++static int rctl_m0stub_noop(const struct device *dev, uint32_t id)
++{
++	ARG_UNUSED(dev);
++	ARG_UNUSED(id);
++
++	return 0;
++}
++
++static DEVICE_API(reset, rctl_m0stub_api) = {
++	.status = rctl_m0stub_status,
++	.line_assert = rctl_m0stub_noop,
++	.line_deassert = rctl_m0stub_noop,
++	.line_toggle = rctl_m0stub_noop,
++};
++
++DEVICE_DT_INST_DEFINE(0, NULL, NULL, NULL, NULL, PRE_KERNEL_1,
++		       CONFIG_RESET_INIT_PRIORITY, &rctl_m0stub_api);
+diff --git a/soc/st/stm32/stm32mp2x/m0plus/soc.c b/soc/st/stm32/stm32mp2x/m0plus/soc.c
+new file mode 100644
+index 00000000000..22e5b10595f
+--- /dev/null
++++ b/soc/st/stm32/stm32mp2x/m0plus/soc.c
+@@ -0,0 +1,23 @@
++/*
++ * Copyright (c) 2025 STMicroelectronics
++ *
++ * SPDX-License-Identifier: Apache-2.0
++ */
++
++/**
++ * @file
++ * @brief STM32MP25 Cortex-M0+ initialization code
++ */
++
++#include <soc.h>
++
++/**
++ * @brief Perform basic hardware initialization at boot.
++ *
++ * This needs to be run from the very beginning.
++ */
++void soc_early_init_hook(void)
++{
++	/* Update CMSIS SystemCoreClock variable (HCLK) */
++	SystemCoreClockUpdate();
++}
+diff --git a/soc/st/stm32/stm32mp2x/m0plus/soc.h b/soc/st/stm32/stm32mp2x/m0plus/soc.h
+new file mode 100644
+index 00000000000..8ba66567f0d
+--- /dev/null
++++ b/soc/st/stm32/stm32mp2x/m0plus/soc.h
+@@ -0,0 +1,25 @@
++/*
++ * Copyright (C) 2025 Savoir-faire Linux, Inc.
++ *
++ * SPDX-License-Identifier: Apache-2.0
++ */
++
++/**
++ * @file SoC configuration macros for the STM32MP2 family processors.
++ *
++ * Based on reference manual:
++ *   STM32MP23/25xx advanced ARM(r)-based 32/64-bit MPUs
++ *
++ * Chapter 2.4.2: Memory map and register boundary addresses
++ */
++
++#ifndef _STM32MP2_M0PLUS_SOC_H_
++#define _STM32MP2_M0PLUS_SOC_H_
++
++#ifndef _ASMLANGUAGE
++
++#include <stm32mp2xx.h>
++
++#endif /* !_ASMLANGUAGE */
++
++#endif /* !_STM32MP2_M0PLUS_SOC_H_ */

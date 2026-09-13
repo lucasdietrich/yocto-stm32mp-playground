@@ -1,0 +1,36 @@
+~/Projects/openocd master !1 ?1 ❯ openocd -f interface/stlink.cfg -c "transport select swd" -f target/st/stm32mp25x.cfg                                                             12:12:19
+Open On-Chip Debugger 0.12.0+dev-02616-gda3920b0a-dirty (2026-09-11-10:08)
+Licensed under GNU GPL v2
+For bug reports, read
+        http://openocd.org/doc/doxygen/bugs.html
+Info : [stm32mp25x.a35_0] Hardware thread awareness created
+Info : [stm32mp25x.a35_1] Hardware thread awareness created
+Info : Listening on port 6666 for tcl connections
+Info : Listening on port 4444 for telnet connections
+Info : STLINK V3J17M10B6S1 (API v3) VID:PID 0483:3753
+Info : Target voltage: 3.280851
+Info : Unable to match requested speed 5000 kHz, using 3300 kHz
+Info : Unable to match requested speed 5000 kHz, using 3300 kHz
+Info : clock speed 3300 kHz
+Info : SWD DPIDR 0x6ba02477
+Info : [stm32mp25x.ap0] Examination succeed
+Info : stm32mp25x.a35_0: hardware has 6 breakpoints, 4 watchpoints
+Info : [stm32mp25x.a35_0] external reset detected
+Info : stm32mp25x.a35_1: hardware has 6 breakpoints, 4 watchpoints
+Info : [stm32mp25x.a35_1] external reset detected
+Info : [stm32mp25x.m33] Cortex-M33 r1p0 processor detected
+Info : [stm32mp25x.m33] target has 8 breakpoints, 4 watchpoints
+Info : [stm32mp25x.m0p] Cortex-M0+ r0p1 processor detected
+Info : [stm32mp25x.m0p] target has 4 breakpoints, 2 watchpoints
+Info : [stm32mp25x.axi] Examination succeed
+Info : [stm32mp25x.ap0] gdb port disabled
+Info : [stm32mp25x.axi] gdb port disabled
+Info : [stm32mp25x.ap2] gdb port disabled
+Info : [stm32mp25x.ap8] gdb port disabled
+Info : [stm32mp25x.a35_0] starting gdb server on 3333
+Info : Listening on port 3333 for gdb connections
+Info : [stm32mp25x.m33] starting gdb server on 3334
+Info : Listening on port 3334 for gdb connections
+Info : [stm32mp25x.m0p] starting gdb server on 3335
+Info : Listening on port 3335 for gdb connections
+Info : [stm32mp25x.m0p] external reset detected

@@ -62,6 +62,7 @@
     - [ ] https://wiki.st.com/stm32mpu/wiki/How_to_use_hardware_acceleration_with_TensorFlow_Lite_and_ONNX_Runtime_frameworks
 
 [ ] TSN:
+    - [ ] <https://github.com/STMicroelectronics/meta-st-stm32mp-tsn-swch>
 
 [ ] TSN + AI: closed loop predictive control with AI inference
     [ ] inverted pendulum ?
