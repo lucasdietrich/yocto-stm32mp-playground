@@ -1,0 +1,42 @@
+From ff4df5aa421767e99059b58d5ee282d3ba32fdb8 Mon Sep 17 00:00:00 2001
+From: Lucas Dietrich <lucas.dietrich.git@proton.me>
+Date: Sun, 13 Sep 2026 13:33:08 +0200
+Subject: [PATCH] build(cmake): make _TRACE define opt-in via TRACE option in
+ DK USBPD_DRP_UCSI
+
+Remove hardcoded -D_TRACE from DEFINITIONS and gate it behind an
+option(TRACE OFF), matching the EV1 demo's CMakeLists.txt.
+
+Upstream-Status: Inappropriate
+---
+ .../Demonstrations/USBPD_DRP_UCSI/CMakeLists.txt         | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/Projects/STM32MP257F-DK/Demonstrations/USBPD_DRP_UCSI/CMakeLists.txt b/Projects/STM32MP257F-DK/Demonstrations/USBPD_DRP_UCSI/CMakeLists.txt
+index acc76acc..11b907f8 100644
+--- a/Projects/STM32MP257F-DK/Demonstrations/USBPD_DRP_UCSI/CMakeLists.txt
++++ b/Projects/STM32MP257F-DK/Demonstrations/USBPD_DRP_UCSI/CMakeLists.txt
+@@ -28,12 +28,19 @@ set(DEFINITIONS "-DSTM32MP257Cxx \
+ 				-DTCPP0203_SUPPORT \
+ 				-DUSBPD_PORT_COUNT=1 \
+ 				-D_DRP \
+-				-D_TRACE \
+ 				-DUSBPDCORE_LIB_PD3_FULL \
+ 				-D_SRC_CAPA_EXT \
+ 				-D_RTOS \
+ 				-D_VCONN_SUPPORT")
+ 
++# To enable USBPD trace, configure with: -DTRACE=ON
++# Option for TRACE (_TRACE macro)
++option(TRACE "USBPD Trace feature (_TRACE macro)" OFF)
++
++if(TRACE)
++    add_definitions(-D_TRACE)
++endif()
++
+ set(TARGET USBPD_DRP_UCSI_CM33_NonSecure)
+ 
+ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CFLAGS} ${COMMON_COMPILE_FLAGS} -T${LINKER_SCRIPT} ${WARNING_FLAGS} ${DEFINITIONS}")
+-- 
+2.55.0
+

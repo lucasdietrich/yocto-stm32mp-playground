@@ -6,6 +6,7 @@ LIC_FILES_CHKSUM = "file://License.md;md5=012a8d78c6f636371ad889eadb15885c"
 
 SRC_URI = " \
     git://github.com/STMicroelectronics/STM32CubeMP2.git;protocol=https;nobranch=1 \
+    file://0001-build-cmake-make-_TRACE-define-opt-in-via-TRACE-opti.patch \
     file://cm33-usbpd-load.sh \
     file://cm33-usbpd-init \
     file://cm0-load.sh \
@@ -32,18 +33,25 @@ INITSCRIPT_PACKAGES = "${PN}-cm33"
 INITSCRIPT_NAME:${PN}-cm33 = "cm33-usbpd"
 INITSCRIPT_PARAMS:${PN}-cm33 = "start 70 S . stop 30 0 6 ."
 
+PACKAGECONFIG ??= ""
+
+# cm33 trace uses usart6 (exposed on CN5 on dk) which may conflicts if linux uses it
+PACKAGECONFIG[trace] = "-DTRACE=ON,-DTRACE=OFF"
+
 do_configure() {
     cmake \
         -G "Unix Makefiles" \
         --fresh \
         -S ${USBPD_PROJECT_DIR} \
-        -B ${USBPD_PROJECT_DIR}/build
+        -B ${USBPD_PROJECT_DIR}/build \
+        ${EXTRA_OECMAKE}
 
     cmake \
         -G "Unix Makefiles" \
         --fresh \
         -S ${CM0PLUS_PROJECT_DIR} \
-        -B ${CM0PLUS_PROJECT_DIR}/build
+        -B ${CM0PLUS_PROJECT_DIR}/build \
+        ${EXTRA_OECMAKE}
 }
 
 do_compile() {
